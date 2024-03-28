@@ -1,0 +1,8 @@
+{if $sn_settings.enable_fb_recent_activity}
+<br/>
+{*<script src="http://connect.facebook.net/{$sn_settings.fb_lb_locale}/all.js#xfbml=1"></script><fb:activity site="" width="{$sn_settings.fb_ra_width}" height="{$sn_settings.fb_ra_height}" header="true" font="" border_color="" recommendations="{if $sn_settings.fb_ra_show_recommendations}true{else}false{/if}" colorscheme="{$sn_settings.fb_ra_color}"></fb:activity>*}
+
+<div class="fb-activity" data-app-id="Display all actions associated with this app ID" data-site=""  recommendations="{if $sn_settings.fb_ra_show_recommendations}true{else}false{/if}" data-action="likes, recommends" data-width="{$sn_settings.fb_ra_width}" data-height="{$sn_settings.fb_ra_height}" data-colorscheme="{$sn_settings.fb_ra_color}" data-header="{if $sn_settings.fb_ra_show_header}true{else}false{/if}" ></div>
+
+{/if}
+

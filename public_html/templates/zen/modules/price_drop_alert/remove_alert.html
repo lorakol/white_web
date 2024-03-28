@@ -1,0 +1,16 @@
+{include file="header.html"}
+
+<div id="page_content">
+<div id="form_container">
+<div class="title">
+<h1>{$lng_price_drop_alert.remove_alert_for} #{$id} ("{$ad_title}")</h1>
+</div>
+
+{if isset($error) && $error}<div class="error"><p>{$error}</p></div>{/if}
+
+{if isset($info) && $info}<div class="info"><p>{$info}</p></div>{/if}
+
+</div>
+</div>
+{include file="footer.html"}
+

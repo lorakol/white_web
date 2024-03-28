@@ -1,0 +1,40 @@
+	<script>
+	jQuery(document).ready(function() {
+
+	$(document).on("click", ".remove_days", function(){
+
+		$(".bump_days_div").hide();
+	
+	}); // end bump click
+	
+	$(document).on("click", "a.bump_all", function(){
+
+		$("#bump_days_div").show();
+	
+	}); // end bump click
+	
+	}); // end document ready
+	
+</script>
+
+	<div class="relative" style="display: inline;">
+
+		<a href="javascript:;" {if $demo}onclick="alert('{$lng.general.errors.demo}'); return false;"{else}class="bump_all" id="bump_all"{/if}>
+		<img src="{$template_path}modules/bump/images/bump_all.png" class="tooltip icon" title="{$lng_ba.bump_all}" >
+		</a>
+
+		<div style="position: absolute; width: 400px; top: 20px; left: 0; background: #f0f0f0; border: 1px solid #999; z-index: 1000; border-radius: 10px; display: none; color: #333;" id="bump_days_div" class="bump_days_div">
+			
+		<div style="padding: 20px; border-bottom: 1px solid #fff;">
+		<img class="remove_days tooltip" src="{$template_path}/images/delete.png" style="float: right; cursor: pointer;" title="Close"/>
+		<div style="margin-top: 30px; ">
+		<input type="text"  name="bump_all_days" id="bump_all_days" value="{$ba_settings.duration}" size="5" style="text-align: center; border: 1px solid #555;"/>&nbsp;{$lng.settings.days}&nbsp;
+
+		<input type="submit" name="bump_selected" value="{$lng_ba.bump_selected}" style="float: right; padding: 7px 20px; background: #555; text-align: center; color: #fff; cursor: pointer; border-radius: 4px; border: 0" />
+
+		</div>
+		</div>
+			
+		</div> {* end absolute *}
+				
+	</div>{* end relative *}

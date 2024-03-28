@@ -1,0 +1,133 @@
+<div class="form_container">
+
+{if $error != ""}<div class="error">{$error}</div>{/if}
+{if $info != ""}<div class="info">{$info}</div>{/if}
+
+<div class="clearfix">
+	<div class="left_form">API key</div>
+	<div class="right_form"><input type="text" name="api_key" id="api_key" size="70" value="{if isset($processor_settings.api_key) && $processor_settings.api_key}{$processor_settings.api_key}{/if}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Secret key</div>
+	<div class="right_form"><input type="text" name="secret_key" id="secret_key" size="70" value="{if isset($processor_settings.secret_key) && $processor_settings.secret_key}{$processor_settings.secret_key}{/if}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.payment_processor_title}</div>
+	<div class="right_form"><input type="text" name="pay_name" id="pay_name" size="70" value="{if isset($processor_settings.pay_name) && $processor_settings.pay_name}{$processor_settings.pay_name}{/if}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.epay_currency}</div>
+	<div class="right_form">
+		<select name="currency" id="currency">
+		<option value="TRY" {if $processor_settings.currency=='TRY'} selected="selected" {/if}>TRY</option>
+		<option value="EUR" {if $processor_settings.currency=='EUR'} selected="selected" {/if}>EUR</option>
+		<option value="USD" {if $processor_settings.currency=='USD'} selected="selected" {/if}>USD</option>
+		<option value="GBP" {if $processor_settings.currency=='GBP'} selected="selected" {/if}>GBP</option>
+		<option value="IRR" {if $processor_settings.currency=='IRR'} selected="selected" {/if}>IRR</option>
+		<option value="NOK" {if $processor_settings.currency=='NOK'} selected="selected" {/if}>NOK</option>
+		<option value="RUB" {if $processor_settings.currency=='RUB'} selected="selected" {/if}>RUB</option>
+		<option value="CHF" {if $processor_settings.currency=='CHF'} selected="selected" {/if}>CHF</option>
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Name field</div>
+	<div class="right_form">
+		<select name="name_field" id="name_field">
+			<option value=""></option>
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.name_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Surname field</div>
+	<div class="right_form">
+		<select name="surname_field" id="surname_field">
+		<option value=""></option>
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.surname_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Phone field</div>
+	<div class="right_form">
+		<select name="phone_field" id="phone_field">
+		<option value=""></option>
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.phone_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Identity field</div>
+	<div class="right_form">
+		<select name="identity_field" id="identity_field">
+		<option value=""></option>
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.identity_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Address field</div>
+	<div class="right_form">
+		<select name="address_field" id="address_field">
+		<option value=""></option>
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.address_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Country field</div>
+	<div class="right_form">
+		<select name="country_field" id="country_field">
+		<option value=""></option>
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.country_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">City field</div>
+	<div class="right_form">
+		<select name="city_field" id="city_field">
+		<option value=""></option>
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.city_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.payfast_demo}</div>
+	<div class="right_form"><input type="checkbox"  name="test" id="test" {if $processor_settings.test==1} checked="checked"{/if} /></div>
+</div>
+
+<div class="form_footer">
+	<div class="buttons rfloat" {if $demo}onClick="alert('{$lng.general.errors.demo}');return false;"{/if}>
+		<span class="positive"><input type="submit" name="Submit_iyzico" value="{$lng.general.submit}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+</div> {* end form_container *}

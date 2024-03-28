@@ -1,0 +1,33 @@
+<script type="text/javascript">
+{literal}
+jQuery(document).ready(function() {
+
+$('.addcmpwin').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true,
+  callbacks: {
+  close: function() {
+		var listing_id = $.magnificPopup.instance.st.el.attr("id").substr(3);
+		$("#cmp"+listing_id).hide();
+		$("#remcmp"+listing_id).show();
+  }
+}
+});
+
+$('.remcmpwin').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true,
+  callbacks: {
+  close: function() {
+		var listing_id = $.magnificPopup.instance.st.el.attr("id").substr(6);
+		$("#cmp"+listing_id).show();
+		$("#remcmp"+listing_id).hide();
+  }
+}
+});
+
+});
+{/literal}
+</script>

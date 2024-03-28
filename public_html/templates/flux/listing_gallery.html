@@ -1,0 +1,97 @@
+
+{assign var="no_images" value=$listing.images|@count}
+
+<div id="gallery" {if !$no_images}class="hidden"{/if}>
+
+{if $no_images}
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+	{foreach from=$listing.images name="images" item=i}
+	<figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+		<a href="{$live_site}/images/listings{if $i.folder}/{$i.folder}{/if}/{$i.picture}" itemprop="contentUrl" data-size="{$i.width}x{$i.height}">
+			<img src="{$live_site}/images/listings{if $i.folder}/{$i.folder}{/if}/bigThmb/{$i.picture}" class="slides" itemprop="thumbnail" alt="{$listing.title}" id="img-{$smarty.foreach.images.index+1}" />
+		</a>
+	</figure>
+	{/foreach}
+	{if $no_images>1}
+	<button class="nav-button nav-left" onclick="plusDivs(-1)">&#10094;</button>
+	<button class="nav-button nav-right" onclick="plusDivs(1)">&#10095;</button>
+	{/if}
+</div>
+{* dots instead of counting image *}
+{*
+	{if $no_images>1}
+	<div class="nav-dots">
+	{for $var=1 to $no_images}
+      <label for="img-{$var}" class="nav-dot {if $var==1}crt-dot{/if}" id="img-dot-{$var}"></label>
+    {/for}
+    </div>
+    {/if}
+*}	
+
+<div class="bottom-gallery">
+	{if $no_images>1}<div class="lfloat image_counter gallery-button"><img src="{$template_path}images/camera.png" />&nbsp;<span id="crt_img">1</span> of {$no_images}</div>{/if}
+	<div class="rfloat gallery-button" id="view_gallery"><img src="{$template_path}images/zoom.png" /></div>
+</div>
+
+    {*<div class="mlink" id="view_gallery">{$lng.general.view}</div>*}
+	<div class="clearfix"></div>
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <div class="pswp__bg"></div>
+
+    <div class="pswp__scroll-wrap">
+
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{/if}
+
+</div> {* end gallery *}

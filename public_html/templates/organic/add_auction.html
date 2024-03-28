@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>{$page_info.title}</title>
+<meta http-equiv="Content-Type" content="text/html; charset={$appearance.charset}">
+<meta name="description" content="{$page_info.meta_description}">
+<meta name="keywords" content="{$page_info.meta_keywords}">
+<meta name="robots" content="index, follow">
+
+<link rel="stylesheet" type="text/css" href="{$template_path}css/style{if $text_direction=="rtl"}-rtl{/if}.css" />
+<script type="text/javascript" src="{$live_site}/libs/jQuery/jquery.js"></script>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+</head>
+<body style="text-align: left; background: #fff;">
+
+<div class="wait"></div>
+
+<div id="form_container" style="width: 570px;">
+<div class="title">
+<h1>{$lng.useraccount.add_auction}</h1>
+</div>
+
+<form name="add_auction" id="add_auction" method="post" action="{$live_site}/include/add_auction.php?post=1&aid={$ad_id}">
+<div class="form_content">
+
+<div class="info ma20" style="display: none"></div>
+
+<ul>
+
+<li>
+	<label>{$lng.useraccount.auction_start_price}<span class="mandatory"> *</span></label>
+	<input type="text" name="starting_price" id="starting_price" value="{$listing_price}" />&nbsp;
+	<select name="currency" id="currency">
+	{foreach from=$currencies item=i}
+	<option value="{$i.currency}" {if in_array("multicurrency", $modules_array) && $mc_default_currency==$i.currency}selected="selected"{/if}>{$i.currency}</option>
+	{/foreach}
+	</select>
+
+</li>
+
+</ul>
+
+<div class="buttons">
+	<strong><input type="submit" name="Submit" value="{$lng.general.add}" /></strong>
+</div>
+
+</div>
+</form>
+
+</div>
+
+</body>
+</html>
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+jQuery(document).ready(function() {
+
+	$(".info").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$(".info").html("<p>"+ret.info+"</p>");
+				$(".info").show();
+				$(".form2").slideUp();
+				$(".overlay-bottom-bg").hide();
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+
+} 
+
+ $('#add_auction').ajaxForm(options);
+
+});
+{/literal}
+//]]>
+</script>

@@ -1,0 +1,24 @@
+<div> 
+	<ul class="list">
+	{if (!isset($cat)) || !$cat}
+	<li><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.listings}{else}listings.php{/if}">{$lng.listings.all_ads}</a></li>
+	{/if}
+	{foreach from=$array_categories item=v name=cat}
+
+	{if ((!isset($cat) || !$cat) && (!isset($v.parent_id) || !$v.parent_id)) || (isset($cat) && $cat && isset($v.parent_id) && $v.parent_id==$cat)}
+
+	{capture name=some_content assign=categ_url}
+	{if isset($v.subcats) && $v.subcats>0}{if $seo_settings.enable_mod_rewrite}{seo->makeBrowseCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/index.php?category={$v.id}{/if}{else}	{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/listings.php?category={$v.id}{/if}{/if}
+	{/capture}
+
+	<li><a href="{$categ_url}">{if $v.icon}<img src="{$live_site}/images/categories/{$v.icon}" alt="{$v.alt}" />&nbsp;&nbsp;{/if}{$v.name|escape:"html"}{if $appearance.categ_count_ads} <span class="no_ads">({$v.ads})</span>{/if}</a></li>
+	{/if}
+
+	{/foreach}
+
+	{if isset($cat) && $cat}
+	<li><a href="{if $parent.id}{if $seo_settings.enable_mod_rewrite}{seo->makeBrowseCategoryLink p1=$parent.id p2=$parent.name}{else}{$live_site}/index.php?category={$parent.id}{/if}{else}{$live_site}/{/if}">&lsaquo;&lsaquo; {$lng.listings.all_ads}</a></li>
+	{/if}
+
+	</ul>
+</div>

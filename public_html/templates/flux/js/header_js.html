@@ -1,0 +1,361 @@
+<script>
+//<![CDATA[
+
+
+// redirect if media queries are not enabled
+function mediaQueriesEnabled () {
+    return (typeof window.matchMedia != "undefined" || typeof window.msMatchMedia != "undefined");
+}
+
+function isIE () {
+  var myNav = navigator.userAgent.toLowerCase();
+  return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
+}
+
+if (isIE () && isIE () < 9) window.location.href="{$live_site}/bns.php";
+// end redirect if media queries are not enabled
+
+site_width={$appearance.outer_table};
+{if $settings.google_maps_api_key}gmak='{$settings.google_maps_api_key}';{/if}
+
+gmalng='{if isset($ads_settings.gm_api_lang)}{$ads_settings.gm_api_lang}{/if}';
+gmareg='{if isset($ads_settings.limit_location_autosuggest)}{$ads_settings.limit_location_autosuggest}{/if}';
+
+{if $ads_settings.enable_location_autosuggest}places=1;{else}places=0;{/if}
+{if $ads_settings.enable_distance_search}dsearch=1;{else}dsearch=0;{/if}
+exdate=new Date();
+exdate.setDate(exdate.getDate() + 365);
+var frontend = 1;
+var no_languages = {$languages|@count};
+
+jQuery(document).ready(function() {
+/*
+  $(window).scroll(function(e){
+
+      if($("header").offset().top !== 0){
+          if(!$("header").hasClass('shadow')){
+              $("header").addClass('shadow');
+          }
+
+          $('#logo').removeClass('logo');
+          $('#logo').addClass('small-logo');
+      }else{
+          $("header").removeClass('shadow');
+          $('#logo').removeClass('small-logo');
+          $('#logo').addClass('logo');
+      }
+  });
+*/
+if(places || dsearch) {
+	load_gmaps();
+}
+
+if(dsearch && !places) {
+
+	$("#qs_location").change(function(event){
+
+		// fill in qs_lat and qs_long with the location coordinates
+		var geocoder =  new google.maps.Geocoder();
+		geocoder.geocode( { 'address': $("#qs_location").val()}, function(results, status) {
+			if (status == google.maps.GeocoderStatus.OK) {
+				$("#qs_lat").val(results[0].geometry.location.lat());
+				$("#qs_long").val(results[0].geometry.location.lng());
+				$("#qs_dist").prop('disabled', false);
+
+			} else {
+				//alert("Something got wrong " + status);
+				$("#qs_lat").val('');
+				$("#qs_long").val('');
+				$("#qs_dist").prop('disabled', true);
+			}
+		});
+
+	});
+
+}
+
+//alert(navigator.userAgent)
+$("a[href='#top']").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+
+$("#show_search").click(function(){
+
+	$("#nav").slideUp();
+	$("#quick-search").slideDown();
+	$("#menu").toggleClass("change");
+
+});
+
+ 	// show left and right banners only if the window is wide enough
+ 	if( window.innerWidth >= site_width+100) {
+
+	// get position for left and right banners
+	var left_page_pos = $(".page").offset().left;
+	var right_page_pos = left_page_pos + $(".page").width()+10;
+	var top_page_pos = $(".page").offset().top;
+
+{if in_array('left',$banners_positions)}
+{literal}
+
+	$(".left_banners").css({top: top_page_pos, left: left_page_pos-$(".left_banners").width()-10, position:'absolute'});
+	$(".left_banners").fadeIn();
+
+{/literal}
+{/if}
+{if in_array('right',$banners_positions)}
+{literal}
+	$(".right_banners").css({top: top_page_pos, left: right_page_pos, position:'absolute'});
+	$(".right_banners").fadeIn();
+{/literal}
+{/if}
+{literal}
+
+	lb_height = $(".left_banners").height();
+	rb_height = $(".right_banners").height();
+	page_bottom = $("footer").offset().top;
+
+  	$(window).scroll(function () {
+
+ 		set2 = $(document).scrollTop()+20;
+
+		if(set2<top_page_pos) set3 = top_page_pos+"px";
+		else set3 = set2+"px";
+
+{/literal}
+{if in_array('left',$banners_positions)}
+{literal}
+ 		if(set2+lb_height<page_bottom)
+ 		$('.left_banners').animate({top:set3},{duration:500,queue:false});
+{/literal}
+{/if}
+{if in_array('right',$banners_positions)}
+{literal}
+ 		if(set2+rb_height<page_bottom)
+ 		$('.right_banners').animate({top:set3},{duration:500,queue:false});
+{/literal}
+{/if}
+{literal}
+
+	}); // end on window scroll
+
+	} // end show left and right banners only if the window is wide enough
+
+	// back to top button
+	// browser window scroll (in pixels) after which the "back to top" link is shown
+	var offset = 300,
+	//browser window scroll (in pixels) after which the "back to top" link opacity is reduced
+	offset_opacity = 1200,
+	//duration of the top scrolling animation (in ms)
+	scroll_top_duration = 700,
+	//grab the "back to top" link
+	$back_to_top = $('.cd-top');
+
+	//hide or show the "back to top" link
+	$(window).scroll(function(){
+		( $(this).scrollTop() > offset ) ? $back_to_top.addClass('cd-is-visible') : $back_to_top.removeClass('cd-is-visible cd-fade-out');
+		if( $(this).scrollTop() > offset_opacity ) {
+			$back_to_top.addClass('cd-fade-out');
+		}
+	});
+
+	//smooth scroll to top
+	$back_to_top.on('click', function(event){
+		event.preventDefault();
+		$('body,html').animate({
+			scrollTop: 0 ,
+		 	}, scroll_top_duration
+		);
+	});
+	// end back to top button
+
+	$("#remove_qs_keyword").click(function(){
+		$("#qs_{/literal}{$keyword_name}{literal}").val('');
+		$("#qsearch").submit();
+
+	});
+	$("#remove_qs_location").click(function(){
+		$("#qs_location").val('');
+		$("#qs_dist").val('');
+		$("#qs_lat").val('');
+		$("#qs_long").val('');
+		$(".location_ac_field").val('');
+		$("#qsearch").submit();
+
+	});
+	$("#qs_category").change(function(){
+		//$("#qsearch").submit();
+		{/literal}
+		onQuickSearch('qsearch', '{$live_site}'); {if $multi_depending}reloadDep('{$multi_depending}', '{$live_site}');{/if}
+		{literal}
+
+	});
+
+	{/literal}
+	{if $cat}
+	onQuickSearch('qsearch', '{$live_site}'); {if $multi_depending}reloadDep('{$multi_depending}', '{$live_site}');{/if}
+	{/if}
+	{literal}
+
+
+$(".checkbox-dropdown").click(function () {
+
+    $(this).toggleClass("is-active");
+	var caption = $(this).attr("id").substr(3);
+    
+    var list_name = "checkbox-dropdown-list_"+caption;
+    if($('#'+list_name+':visible').length)
+        $('#'+list_name).hide();
+    else
+        $('#'+list_name).show();        
+        
+});
+
+$(".checkbox-dropdown ul").click(function(e) {
+    e.stopPropagation();
+});
+	
+	
+}); // end document ready
+
+{/literal}
+{if in_array('left',$banners_positions) || in_array('right',$banners_positions)}
+{literal}
+
+// show left and right banners only if the window is wide enough
+if( window.innerWidth >= site_width+100) {
+
+$(window).on("resize", function(){
+
+	// get position for left and right banners
+	left_page_pos = $(".page").offset().left;
+	right_page_pos = left_page_pos + $(".page").width()+10;
+	top_page_pos = $(".page").offset().top;
+
+{/literal}
+{if in_array('left',$banners_positions)}
+{literal}
+
+	$(".left_banners").css({top: top_page_pos, left: left_page_pos-$(".left_banners").width()-10, position:'absolute'});
+	$(".left_banners").fadeIn();
+
+{/literal}
+{/if}
+{if in_array('right',$banners_positions)}
+{literal}
+	$(".right_banners").css({top: top_page_pos, left: right_page_pos, position:'absolute'});
+	$(".right_banners").fadeIn();
+{/literal}
+{/if}
+{literal}
+
+}); // end on resize
+
+} // end show left and right banners only if the window is wide enough
+
+{/literal}
+{/if}
+
+function toggleMenu(x) {
+
+	x.classList.toggle("change");
+	if($("#nav").is(":visible"))
+		$("#nav").slideUp();
+	else $("#nav").slideDown();
+
+}
+
+function toggleLocation() {
+
+	if($("#locations_list").is(":visible"))
+		$("#locations_list").slideUp();
+	else $("#locations_list").slideDown();
+
+}
+
+WebFont.load({
+    google: {
+      families: ['Open Sans:400,600,700', 'Roboto']
+    }
+});
+
+function enable_autocomplete() {
+
+	var input = document.getElementById('qs_location');
+	var options = {
+	geocode: 1{if $ads_settings.limit_location_autosuggest},
+	strictBounds: true,
+	componentRestrictions: {
+            country: ['{$ads_settings.limit_location_autosuggest|replace:",":"','"}']
+          }{/if}
+
+	};
+
+	autocomplete = new google.maps.places.Autocomplete(input, options);
+	autocomplete.addListener('place_changed', fillInLocationFields);
+
+
+} // end enable_autocomplete
+
+function fillInLocationFields() {
+
+      var componentForm = {
+      {foreach from=$ads_settings.address_components item = c key=k }
+		{if $c.field}{$k}: '{$c.type}',{/if}
+      {/foreach}
+      };
+
+      var componentMapForm = {
+      {foreach from=$ads_settings.address_components item = c key=k }
+		{if $c.field}{$k}: '{$c.field}',{/if}
+      {/foreach}
+      };
+	  var place = autocomplete.getPlace();
+
+        for (var component in componentMapForm) {
+          document.getElementById("qs_"+componentMapForm[component]).value = '';
+        }
+
+        // Get each component of the address from the place details
+        // and fill the corresponding field on the form.
+        var found_loc = 0;
+        for (var i = 0; i < place.address_components.length; i++) {
+          var addressType = place.address_components[i].types[0];
+
+          if (componentForm[addressType]) {
+            var val = place.address_components[i][componentForm[addressType]];
+            document.getElementById("qs_"+componentMapForm[addressType]).value = val;
+            found_loc = 1;
+          }
+        }
+
+        if(dsearch) {
+			$("#qs_lat").val();
+			$("#qs_long").val();
+			$("#qs_dist").prop('disabled', true);
+
+			$("#qs_lat").val(place.geometry.location.lat());
+			$("#qs_long").val(place.geometry.location.lng());
+			$("#qs_dist").prop('disabled', false);
+		}
+}
+
+function onMultisearch(caption, chk_name, chk_value) {
+
+	var mselect_val = $("#qs_"+caption).val();
+
+	// add element to multiselect selected value
+	if($("#"+chk_name).is(":checked"))		
+		mselect_val = mselect_val+"|"+chk_value;
+	else // remove element from multiselect selected value 
+		mselect_val = mselect_val.replace(chk_value,'');
+
+	// trim | 	
+	mselect_val = mselect_val.replace(/^\|+|\|+$/g, '');
+	$("#qs_"+caption).val(mselect_val)
+
+}
+
+//]]>
+</script>

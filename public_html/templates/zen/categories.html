@@ -1,0 +1,49 @@
+
+          <!-- CATEGORIES -->
+          <div id="categories"> 
+
+	<table cellpadding="0" cellspacing="4" width="100%">
+	<tr>
+	{foreach from=$array_categories item=v name=cat}
+	<td valign="top" width="{$width}%" align="left">
+
+	{capture name=some_content assign=categ_url}
+	{if isset($v.subcats) && $v.subcats>0}{if $seo_settings.enable_mod_rewrite}{seo->makeBrowseCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/index.php?category={$v.id}{/if}{else}	{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/listings.php?category={$v.id}{/if}{/if}
+	{/capture}
+
+	<h2><a href="{$categ_url}" class="categ">{$v.name}</a></h2>
+	{if $v.picture}
+	<div class="categ"><a href="{$categ_url}"><img src="{$live_site}/images/categories/{$v.picture}" alt="{$v.alt}" /></a></div>
+	{/if}
+
+	{if $appearance.categ_count_ads}
+	<p class="small count">
+	{$v.ads}&nbsp;{if $v.ads==1}{$lng.general.activead}{else}{$lng.general.activeads}{/if}
+		{if $v.subcats}, {$v.subcats} {if $v.subcats==1}{$lng.general.subcat}{else}{$lng.general.subcats}{/if}{/if}
+	</p>
+	{/if}
+
+	<p class="small">{$v.description}</p>
+
+	<div class="categ_button">
+		<a href="{$categ_url}" class="view_button">	
+		<span class="categ_button">
+		{$lng.general.view_ads|replace:" ":"&nbsp;"}&raquo;
+		</span>
+		</a>
+	</div>
+
+	</td>
+
+	{if $smarty.foreach.cat.index%$appearance.max_cat_per_row==$appearance.max_cat_per_row-1}
+    </tr>
+	{/if}
+
+	{if $smarty.foreach.cat.index%$appearance.max_cat_per_row==$appearance.max_cat_per_row-1 && $smarty.foreach.cat.index!=$array_categories|@count-1}
+    <tr>
+	{/if}
+
+	{/foreach}
+	</table>
+	</div>
+	<!-- end CATEGORIES -->

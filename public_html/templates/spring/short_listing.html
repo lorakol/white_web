@@ -1,0 +1,82 @@
+<div class="classified{if $v.highlited && $ads_settings.enable_highlited} highlited{/if} {if $v.featured && $ads_settings.enable_featured} featured{/if}" {if $v.highlited && $ads_settings.enable_highlited}style='background: {$ads_settings.highlited_color};'{/if}>
+
+{if $v.featured && $ads_settings.enable_featured}<div class="featured-icon"></div>{/if}
+
+{capture name=some_content assign=details_url}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title p3=$post_array.search_id p4=$v.category_id p5=$v.slug}{else}{$live_site}/details.php?id={$v.id}{/if}
+{/capture}
+<div class="class-content"> 
+<div>
+      <div class="classified_photo cp">
+	<a href="{$details_url}" name="listing{$v.id}">
+	<img src="{$live_site}/{$v.image}" class="pic" id="pic{$v.id}" alt="{if $v.image_id}{$v.title|strip_tags:false|substr:0:100}{/if}" />
+	</a>
+	{if $v.rented && $ads_settings.enable_rented}<div class="rented" id="rented{$v.id}" style="display: none;"></div>{elseif $v.sold && $ads_settings.enable_sold}<div class="sold" id="sold{$v.id}" style="display: none;"></div>{/if}
+      </div>
+
+      <div class="classified_content">
+
+{if $v.auction}<div class="lfloat auction-btn">{$lng.useraccount.auction}</div>{/if}
+{if $v.urgent && $ads_settings.enable_urgent}<div class="lfloat urgent-btn">{$lng.listings.urgent}</div>{/if}
+
+<h3><a href="{$details_url}" id="title{$v.id}">{$v.title}</a></h3>
+{if $data_set=="cars"}<div class="listing_make">{$v.make} {$v.model}</div>{/if}
+
+{if $ads_settings.enable_price}
+		
+	{if in_array("price_extra",$modules_array) && (isset($pe_settings[$v.fieldset]) || isset($pe_settings[0])) }
+	
+	{include file="modules/price_extra/short_listing.html"}
+	
+	{else}
+
+	{if $v.price>=0}<span class="price">{$v.price_curr}&nbsp;</span>{/if}
+ 
+	{/if}
+			
+{/if} {* end if enable price *}
+
+{if $v.location_str}<span class="location">{if $v.location_str && $ads_settings.enable_price && $v.price>=0} | {/if}{$v.location_str}</span>{/if}{if $v.location_str || ($ads_settings.enable_price && $v.price>=0)}<br/>{/if}
+<div class="small">{if $ads_settings.show_ad_date_for_everybody==1}{if $v.date_added!=$v.date_updated}{$lng.listings.updated}&nbsp;{$v.date_updated_nice}{else}{$lng.listings.added_on}&nbsp;{$v.date_nice}{/if}{else}{$lng.listings.posted}{/if}&nbsp;{$lng.general.to}&nbsp;<u>{$v.category}</u></div>
+<p>{$v.description}</p>
+
+<span class="classified_links">
+
+{* if listings_compare *}
+{if in_array("listings_compare", $modules_array)}
+
+<a href="javascript:;" class="addcmpwin" id="cmp{$v.id}" {if in_array($v.id, $cmp)}style="display: none;"{/if}>{$lng_compare.add_to_compare}</a>&nbsp;
+
+<a href="javascript:;" class="remcmpwin" id="remcmp{$v.id}" {if !in_array($v.id, $cmp)}style="display: none;"{/if}>{$lng_compare.rem_compare}</a>&nbsp;
+
+{/if}
+{* end if listings_compare *}
+
+<a href="javascript:;" class="fshare" id="fshare{$v.id}">{$lng.listings.recommend_this}</a>
+
+&nbsp;<a href="javascript:;" {if $self_noext=="favorites" || in_array($v.id, $fav_array)}style="display: none;"{/if} class="addtofav" id="fav{$v.id}">{$lng.listings.add_to_favourites}</a>
+<a href="javascript:;" {if $self_noext!="favorites" && !in_array($v.id, $fav_array)}style="display: none;"{/if} class="remfav" id="remfav{$v.id}">{$lng.listings.remove_favourite}</a>
+
+&nbsp;<a href="{$details_url}">{$lng.listings.details}</a>&nbsp;
+
+{if ($logged_in || !$ads_settings.hide_contact_when_not_logged)  && (!$v.sold || !$ads_settings.hide_contact_when_sold) && (!$v.rented || !$ads_settings.hide_contact_when_rented)}&nbsp;<a href="javascript:;" class="fmailto" id="mailto{$v.user_id}_{$v.id}">{$lng.general.contact}</a>{/if}
+</span>
+
+{if (isset($v.priority_name) && $v.priority_name && $ads_settings.enable_priorities) || ($v.video && $v.enable_video && $ads_settings.enable_video)}
+	<table class="extra" cellpadding="0" cellspacing="0">
+	<tr>
+	{if $v.priority_name && $ads_settings.enable_priorities}
+	<td><div class="buttonwrapper"><div class="priority-left"><div class="priority-right">{$v.priority_name}</div></div></div></td><td>&nbsp;</td>
+	{/if}
+
+	{if $v.video && $v.enable_video && $ads_settings.enable_video}
+	<td><div class="buttonwrapper"><div class="video-left"><div class="video-right">{$lng.listings.short_video}</div></div></div></td>
+	{/if}
+	</tr>
+	</table>
+{/if}
+
+	</div><!-- end: classified_content -->
+      </div>
+     </div>
+</div>

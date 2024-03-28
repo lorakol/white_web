@@ -1,0 +1,35 @@
+<li class="classified{if $v.highlited && $ads_settings.enable_highlited} highlited{/if}" {if $v.highlited && $ads_settings.enable_highlited}style='background: {$ads_settings.highlited_color};'{/if}>
+{capture name=some_content assign=details_url}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title p3=$post_array.search_id p4=$v.category_id p5=$v.slug}{else}{$live_site}/details.php?id={$v.id}{/if}
+{/capture}
+
+<a href="{$details_url}"{if $v.featured && $ads_settings.enable_featured}class="featured"{/if}>
+<div class="classifieds_content">
+<h3>{$v.title}</h3>
+{if $v.urgent && $ads_settings.enable_urgent}<div class="urgent-btn">{$lng.listings.urgent}</div>{/if}
+<div class="location">{$v.location_str}</div>
+
+
+{if $ads_settings.enable_price}
+		
+	{if in_array("price_extra",$modules_array) && isset($pe_settings[$v.fieldset])}
+	
+	{include file="modules/price_extra/short_listing.html"}
+	
+	{else}
+
+	{if $v.price>=0}<div class="price">{$v.price_curr}</div>{/if}
+ 
+	{/if}
+			
+	{/if} {* end if enable price *}
+
+</div>
+
+<div class="classified_photo">
+	<img src="{$live_site}/{$v.image}" id="pic{$v.id}" alt="{if $v.image_id}{$v.title|strip_tags:false|substr:100}{/if}" />
+	{if $v.rented && $ads_settings.enable_rented}<div class="rented" id="rented{$v.id}" style="display: none;"></div>{elseif $v.sold && $ads_settings.enable_sold}<div class="sold" id="sold{$v.id}" style="display: none;"></div>{/if}
+</div>
+</a>
+
+</li>

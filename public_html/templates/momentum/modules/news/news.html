@@ -1,0 +1,43 @@
+{include file="header.html"}
+
+{capture name=some_content assign=field_name}title_{$crt_lang}{/capture}
+
+<div class="main1 box">
+<div class="page_title heading"><h1>{$news_settings[$field_name]}</h1></div>
+
+<div id="content">
+
+	{if $no_news>0}
+
+	{if $no_news>$news_per_page} 
+	{include file="paginator.html"}
+	{/if}
+
+	{foreach name=listings from=$news item=v}
+	<div class="clearfix">
+	<div class="lfloat heading-date">
+	<img src="{$template_path}images/calendar.png" /><br/>
+	{$v.date_nice}
+	</div>
+	<div class="heading heading7 underline lfloat"><h1>{$v.title}</h1></div>
+	</div>
+
+	<div class="mt20 mb40 clearfix">
+		{if $v.image}<img src="{$live_site}/modules/news/images/{$v.image}" class="lfloat mr20 mb20" />{/if}
+		{$v.content}
+	</div>
+
+	{/foreach}
+
+	{if $no_news>$news_per_page} 
+	<div class="mb20 clearfix">
+	{include file="paginator.html"}
+	</div>
+	{/if}
+
+	{/if}
+
+</div> {* end p30 *}
+</div> {* end main *}
+
+{include file="footer.html"}

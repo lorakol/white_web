@@ -1,0 +1,65 @@
+<!-- LATEST AUCTIONS -->
+<div id="auctions">
+	{capture name=some_content assign=title_field}title_{$crt_lang}{/capture}
+       <h1 class="head">{$la_settings[$title_field]}</h1>
+       <div class="box-top-gray"><div class="box-bottom"><div class="box-left"><div class="box-right"><div class="box-bottom-left"><div class="box-bottom-right"><div class="box-top-left"><div class="box-top-right">
+                    <div class="vert-box"> 
+			{if $no_auctions}
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                      {section name=loop start=0 loop=$no_auctions step=1}
+			{capture name=some_content assign=details_url}
+			{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$auctions[loop].id p2=$auctions[loop].title p3='' p4=$auctions[loop].category_id p5=$auctions[loop].slug}{else}{$live_site}/details.php?id={$auctions[loop].id}{/if}
+			{/capture}
+                        <tr> 
+                          <td valign="middle" class="last-image"><div class="box-image">
+				<a href="{$details_url}"><img class="pic" id="apic{$auctions[loop].id}" src="{$live_site}/{$auctions[loop].image}" alt="{if $auctions[loop].image_id}{$auctions[loop].title|strip_tags:false|substr:0:100}{/if}" /></a>
+				{if $auctions[loop].rented && $ads_settings.enable_rented}<div class="rented" id="arented{$auctions[loop].id}" style="display: none;"></div>{elseif $auctions[loop].sold && $ads_settings.enable_sold}<div class="sold" id="asold{$auctions[loop].id}" style="display: none;"></div>{/if}
+				</div></td>
+			<td valign="middle">
+			{if $data_set=="cars" && ($auctions[loop].make || $auctions[loop].model)}
+			<h3><a href="{$details_url}">{$auctions[loop].make} {$auctions[loop].model}</a></h3>
+			{else}
+			<h3><a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$auctions[loop].title|mb_truncate:40:"...":"UTF-8"}{else}{$auctions[loop].title|truncate:40:"...":false}{/if}</a></h3>
+			{/if}
+			{$auctions[loop].location_str}
+
+			<div class="price">{$lng.useraccount.starts_at|replace:" ":"&nbsp;"}:&nbsp;{$auctions[loop].auction.starting_price|replace:" ":"&nbsp;"}</div>
+
+			{if $auctions[loop].auction.max_bid}<div class="price">{$lng.useraccount.max_bid|replace:" ":"&nbsp;"}:&nbsp;{$auctions[loop].auction.max_bid_nice|replace:" ":"&nbsp;"}</div>{/if}
+			
+			<div class="date">{$auctions[loop].date_nice}</div>
+			</td></tr>
+                        {if $smarty.section.loop.index<$no_popular-1}
+                        <tr>
+                          <td colspan="2"><div class="vert-separator"></div></td>
+                        </tr>
+                        {/if}
+                      {/section}
+                      </table>
+			{/if}
+                    </div>
+	</div></div></div></div></div></div></div></div>
+</div>
+<!-- END LATEST AUCTIONS -->
+
+<script type="text/javascript">
+{literal}
+$(window).load(function(){
+{/literal}
+{foreach from = $auctions item=v}
+	{if $v.rented}
+	{literal}
+		$("#arented{/literal}{$v.id}{literal}").show();
+		$("#arented{/literal}{$v.id}{literal}").css({ top: $("#apic{/literal}{$v.id}{literal}").position().top-8, left: $("#apic{/literal}{$v.id}{literal}").position().left+ $("#apic{/literal}{$v.id}{literal}").width()-57});
+	{/literal}
+	{elseif $v.sold}
+	{literal}
+		$("#asold{/literal}{$v.id}{literal}").show();
+		$("#asold{/literal}{$v.id}{literal}").css({ top: $("#apic{/literal}{$v.id}{literal}").position().top-8, left: $("#apic{/literal}{$v.id}{literal}").position().left+ $("#apic{/literal}{$v.id}{literal}").width()-57});
+	{/literal}
+	{/if}
+{/foreach}
+{literal}
+});
+{/literal}
+</script>

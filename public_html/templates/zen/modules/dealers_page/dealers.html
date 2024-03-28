@@ -1,0 +1,80 @@
+{include file="header.html"}
+<style>
+.dcategories td { height: 50px; line-height: 50px; }
+.dcategories h2 { line-height: 40px; }
+.dcategories img { margin-right: 10px; opacity: 0.8; }
+</style>
+	<div id="page_content">
+	<h1>{$dealers_page_settings.link_name}</h1>
+
+	{include file="modules/dealers_page/search_form.html"}
+
+	{if $dealers_page_settings.group_on_categories && $dealers_page_settings.category_field && !$dcat && (!isset($post) || !$post)}
+		<br/><br/>
+		<table cellpadding="2" cellspacing="2" width="90%" style="margin: auto;" class="dcategories">
+		<tr>
+		{foreach from=$dealer_categories name=dcat item=v}
+			<td valign="top" width="{$width}%" align="center">
+			{if $v.image}<div><img src="{$live_site}/images/categories/{$v.image}" /></div>{/if}
+			<h2 style="text-align: center;"><a href="{$live_site}/modules/dealers_page/dealers.php?dcat={$v.category}">{$v.category} ( {$v.no_dealers} )</a></h2>
+
+			{if $smarty.foreach.dcat.index%$dealers_page_settings.categories_on_row==$dealers_page_settings.categories_on_row-1}
+			</tr>
+			{/if}
+
+			{if $smarty.foreach.dcat.index%$dealers_page_settings.categories_on_row==$dealers_page_settings.categories_on_row-1 && $smarty.foreach.dcat.index!=$dealer_categories|@count-1}
+			<tr>
+			{/if}
+		{/foreach}
+		</table>
+	{else}
+
+	{if $dealers_page_settings.group_on_categories && $dealers_page_settings.category_field && $dcat}
+
+	{if $dcat_image}<div><img src="{$live_site}/images/categories/{$dcat_image}" /></div>{/if}
+
+	<h2> <a href="{$live_site}/modules/dealers_page/dealers.php">{$dealers_page_settings.link_name}</a> <a href="{$live_site}/modules/dealers_page/dealers.php?dcat={$dcat}">&raquo; {$dcat}</a></h2>
+	{/if}
+
+	{if $no_dealers>0}
+
+	{if $dealers_page_settings.enable_map_search}
+
+	<div class="clearfix">
+	<div id="showMap" style="{if $dealers_page_settings.map_visible}display: none;{/if} float: left !important;">{$lng.listings.show_map}</div>
+	<div id="hideMap" style="{if !$dealers_page_settings.map_visible}display: none;{/if} float: left !important;">{$lng.listings.hide_map}</div>
+	</div>
+
+	{include file="modules/dealers_page/dealers_map.html"}
+	{/if}
+
+	{include file="paginator.html"}
+
+	{foreach name="dealers" from=$dealers_array item=v}
+		{include file="modules/dealers_page/short_dealer.html"}
+		<hr/>
+
+		{if ($smarty.foreach.dealers.index+1)==$appearance.ads_per_page/2|ceil && $smarty.foreach.dealers.index!=$dealers_array|@count-1}
+		{* ------ listings4 banners ------- *}
+		{if in_array('listings4',$banners_positions)}
+		{banner->getTemplateBanners p1='listings4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+		{if $array_banners|@count}<div class="clearfix" style="margin: 10px 0 10px 0;"></div><div class="dcenter">{/if}
+		{foreach from=$array_banners item=v}
+		<div class="vert_banners">{include file="banner.html"}</div>
+		{/foreach}
+		{if $array_banners|@count}</div>{/if}{/if}
+		{* ------- end listings4 banners ------- *}
+		{/if}
+	{/foreach}
+
+	<div class="clearfix"></div>
+	{include file="paginator.html"}
+	{else}
+	<br/><br/><br/><br/>
+	<br/><br/><br/><br/>
+	{/if}
+
+	{/if}
+
+	</div>
+{include file="footer.html"}

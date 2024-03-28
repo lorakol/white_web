@@ -1,0 +1,35 @@
+{if !isset($jqform_included) || !$jqform_included}
+<div class="wait"></div>
+{assign var="jqform_included" value="1"}
+{/if}
+
+{* left col - reviews *}
+<div class="col-7">
+<div class="heading6 p10"><span id="no_reviews">{$no_reviews}</span> {if $no_reviews!=1}{$lng_ratings.sreviews}{else}{$lng_ratings.sreview}{/if} {$lng.general.on} {$listing.title}</div>
+<div class="heading_large_under heading6-under"></div>
+
+
+<div id="reviews_container">
+
+	{foreach from=$reviews_array item=v name=rloop}
+	{include file="modules/ratings/review.html" prefix="lr_"}
+	{/foreach}	
+
+	{if $lr_no_pages>1}
+	{include file="modules/ratings/lr_paginator.html"}
+	{/if}
+
+</div> {* end reviews_container *}
+
+</div> {* end col-7 *}
+
+{* right col - add reviews *}
+<div class="col-5">
+
+<div class="lgbox p20">
+{include file="modules/ratings/add_listing_review.html"}
+</div>
+
+</div>{* end rcomm *}
+<div class="clearfix"></div>
+

@@ -1,0 +1,47 @@
+{include file="header.html"}
+{include file="search.html"}
+
+<div id="heading">{$lng.general.featured_ads}</div>
+
+{if $no_listings>0}
+<ul class="classified">
+{foreach name="listings" from=$listings_array item=v}
+	{include file="short_listing.html"}
+{/foreach}
+</ul>
+{if $no_pages>1}
+{include file="paginator.html"}
+{else}
+<div class="clearfix"></div>
+{/if}
+
+{else}
+	<div class="info"><p>{$lng.advanced_search.no_results}</p></div>
+{/if}
+
+<script type="text/javascript">
+{literal}
+$(window).load(function(){ // fix for safari and chrome setting width and height after the image is loaded
+{/literal}
+{foreach from = $listings_array item=v}
+	{if $v.rented}
+	{literal}
+		$("#rented{/literal}{$v.id}{literal}").show();
+		$("#rented{/literal}{$v.id}{literal}").css({ top: $("#pic{/literal}{$v.id}{literal}").position().top-2, left: $("#pic{/literal}{$v.id}{literal}").position().left+ $("#pic{/literal}{$v.id}{literal}").width()-31});
+	{/literal}
+	{elseif $v.sold}
+	{literal}
+		$("#sold{/literal}{$v.id}{literal}").show();
+		$("#sold{/literal}{$v.id}{literal}").css({ top: $("#pic{/literal}{$v.id}{literal}").position().top-2, left: $("#pic{/literal}{$v.id}{literal}").position().left+ $("#pic{/literal}{$v.id}{literal}").width()-31});
+	{/literal}
+	{/if}
+{/foreach}
+{literal}
+//$(".classifieds_content").width;
+
+});
+
+{/literal}
+</script>
+
+{include file="footer.html"}

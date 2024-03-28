@@ -1,0 +1,12 @@
+{include file="header.html"}
+{include file="search.html"}
+{include file="categories.html"}
+
+{* -------------- news module -------------- *}
+{if in_array("news",$modules_array) && $news|@count}
+{include file="modules/news/news_summary.html"}
+{/if}
+{* ------------ end news module ------------ *}
+
+
+{include file="footer.html"}

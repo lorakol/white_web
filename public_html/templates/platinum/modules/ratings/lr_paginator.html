@@ -1,0 +1,71 @@
+<div class="paginator">
+<ul>
+
+{if $lr_no_pages <= 10}
+
+{section name=loop start=1 loop=$lr_no_pages+1 step=1}
+<li><a class="rpage{if $page==$smarty.section.loop.index} currentpage{/if}" id="rpage{$smarty.section.loop.index}" href="javascript:;">{$smarty.section.loop.index}</a></li>
+{/section}
+
+{else}
+
+{* start 2 pages *}
+{section name=loop start=1 loop=3 step=1}
+<li><a class="rpage{if $page==$smarty.section.loop.index} currentpage{/if}" id="rpage{$smarty.section.loop.index}" href="javascript:;">{$smarty.section.loop.index}</a></li>
+{/section}
+
+{if $page>5}
+...
+{/if}
+
+{* middle range *}
+{section name=loop start=$page-2 loop=$page+3 step=1}
+{if $smarty.section.loop.index <= $lr_no_pages && $smarty.section.loop.index>2 && $smarty.section.loop.index<=$max_pages}
+<li><a class="rpage{if $page==$smarty.section.loop.index} currentpage{/if}" id="rpage{$smarty.section.loop.index}" href="javascript:;">{$smarty.section.loop.index}</a></li>
+{/if}
+{/section}
+
+
+{if $lr_no_pages>$page+4}
+...
+{/if}
+
+{* end 2 pages *}
+
+{if $page+3<$lr_no_pages}
+{section name=loop start=$lr_no_pages-1 loop=$lr_no_pages+1 step=1}
+<li><a class="rpage{if $page==$smarty.section.loop.index} currentpage{/if}" id="rpage{$smarty.section.loop.index}" href="javascript:;">{$smarty.section.loop.index}</a></li>
+{/section}
+{/if}
+{/if}
+
+</ul>
+</div>
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+$(document).on("click", ".rpage", function(event){ 
+
+	var page = parseInt(jQuery(this).attr("id").substr(5));
+
+	// replace comments_container content with new generated content for the chosen page
+	$.ajax({
+		type: "GET",
+		url: "{/literal}{$live_site}{literal}/modules/ratings/get_reviews.php",
+		data: { page: page, no_pages: "{/literal}{$lr_no_pages}{literal}", type: 'ad', id: "{/literal}{$listing.id}{literal}"}
+	})
+	.done(function( responseText ) {
+		var content = JSON.parse(responseText);
+		$("#reviews_container").html(content);
+		$(".rpage").removeClass("currentpage");
+		$("#rpage"+page).addClass("currentpage");
+	});
+
+	
+	
+});
+
+</script>
+{/literal}

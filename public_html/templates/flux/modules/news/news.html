@@ -1,0 +1,46 @@
+{include file="header.html"}
+
+{capture name=some_content assign=field_name}title_{$crt_lang}{/capture}
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$news_settings[$field_name]}</h1></div>
+</div>
+
+<div class="wbg">
+<div class="page_bounds mb40">
+
+	{if $no_news>0}
+
+	{foreach name=listings from=$news item=v}
+	<article>
+	<div class="clearfix mt30">
+	
+	<div class="lfloat heading-date">
+		<img src="{$template_path}images/calendar.png" /><br/>
+		{$v.date_nice}
+	</div>
+	<div class="heading news_heading lfloat"><h1>{$v.title}</h1></div>
+	
+	</div>
+
+	<div class="mt20 mb40 clearfix">
+		{if $v.image}<img src="{$live_site}/modules/news/images/{$v.image}" class="lfloat mr20 mb20" />{/if}
+		{$v.content}
+	</div>
+	<hr>
+	</article>
+	{/foreach}
+
+	{if $no_news>$news_per_page} 
+	<div class="center mt10 mb40">
+	{include file="paginator.html"}
+	</div>
+	{/if}
+
+	<div class="clearfix"></div>
+	{/if}
+
+</div> {* end page_bounds *}
+</div> {* end wbg *}
+	
+{include file="footer.html"}

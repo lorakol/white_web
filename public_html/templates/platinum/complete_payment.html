@@ -1,0 +1,32 @@
+{include file="header.html"}
+
+<div id="form_container">
+<div class="title">
+<h1>{$lng.order_history.complete_payment}</h1>
+</div>
+{if isset($error) && $error}
+<div class="error"><p>{$error}</p></div>
+{else}
+<div class="form_content">
+
+<table cellpadding="2" cellspacing="2" width="70%" id="table_options">
+
+	<tr>
+		<td width="30%">{$lng.order_history.complete_payment_for}</td>
+		<td>{$action.actions_str}</td>
+	</tr>
+
+	<tr>
+		<td colspan="2" align="right" class="price">{$lng.listings.total} : {$total}</td>
+	</tr>
+
+	<tr>
+		<td colspan="2" align="center">{$pay_form}</td>
+	</tr>
+
+</table>
+
+</div>
+{/if}
+</div>
+{include file="footer.html"}

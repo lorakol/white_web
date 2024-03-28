@@ -1,0 +1,25 @@
+	<div class="clearfix"></div>
+	<br/>
+
+	{capture name=some_content assign=field_name}title_{$crt_lang}{/capture}
+	{capture name=news_url assign=news_url}{if $seo_settings.enable_mod_rewrite}/news{else}/modules/news/news.php{/if}{/capture}
+
+	<h1 class="head">{$news_settings[$field_name]}</h1>
+
+                    <div class="vert-box"> 
+
+		<div id="news">
+		{foreach from=$news item=v name=newsloop}
+		<div class="article{if $smarty.foreach.newsloop.index<$news|@count-1} artborder{/if}">
+		<a href="{$live_site}{$news_url}">{$v.title}</a><br/>
+		<p>
+		{if $v.image}<img src="{$live_site}/modules/news/images/{$v.image}" /><br/>{/if}
+		{$v.summary}<br/></p>
+		<div class="article_date">{$lng.listings.added_on} {$v.date_nice}</div>
+		<div class="read_more"><a href="{$live_site}{$news_url}">{$lng_news.read_more}</a></div>
+		</div>
+		{/foreach}
+		</div>
+
+                    </div>
+	<div class="clearfix"></div>

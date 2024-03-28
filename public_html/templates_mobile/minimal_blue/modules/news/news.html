@@ -1,0 +1,35 @@
+{include file="header.html"}
+
+{capture name=some_content assign=field_name}title_{$crt_lang}{/capture}
+
+
+<div id="heading">{$news_settings[$field_name]}</div>
+
+<ul class="classified">
+
+	{if $no_news>0}
+
+	{if $no_news>$news_per_page} 
+	{include file="paginator.html"}
+	{/if}
+
+	{foreach name=listings from=$news item=v}
+	<li class="classified">
+		<h3 class="pl10">{$v.title}</h3>
+		<div class="pl10" style="font-size: 0.9em; font-style: italic;">{$v.date_nice}<div>
+		{if $v.image}<img src="{$live_site}/modules/news/images/{$v.image}" class="pl10" />{/if}
+		<div class="p10">{$v.content}</div>
+	</li>
+	{/foreach}
+
+	{if $no_news>$news_per_page} 
+	<div class="mb20 clearfix">
+	{include file="paginator.html"}
+	</div>
+	{/if}
+
+	{/if}
+
+</ul>
+
+{include file="footer.html"}

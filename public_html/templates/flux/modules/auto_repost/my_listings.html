@@ -1,0 +1,14 @@
+{if $group_allowed && $v.active}
+
+{if ($v.repost==0 || $v.repost.active==0) && !$v.pending_repost}
+<div class="status_btns">
+<a href="{$live_site}/modules/auto_repost/auto_repost.php?id={$v.id}"><div class="med-btn btn2 ml10">{$lng_repost.repost_your_ad|replace:" ":"&nbsp;"}</div></a>
+</div>
+{elseif $v.repost.active==1}
+<div class="status_btns">
+<a href="javascript:;"><div class="med-btn btn3 ml10 tooltip" title="{$v.repost.tasks_str}" style="height: 40px; line-height: 40px; padding: 0 20px; ">{$lng_repost.reposts_scheduled|replace:" ":"&nbsp;"}</div></a>
+</div>
+
+{/if}
+
+{/if}

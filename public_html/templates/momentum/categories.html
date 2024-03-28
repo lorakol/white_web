@@ -1,0 +1,50 @@
+{literal}
+<style type="text/css">
+@media all and (min-width: 600px) {
+	.category { width: {/literal}{$width}{literal}%; }
+}
+</style>
+{/literal}
+{capture name=some_content assign=count}{$array_categories|@count}{/capture}
+{capture name=some_content assign=c}{$count/$appearance.max_cat_per_row|ceil}{/capture}
+
+{foreach from=$array_categories item=v name=cat}
+	{capture name=some_content assign=categ_url}{if $v.subcats>0}{if $seo_settings.enable_mod_rewrite}{seo->makeBrowseCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/index.php?category={$v.id}{/if}{else}	{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/listings.php?category={$v.id}{/if}{/if}{/capture}
+
+	<div class="mlink center lfloat category {if $smarty.foreach.cat.index%$appearance.max_cat_per_row!=$appearance.max_cat_per_row-1}right-border{/if}{if $smarty.foreach.cat.iteration/$appearance.max_cat_per_row|ceil!=$c} bottom-border{/if}" id="tdlink{$v.id}">
+
+		<input type="hidden" id="clink{$v.id}" value="{$categ_url}" />
+		<div class="ctitle">{$v.name}</div>
+
+		{if $v.picture}<div class="pt10"><img src="{$live_site}/images/categories/{$v.picture}" alt="{$v.alt}" /></div>{/if}
+
+		{if $appearance.categ_count_ads}
+
+		{capture name=some_content assign=cat_str}{$v.ads}&nbsp;{if $v.ads==1}{$lng.general.activead}{else}{$lng.general.activeads}{/if}{if $v.subcats}, {$v.subcats} {if $v.subcats==1}{$lng.general.subcat}{else}{$lng.general.subcats}{/if}{/if}{/capture}
+
+		<div class="btn3 btn_smaller"><strong>{$cat_str|replace:" ":"&nbsp;"}</strong></div>
+		{/if} {* end if count ads *}
+
+		<div class="pt10 p20 small-light cdescription">{$v.description}</div>
+	
+	</div>
+
+	{if $smarty.foreach.cat.index%$appearance.max_cat_per_row==$appearance.max_cat_per_row-1 || $smarty.foreach.cat.index==$count-1}
+    <div class="clearfix"></div>
+	{/if}
+
+{/foreach}
+
+<script type="text/javascript">
+{literal}
+jQuery(document).ready(function() {
+	$(".category").click(function() {
+		var cid = jQuery(this).attr("id").substr(6);
+		var url = $("#clink"+cid).val();
+		window.location.href = url;
+		return;
+		
+	});
+});
+{/literal}
+</script>

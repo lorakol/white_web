@@ -1,0 +1,92 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+
+<form name="subscriptions" method="post" action="subscriptions.php" class="main">
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng.useraccount.subscriptions}</h1></div>
+
+<div class="tt"><a href="subscribe.php" class="add lfloat mr5 tooltip" title="{$lng.useraccount.buy_package}"><img src="{$template_path}/images/add.png" /></a></div>
+
+</div> {* end page_bounds *}
+
+<div class="wbg pt30">
+<div class="page_bounds">
+
+{foreach from=$subscriptions_array item=v}
+
+<div class="item{if !$v.active} inactive{/if}">
+
+	<div class="item-top">
+
+		<div class="col-m-5">
+		{$lng.listings.id}: <b>#{$v.id}</b><br/>
+		{$lng.subscriptions.package}: <b>{$v.package_name}</b>
+		</div>
+		<div class="col-m-5">
+		{$lng.subscriptions.remaining_ads}: <b>{if $v.ads_left==-1}{$lng.general.unlimited}{else}{$v.ads_left}{/if}</b><br/>
+		{$lng.subscriptions.date_start}: {$v.date_start_nice}<br/>
+		{if $v.date_renew!='' && $v.date_renew_nice && $v.date_renew!=$v.date_start}{$lng.subscriptions.date_renew}: {$v.date_renew_nice}<br/>{/if}
+		{if $v.date_end!='' && $v.date_end_nice}{$lng.subscriptions.date_end}: {$v.date_end_nice}{/if}
+		</div>
+
+		<div class="status_btns">
+			{if $v.active}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+			{else}
+			<div class="small-btn inactivebutton icon">{$lng.listings.inactive}</div>
+			{/if}
+			{if $v.pending}
+			<a href="javascript:;" title="{if isset($v.pending_info)}{$v.pending_info}{/if}" class="tooltip"><div class="small-btn pendingbutton icon">{$lng.listings.pending}</div></a>
+			{/if}
+			{if $v.expired}
+			<div class="small-btn expiredbutton icon">{$lng.listings.expired}</div>
+			{/if}
+
+			{if $v.recurring}
+			<div class="small-btn optionsbutton icon">{$lng.subscriptions.recurring}</div>
+			{/if}
+		</div>
+
+		<div class="clearfix"></div>
+	</div> {* end item-top *}
+	<div class="item-bottom">
+		{if $v.fixed==0}
+
+		<a href="javascript:;" onclick="onDelete('{$v.id}','{$lng.subscriptions.confirm_delete|addslashes}', 'usr_pkg');" class="ubtn delbtn">{$lng.general.delete}</a>
+
+		{if $v.expired && !$c.recurring}
+		<a href="subscribe.php?id={$v.id}&renew=1" class="ubtn">{$lng.listings.renew}</a>
+		{/if}
+
+		{/if}
+
+	</div> {* end item-bottom *}
+
+</div> {* end item *}
+{/foreach}
+
+{if !$no_subscriptions}
+<div class="info">{$lng.subscriptions.no_subscriptions}</div>
+{/if}
+
+</div>{* end page_bounds *}
+
+<div class="mb40"></div>
+
+</div> {* end wbg *}
+</form>
+
+{literal}
+<script>
+	$(document).ready(function() {
+
+		$('.tooltip').powerTip({
+			placement: 'n'
+		});
+
+	});
+</script>
+{/literal}
+
+{include file="footer.html"}

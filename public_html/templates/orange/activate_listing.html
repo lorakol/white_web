@@ -1,0 +1,89 @@
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<div id="form_container">
+<div class="title">
+<h1>{$lng.listings.activate_listing} #{$id}</h1>
+</div>
+<div class="form_content">
+
+<div class="error" style="display: none;"></div>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function () {
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { 
+
+		return true;  
+	},
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1) {
+
+				$(".sms_info").html("<p>"+ret.info+"</p>");
+				$(".sms_info").show();
+				$(".error").hide();
+
+				$(".tbox").hide();
+				$(".form_footer").hide();
+				
+				$("body").removeClass("loading"); 
+				return;
+			}
+
+			// response = 0 -> show the error
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+			//$(".options").hide();
+
+			$("body").removeClass("loading"); 
+
+} 
+
+//initialize the AJAX form
+ $('#activation_form').ajaxForm(options);
+
+	// *********** tax value **************
+
+}); // end document ready
+
+{/literal}
+
+</script>
+
+<form name="activation_form" id="activation_form" method="post" action="activate_listing.php?id={$id}&post=1">
+
+<div class="dcenter eop info sms_info">{if isset($info) && $info}<p>{$info}</p>{/if}</div>
+{if !isset($active) || !$active}
+<div class="dcenter eop topnoborder tbox">
+	<div class="left_div">{$lng.users.verification_code}</div>
+	<div class="right_div"><input type="text" name="activation" id="activation" size="10" /></div>
+</div>
+
+<div class="dcenter eop topnoborder form_footer">
+	<div class="buttons">
+		<span class="positive"><input type="submit" name="Submit" value="{$lng.general.submit}" /></span>
+	</div>
+</div>
+{/if}
+
+</form>
+
+
+</div>
+</div>
+{include file="footer.html"}

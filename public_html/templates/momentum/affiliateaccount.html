@@ -1,0 +1,97 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+
+<div class="main1 box">
+<div class="page_title heading"><h1>{$lng.useraccount.statistics}</h1></div>
+
+<div class="half lfloat">
+
+<div class="pdiv7">
+<div class="heading heading_large heading5">{$lng.stats.general}</div>
+<div class="heading_large_under heading5-under"></div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.useraccount.account_type}</div>
+<div class="rfloat gray-bold">{$group.name}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.users.affiliate_id}</div>
+<div class="rfloat gray-bold">{$crt_usr_sett.affiliate_id}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.users.affiliate_link}</div>
+<div class="rfloat gray-bold"><a href="{$user.affiliate_link}" target="_blank">{$user.affiliate_link}</a></div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-even">
+<div class="lfloat">{$lng.useraccount.last_login}</div>
+<div class="rfloat gray-bold">{if isset($last_login.date_login_nice) && $last_login.date_login_nice}{$last_login.date_login_nice}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.useraccount.last_login_ip}</div>
+<div class="rfloat gray-bold">{if isset($last_login.ip) && $last_login.ip}{$last_login.ip}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-even">
+<div class="lfloat">{$lng.affiliates.last_payment}</div>
+<div class="rfloat gray-bold">{if isset($last_payment.amount) && $last_payment.amount}{$last_payment.amount}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.affiliates.last_payment_date}</div>
+<div class="rfloat gray-bold">{if isset($last_payment.date) && $last_payment.date}{$last_payment.date}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-even">
+<div class="lfloat">{$lng.affiliates.next_payment_date}</div>
+<div class="rfloat gray-bold">{if isset($next_payment_date) && $next_payment_date}{$next_payment_date}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.affiliates.total_due}</div>
+<div class="rfloat gray-bold"><div class="lfloat">{$total_due}</div><div class="mt4 lfloat btn7 space5"><a href="affiliate_revenue.php">{$lng.affiliates.revenue_history}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-even">
+<div class="lfloat">{$lng.affiliates.total_payments}</div>
+<div class="rfloat gray-bold"><div class="lfloat">{$total_payments}</div><div class="mt4 lfloat btn7 space5">
+	<a href="affiliate_payments_history.php">{$lng.affiliates.payments_history}</a></div></div>
+<div class="clearfix"></div>
+</div>
+
+{if isset($pending_payment) && $pending_payment}
+<div class="row row-even">
+<div class="lfloat">{$lng.affiliates.pending_payment}</div>
+<div class="rfloat gray-bold">{$pending_payment}</div>
+<div class="clearfix"></div>
+</div>
+{/if}
+
+<div class="row-bottom"></div>
+
+</div>
+
+</div>{* end half *}
+
+<div class="half rfloat">
+
+
+
+</div>
+<div class="clearfix"></div>
+</div> {* end main1 *}
+
+{include file="footer.html"}

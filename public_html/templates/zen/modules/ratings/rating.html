@@ -1,0 +1,56 @@
+	{* ----------- start rating ------------ *}
+	<script type="text/javascript" src="{$live_site}/modules/ratings/js/jquery.rating.min.js"></script>
+	<link href="{$live_site}/modules/ratings/css/rating{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+
+	<div class="rating" id="rating">
+
+	{if $ratings_settings.ar_enable_reviews}
+
+	{section name=loop start=0 loop=5 step=1}
+	<img src="{$live_site}/modules/ratings/css/images/star{if $listing.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />
+	{/section}
+
+	{else}
+
+	{section name=loop start=0 loop=5 step=1}
+	<input name="star" type="radio" class="star" {if $listing.rating|round>=($smarty.section.loop.index+1)}checked="checked"{/if} value="{$smarty.section.loop.index+1}"/>
+	{/section}&nbsp;<span id="thanks">{if $voted}{$lng_ratings.you_rated_listing} {$voted}{/if}</span>
+	<div class="clearfix"></div>
+	<div id="rating_text" class="small">{$lng_ratings.rating}: {$listing.rating|round} ( {$listing.no_ratings} {if $no_ratings!=1}{$lng_ratings.votes}{else}{$lng_ratings.vote}{/if}{if $ratings_settings.ar_enable_reviews}, {$no_reviews} {if $no_reviews!=1}{$lng_ratings.reviews}{else}{$lng_ratings.review}{/if}{/if})</div>
+	{/if}
+	</div>
+	<div class="clearfix"></div>
+
+<script type = "text/javascript">
+{if $voted || $same_user || $rating_nologin}
+{literal}
+jQuery(document).ready(function() {
+	$('.star').rating('readOnly',true);
+	$('.star').click(function(){
+		{/literal}{if $same_user}alert("{$lng_ratings.you_cannot_rate_your_listings}");{elseif $voted}alert("{$lng_ratings.you_already_rated_listing}");{else}alert("{$lng_ratings.you_need_to_login}"){/if}{literal}
+	});
+});
+{/literal}
+{/if}
+
+{literal}
+
+$('.star').rating({
+  callback: function(value, link){
+	$.post("{/literal}{$live_site}{literal}/modules/ratings/add_listing_rating.php", { id: "{/literal}{$listing.id}{literal}", rating: value, ip: "{/literal}{$ip}{literal}"}, function(data){ 
+		//alert(data);
+		var arr = data.split("|");
+		var rating = arr[0];
+		var info = arr[1];
+		$('#rating_text').html(info);
+		$('#thanks').html('{/literal}{$lng_ratings.thanks_for_rating}{literal}');
+		$('.star').rating('readOnly',true);
+	} );
+  }
+
+});
+
+{/literal}
+</script>
+
+{* ----------- end rating ------------ *}

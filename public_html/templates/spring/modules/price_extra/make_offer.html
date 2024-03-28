@@ -1,0 +1,135 @@
+<style>
+
+	#box_offer {
+		margin-left: 0;
+		margin-right: 0;
+		padding: 30px 20px;
+		background: #555 !important;
+	}
+	#box_offer label {
+		display: inline-block; 
+		width: 100px;
+		line-height: 38px;
+	}
+	.large {
+		font-family: 'Open Sans', sans-serif;
+		font-weight: 600;
+		font-size: 1.1em;
+	}
+	.offer_price {
+		color: 
+	}
+	#box_offer input {
+		width: 100%;
+	}
+	.input_offer::before {
+		content: "{$listing.currency}";
+		position: absolute;
+		top: 8px;
+		left: 110px;
+		z-index: 2;
+		pointer-events: none;
+	}
+	.active_btn {
+		color: #444;
+		background: #fff;
+		border: 1px solid #444;
+	}
+.cdbtns {
+	display: flex;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+}
+
+.cdbtn {
+	flex-grow: 1;
+	-webkit-flex-grow: 1;
+	-ms-flex-grow: 1;
+}
+.wide_btn2 {
+	background: #aaa;
+	border-radius: 5px;
+	padding: 8px 10px 8px 10px;
+	color: #fff;
+	text-align: center;
+	margin-top: 20px;
+	font-size: 1.1em;
+}
+.wide_btn2:hover {
+	opacity: 0.8;
+}
+
+</style>
+
+<div class="clearfix"></div>
+<div class="box hidden" id="box_offer">
+
+{if $logged_in}
+	<div id="offer_info" class="info" style="display: none;"></div>
+	<div id="offer_error" class="error" style="display: none;"></div>
+
+	<div class="offer_form">
+	<div class="pb10">
+	<label class="large">{$lng.listings.price}:</label>
+	<span class="large offer_price">{$listing.price_curr}</span>
+	</div>
+	
+	<div class="cdbtns relative">
+	<label class="large">{$lng_pe.offer}:</label>
+	<div class="cdbtn input_offer"><input type="text" name="offer" id="offer" class="large" value="{if isset($listing.price) && $listing.price}{$listing.price}{/if}" /><input type="hidden" name="offer_currency" id="offer_currency" value="{$listing.currency}"/></div>
+	</div>
+	
+	<a href="javascript:;" id="MakeOffer" /><div class="wide_btn2">{$lng_pe.send_offer}</div></a>
+	</div>
+{else}
+<p>{$lng_pe.need_to_login|replace:'::LOGIN_LINK::':$login_link}</p>
+{/if}
+</div>
+
+
+<script>
+
+$(document).ready(function () {
+
+	$("#make_offer").click(function() {
+		$( "#box_offer" ).toggle("slow");
+		$( "#make_offer_btn" ).toggleClass( "active_btn" );
+		$(".offer_form").show();
+		$("#offer_info").hide();
+	});
+
+	$("#MakeOffer").click(function(event){
+
+	var offer = $("#offer").val();
+	
+	var currency = $("#offer_currency").val();
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{$live_site}/modules/price_extra/make_offer.php?aid={$listing.id}&offer="+offer+"&currency="+currency,
+		data		: $(this).serializeArray(),
+		success: function(responseText) {
+
+				var ret = JSON.parse(responseText);
+				if(ret.response==1) {
+
+					$("#offer_info").html("<p>"+ret.info+"</p>");
+					$("#offer_info").show();
+					$("#offer_error").hide();
+					$(".offer_form").slideUp();
+				
+					return;
+
+				}
+				
+				$("#offer_error").html("<p>"+ret.error+"</p>");
+				$("#offer_error").show();
+
+			} // end data
+		});// end ajax
+
+});
+
+});
+
+</script>

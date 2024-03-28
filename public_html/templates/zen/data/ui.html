@@ -1,0 +1,18 @@
+<script type="text/javascript">
+
+var len = $('script[src*="{$live_site}/libs/jQuery/jquery-ui.js"]').length; 
+{literal}
+if(!len) {
+
+	var head = document.getElementsByTagName('head')[0];
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.src = "{/literal}{$live_site}{literal}/libs/jQuery/jquery-ui.min.js";
+	head.appendChild(script);
+
+	$("<link rel='stylesheet' type='text/css' href='{/literal}{$live_site}{literal}/libs/jQuery/jquery-ui.min.css'>").appendTo("head");
+
+}
+
+{/literal}
+</script>

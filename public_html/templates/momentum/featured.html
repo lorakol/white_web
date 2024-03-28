@@ -1,0 +1,89 @@
+<!-- FEATURED ADS --> 	
+{capture name=some_content assign=item_width}{math equation="(w-w1)/no" w=$appearance.outer_table w1=75 no=$ads_settings.no_featured_on_row}{/capture}
+{*
+<div class="featured-heading" style="font-size: 120%; font-weight: bold; color: #333; background-color: #e5e5e5; margin-bottom: -20px; margin-top: 20px; height: 40px; line-height: 40px; width: 200px; padding-left: 20px;">{$lng.general.featured_ads}</div>
+*}
+<div class="box fads">
+
+	<a class="prev browse left"></a>
+	<a class="next browse right"></a>
+
+		<div id="featured" style="width: 100%;">	
+	
+		<!-- root element for the items -->
+		{section name=loop start=0 loop=$no_featured step=1}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$featured_ads[loop].id p2=$featured_ads[loop].title p3='' p4=$featured_ads[loop].category_id p5=$featured_ads[loop].slug}{else}{$live_site}/details.php?id={$featured_ads[loop].id}{/if}{/capture}
+
+
+			<div class="lbox square-lbox {if $text_direction!='rtl'}lfloat{else}rfloat{/if}" style="width: {$item_width}px;">
+
+				<div class="gallery-img-bg smallimg mb15 centered">
+				<a href="{$details_url}"><img class="pic" id="fpic{$featured_ads[loop].id}" src="{$live_site}/{$featured_ads[loop].image}" alt="{if $featured_ads[loop].image_id}{$featured_ads[loop].title|strip_tags:false|substr:0:100}{/if}" /></a>
+
+				{if $featured_ads[loop].sold}<div class="sold-bg">{$lng.listings.sold}</div>{/if}
+				{if $featured_ads[loop].rented}<div class="rented-bg">{$lng.listings.rented}</div>{/if}
+
+				{if in_array("acategories", $modules_array) && in_array($featured_ads[loop].category_id, $ac_settings.array_categories_list)}
+				<div id="ac{$featured_ads[loop].id}" class="ac_over">{$lng.general.click_to_view}</div>
+				{/if}
+
+				</div>
+
+				<h3>{if $data_set=="cars" && ((isset($featured_ads[loop].make) && $featured_ads[loop].make) || (isset($featured_ads[loop].model) && $featured_ads[loop].model))}<a href="{$details_url}">{$featured_ads[loop].make} {$featured_ads[loop].model}</a>{else}<a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$featured_ads[loop].title|mb_truncate:30:"...":"UTF-8"}{else}{$featured_ads[loop].title|truncate:30:"...":false}{/if}</a>{/if}</h3>
+
+				{*{$featured_ads[loop].location_str}*}
+
+				{if $ads_settings.enable_price && $featured_ads[loop].price>=0}<div class="small-dark-gray">{$featured_ads[loop].price_curr}</div>
+				{/if}
+			</div>
+		{/section}
+
+		</div> {* end featured *}
+
+{literal}
+<script type="text/javascript">
+$(document).ready(function() {
+
+	$("#featured").carouFredSel({
+
+	    items: {
+	        //visible: {/literal}{$ads_settings.no_featured_on_row}{literal},
+		visible: {
+			min: 1,
+			max: 15
+		}
+	    },
+	    scroll: {
+	        items: 1,
+	        duration: 500,
+	        pauseOnHover: true,
+		conditions: function() { {/literal}{if $no_featured>$ads_settings.no_featured_on_row}return true; {else}return false;{/if}{literal} }
+	    },
+	    auto: 1500,
+	    responsive: true,
+	    prev: {
+	        button: ".prev",
+	        key: "left"
+	    },
+	    next: {
+	        button: ".next",
+	        key: "right"
+	    }
+
+	});
+	 
+
+	 $(".ac_over").on('click',function(){
+		var acid = jQuery(this).attr("id").substr(2);
+		$("#ac"+acid).hide();
+	});
+
+	});
+</script>
+{/literal}
+
+
+</div>
+
+<!-- END FEATURED ADS -->

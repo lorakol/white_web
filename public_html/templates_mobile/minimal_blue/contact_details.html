@@ -1,0 +1,117 @@
+{include file="header.html"}
+
+<div id="heading">{$lng.listings.contact_info}</div>
+<div>
+<ul class="details_list">
+
+	{if in_array("ratings",$modules_array) && $ratings_settings.rate_users}
+	<li>
+	{include file="modules/ratings/user_rating.html"}
+	</li>
+	{/if}
+
+	{* ------- images fields if any (logo ) -------- *}
+	{foreach from=$user_fields_array item=v}
+		{if $v.type=="image" && isset($user[$v.caption]) && $user[$v.caption]}<li><img src="{$live_site}/uploads/{$v.caption}/{$user[$v.caption]}" class="logo" alt="" /></li>{/if}
+	{/foreach}
+
+	{if isset($listing.site_url) && $listing.site_url && $ads_settings.enable_url}
+	<li>
+	<span><img src="{$template_path}images/website_url.png" /></span>&nbsp;<a href="{$listing.site_url}" class="more" target="_blank" rel="nofollow">{$listing.site_url}</a>
+	</li>
+	{/if}
+	
+	{foreach from=$user_fields_array item=v}
+	{capture name=some_content assign=pub_field}pb_{$v.caption}{/capture}
+	{if isset($user[$v.caption]) && $user[$v.caption] && ($v.public==1 || ($v.public==2 && $user[$pub_field]==1 )) && $v.type!="google_maps" && $v.type!="checkbox_group" && $v.type!="youtube"&& $v.type!="image" && $v.type!="htmlarea"&& $v.type!="textarea"}
+	<li>
+		<span>{$v.name}:</span>
+		{if $v.type=='url'}<span><img src="{$template_path}images/website_url.png" /></span>&nbsp;<a href="{$user[$v.caption]}" class="more" target="_blank" rel="nofollow">{/if}
+
+		{if $v.prefix}{$v.prefix}{/if}
+
+		{if $v.type=="file"}
+			<a href="{$live_site}/uploads/{$v.caption}/{$user[$v.caption]}"><img src="{$template_path}/images/download.png" class="tooltip" alt="" title="{$lng.general.download}"/></a>
+		{elseif $v.type=="date"}
+		{$user.vis[$v.caption]}
+
+		{elseif $v.validation_type=="numeric"}
+		{$user.formatted[$v.caption]}
+
+		{elseif $v.type=="textarea"}
+		{$user.formatted[$v.caption]}
+
+		{elseif $v.type=="multiselect"}
+		{$user[$v.caption]|@implode:', '}
+
+		{elseif $v.type=="checkbox"}
+		{if $user[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+		{elseif $v.type=="user_email"}
+
+		<span><img src="{$template_path}images/email.png" /></span><span class="bold dark" id="span_{$v.caption}">{$user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_email}</a>
+
+		{elseif $v.type=="phone"}
+
+		<span><img src="{$template_path}images/phone.png" /></span><span class="bold dark" id="span_{$v.caption}">{$user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_phone}</a>
+
+		{elseif $v.type=="whatsapp"}
+
+		<span><img src="{$template_path}images/whatsapp.png" /></span><span class="bold dark" id="span_{$v.caption}">{$user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_whatsapp}</a>
+
+		{else}
+		{$user[$v.caption]}
+		{/if}
+
+		{if $v.postfix}{$v.postfix}{/if}
+
+		{if $v.type=='url'}</a>{/if}
+	</li>
+	{/if}
+	{/foreach}
+
+	{foreach from=$user_fields_array item=v}
+	{if isset($user[$v.caption]) && $user[$v.caption] && $v.public && ($v.type=="htmlarea" || $v.type=="textarea")}
+	<li class="txt"><span>{$v.name}</span>
+		{$user[$v.caption]}
+	</li>
+	{elseif isset($user[$v.caption]) && $user[$v.caption] && $v.type=='checkbox_group'}
+	<li class="txt"><span>{$v.name}:</span>&nbsp;&nbsp;{foreach from=$user[$v.caption] item=t name=check}{$t}{if $smarty.foreach.check.index!=$user[$v.caption]|@count-1}, {/if}{/foreach}</li>
+	{/if}
+	{/foreach}
+
+</ul>
+</div>
+<div class="clearfix"></div>
+
+{if $back}
+<div class="dcenter button2"><a class="back" href="javascript:;" onclick="history.back(); return false;">{$lng.general.back}</a></div>
+{/if}
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function() {
+
+$("a.more").click(function(event){
+
+	var field = jQuery(this).attr("id").substr(5);
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/get_phone.php?id={$id}&field={literal}"+field,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$("#span_"+field).html(data);
+				$("#show_"+field).hide();
+
+			} // end data
+		});// end ajax
+});
+
+});
+{/literal}
+</script>
+
+{include file="footer.html"}

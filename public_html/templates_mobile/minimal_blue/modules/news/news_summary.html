@@ -1,0 +1,10 @@
+	{capture name=some_content assign=field_name}title_{$crt_lang}{/capture}
+	<div id="heading" class="pl10">{$news_settings[$field_name]}</div>
+
+	<ul class="list">
+
+		{foreach from=$news item=v name=newsloop}
+		<li><a href="{$live_site}{$news_url}">{$v.title}</a></li>
+		{/foreach}
+
+	</ul>

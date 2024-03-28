@@ -1,0 +1,84 @@
+{literal}
+<script>
+//<![CDATA[
+
+$(document).ready(function() {
+
+$(document).on("click",".crop", function (event) {
+    
+    //alert(event.target.id);
+
+    $('<a href="crop_image.php?ad_id={/literal}{$id}{literal}&id='+event.target.id+'">').magnificPopup({
+        type: 'ajax',
+        showCloseBtn: true,
+		closeBtnInside: true,
+		modal: true
+    }).click();   
+    
+	$(document).on('click', '.popup-modal-dismiss', function (e) {
+          e.preventDefault();
+          $.magnificPopup.close();
+	});
+    
+});
+
+
+	$(document).on("click", ".iel", function(event){ 
+    event.stopPropagation();
+	});
+	
+	$(document).on("click", ".editTitle", function(event){ 
+
+	// remove all other image title forms
+	$('.img_title').remove();
+		
+	// get current selected plan
+	var crt_pic = jQuery(this).attr("name");
+	
+	// get title for the image
+	var title = "";
+	if($("img[name|='"+crt_pic+"']").attr("title")) title=$("img[name|='"+crt_pic+"']").attr("title");
+	
+	var edit_title = '<div class="img_title iel"><form id="image_title_form" class="iel" method="post" action="include/edit_im_title.php?id='+lid+'&pending_edited='+pending_edited+'"><input type="hidden" name="pname" id="pname" value="'+crt_pic+'" class="iel"><input class="ptitle iel" name="ptitle" id="ptitle" value="'+title+'" placeholder="Your title here" /><div class="buttons mt5 iel"><input type="submit" name="Submit" value="Submit" class="button wide_button" /></div></form></div>';
+	
+	$("img[name|='"+crt_pic+"']").parent().prepend(edit_title);
+	
+	event.stopPropagation();
+	
+	});
+	
+	
+	// remove all img_title when click anywhere else but on .editTitle
+	$(document).on("click", "html", function(event){ 
+		$('.img_title').remove();
+	});
+
+	$(document).on("submit", "#image_title_form", function (e) {
+		
+    e.preventDefault();
+    var url = $(this).attr('action');
+	
+    $.ajax({
+        type: 'post',
+        url: url,
+        data: $(this).serialize(),
+        success: function (responseText) {
+            
+			//var ret = JSON.parse(responseText);
+			// set title for the image
+			var new_title = $("#ptitle").val();
+			var crt_pic = $("#pname").val();
+			
+			$("img[name|='"+crt_pic+"']").attr("title", new_title);
+			
+			$('.img_title').remove();
+        }
+    });
+});
+
+}); // end document.ready
+
+//]]>
+
+</script>
+{/literal}

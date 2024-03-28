@@ -1,0 +1,405 @@
+{if !isset($post) || !$post}
+{include file="header.html"}
+{include file="data/fancybox.html"}
+{include file="data/form_includes.html" fields_array=$user_fields}
+
+<div class="wait"></div>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<script type="text/javascript" src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+
+<link rel="stylesheet" href="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.css">
+<script src="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.min.js"></script>
+
+{if !$sub || $sub=="acc_info"}
+<div id="heading">{$lng.useraccount.modify_account_info}</div>
+
+<div id="form_container">
+
+<div class="info" id="account_info" style="display: none;"></div>
+
+<div class="form_content" id="div_account_info">
+
+<form name="account_form" id="account_form" method="post" action="account_info.php?action=account_info" enctype="multipart/form-data">
+<ul>
+
+
+{if $tmp.affiliate}
+<li>
+	<label>{$lng.users.affiliate_link}</label><input name="affiliate_link" size="30" type="text" readonly="readonly" value="{$tmp.affiliate_link}" onClick="javascript:this.form.affiliate_link.focus();this.form.affiliate_link.select();" />
+</li>
+
+<li>
+	<label>{$lng.users.affiliate_paypal_email}<span class="mandatory"> *</span></label><input type="text" size="30" name="affiliate_paypal_email" id="affiliate_paypal_email"  value="{$tmp.affiliate_paypal_email}" />
+</li>
+
+
+{/if}
+
+{include file="custom_fields_form.html" fields_array=$user_fields user_fields=[] edit=1 type="user"}
+
+{if $tmp.store>0}
+
+<li>
+	<img src="{$template_path}images/info.png"  class="tooltip" title="{$lng.users.info.store_banner}" /><span class="mandatory"> *</span>{$lng.users.store_banner}</li>
+	<input type="file" name="store_banner" id="store_banner" />
+
+	{if $tmp.store_banner}<a href="{$live_site}/images/store/{$tmp.store_banner}" class="imgfield"><img src="{$template_path}images/camera.png" class="mbm7" alt=""/></a>
+	<a href="{$live_site}/account_info.php?delete=store_banner"><img src="{$template_path}images/delete_file.png" class="mbm7 tooltip" title="{$lng.general.delete}"  /></a>
+	{/if}
+
+</li>
+{/if}{* end if store *}
+
+</ul>
+
+<br/><br/><br/>
+<div class="buttons">
+<span class="positive"><input type="submit" name="Submit" value="{$lng.general.save}" /></span>
+</div>
+
+<div class="clearfix"></div>
+
+</form>
+</div>
+</div>
+<br/><br/>
+{/if} {* end if !$sub || $sub=="acc_info" *}
+
+{if !$sub || $sub=="change_pass"}
+
+<div id="heading">{$lng.useraccount.change_password}</div>
+
+<div id="form_container">
+
+<div class="info" id="pass_info" style="display: none;"></div>
+
+<div class="form_content" id="div_change_pass">
+
+<form name="pass_form" id="pass_form" method="post" action="account_info.php?action=save_pass">
+<ul>
+
+<li>
+	<label>{$lng.useraccount.password}<span class="mandatory"> *</span></label>
+	<input type="password" name="password" id="password" size="30" />
+</li>
+
+<li>
+	<label>{$lng.useraccount.repeat_password}<span class="mandatory"> *</span></label>
+	<input type="password" name="password1" id="password1" size="30" />
+</li>
+
+</ul>
+<br/><br/><br/>
+
+<div class="buttons">
+	<span class="positive"><input type="submit" name="Submit_password" value="{$lng.general.save}" /></span>
+</div>
+
+<div class="clearfix"></div>
+
+</form>
+
+{/if} {* end if !$sub || $sub=="change_pass" *}
+
+
+
+
+
+{if $security_settings.enable_2fa}
+<br/><br/>
+<a id="2fa"></a>
+<form name="2fa_form" id="2fa_form" method="post" action="account_info.php?action=2fa">
+
+<div id="heading">{$lng.useraccount.2fa|replace:" ":"&nbsp;"}</div>
+<br/>
+
+{if isset($tfa_info) && $tfa_info}<p>{$tfa_info}</p>{/if}
+
+<div id="2fa_info" class="info" style="display: none;"></div>
+
+
+<ul>
+
+<li>
+	<label for="enable_2fa"><input type="checkbox" name="enable_2fa" id="enable_2fa" {if isset($tmp.enable_2fa) && $tmp.enable_2fa}checked{/if} />&nbsp;{$lng.useraccount.enable_2fa}</label>
+</li>
+
+<li>
+	<label>{$lng.useraccount.2fa_secret}</label>
+	<input type="text" name="2fa_secret" id="2fa_secret" size="50" readonly {if isset($tmp.2fa_secret) && $tmp.2fa_secret}value="{$tmp.2fa_secret}"{/if} />
+	
+	<a class="med-btn btn-green" href="account_info.php?regenerate_2fa=1">{$lng.general.regenerate}</a>
+</li>
+
+<li>
+	{if isset($tmp.2fa_secret) && $tmp.2fa_secret}
+		<div class="mt10"><img src="{$qr_code_url}" style="border: 1px solid #777;"></div>
+		<div class="information">{$lng.useraccount.info.qr_code}</div>
+	{/if}
+</li>
+
+</ul>
+
+<div class="buttons">
+<span class="positive"><input type="submit" class="button wide_button positive" name="Submit_password" value="{$lng.general.save}" /></span>
+</div>
+<div class="clearfix"></div>
+<br/>
+</form>
+{/if}
+
+
+{if $settings.users_can_ask_account_removal}
+
+{if !$sub || $sub=="remove_account"}
+<br/><br/>
+
+<div id="heading"><a name="acc_removal"></a>{$lng.useraccount.request_removal}</div>
+<br/>
+
+{if isset($info_acc_removal)}<p>{$info_acc_removal}</p>{/if}
+
+<div class="info" id="removal_info" style="display: none;"></div>
+
+<form name="acc_removal_form" id="acc_removal_form" method="post" action="account_info.php?action=request_removal">
+
+<div class="buttons">
+	<span class="positive"><input type="submit" name="Request_removal" value="{$lng.useraccount.request_removal_now}" /></span>
+</div>
+
+<div class="clearfix"></div>
+<br/>
+</form>
+</div> {* end form_container *}
+{/if}
+{/if}
+
+
+
+</div>
+</div>
+
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+$(document).ready(function() {
+
+
+var options = { 
+       // target:        '#output1',   // target element(s) to be updated with server response 
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  beforeSubmit,  // pre-submit callback 
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+function beforeSerialize(jqForm, options) {
+
+	$("body").addClass("loading"); 
+
+	if (typeof data_htmlarea !== 'undefined')
+	for(var i=0;i<data_htmlarea.nicInstances.length;i++){ data_htmlarea.nicInstances[i].saveContent(); }
+
+	// international phones errors
+	var extra_phone_error = recheckIntlPhone();
+	if(extra_phone_error.length>0) {
+
+		// clean all fields possible err class
+		$(".err").removeClass("err");
+		// remove all err_labels
+		$(".err_label").remove();
+			
+		for (var i = 0, len = extra_phone_error.length; i < len; i++) {
+
+			$("#"+extra_phone_error[i]).addClass("err");
+			// add as child to first right_form
+			$("#"+extra_phone_error[i]).before('<label class="err_label">{/literal}{$lng.listings.errors.invalid_phone}{literal}</label>');
+			
+		}
+
+		$("body").removeClass("loading"); 
+
+		// move the page to the first err_label element
+		$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+		return false;
+			
+	} // end international phone error
+
+}
+
+// pre-submit callback 
+function beforeSubmit(formData, jqForm, options) { 
+
+    // formData is an array; here we use $.param to convert it to a string to display it 
+    // but the form plugin does this for you automatically when it submits the data 
+    var queryString = $.param(formData); 
+    return true; 
+
+} 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+	var ret = JSON.parse(responseText);
+
+	if(ret.response==1) {
+
+		// clean all fields possible err class
+		$(".err").removeClass("err");
+		// remove all err_labels
+		$(".err_label").remove();
+
+		// show info message and hide form
+		$(".info").slideUp();
+		$("#account_info").html("<p>"+ret.info+"</p>");
+		$("#account_info").slideDown();
+
+		// move the page to the info label
+		$('html,body').animate({scrollTop:$("#account_info").offset().top}, 'slow');
+
+		$("body").removeClass("loading"); 
+
+		$("#div_account_info").hide();
+
+		return;
+
+	}
+
+	// response = 0 -> there are errors in submit ad process 
+	var no_err = ret.error.length;
+	var err_field, err_string;
+
+	// clean all fields possible err class
+	$(".err").removeClass("err");
+	// remove all err_labels
+	$(".err_label").remove();
+
+	// mark each field with error 
+	for (var idx=0;idx<no_err;idx++) { 
+
+		err_field = ret.error[idx].field;
+		err_string = ret.error[idx].error;
+
+		$("#"+err_field).addClass("err");
+		$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+	}
+			
+	// move the page to the first err_label element
+	$('html,body').animate({scrollTop:$(".err_label:first").offset().top-60}, 'slow');
+
+	$("body").removeClass("loading");
+
+} 
+
+var options_pass = { 
+       // target:        '#output1',   // target element(s) to be updated with server response 
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { var queryString = $.param(formData); return true;  },
+        success:       successResponse_pass  // post-submit callback 
+ 
+    }; 
+
+
+// post-submit callback 
+function successResponse_pass(responseText, statusText, xhr, $form)  { 
+
+	var ret = JSON.parse(responseText);
+
+	$("body").removeClass("loading"); 
+
+	if(ret.response==1) {
+
+		// show info message and hide form
+		$(".info").slideUp();
+		$("#pass_info").html("<p>"+ret.info+"</p>");
+		$("#pass_info").slideDown();
+
+		// move the page to the info label
+		$('html,body').animate({scrollTop:$("#pass_info").offset().top}, 'slow');
+
+		$("#div_change_pass").hide();
+	
+		return;
+
+	}
+
+	// response = 0 -> there are errors in submit ad process 
+	var no_err = ret.error.length;
+	var err_field, err_string;
+
+	// clean all fields possible err class
+	$(".err").removeClass("err");
+	// remove all err_labels
+	$(".err_label").remove();
+
+	// mark each field with error 
+	for (var idx=0;idx<no_err;idx++) { 
+
+		err_field = ret.error[idx].field;
+		err_string = ret.error[idx].error;
+
+		$("#"+err_field).addClass("err");
+		$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+	}
+			
+	// move the page to the first err_label element
+	$('html,body').animate({scrollTop:$(".err_label:first").offset().top-60}, 'slow');
+
+} 
+
+
+var options_remove = { 
+       // target:        '#output1',   // target element(s) to be updated with server response 
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { var queryString = $.param(formData); return true;  },
+        success:       successResponse_remove  // post-submit callback 
+ 
+    }; 
+
+
+// post-submit callback 
+function successResponse_remove(responseText, statusText, xhr, $form)  { 
+
+	var ret = JSON.parse(responseText);
+
+	$("body").removeClass("loading"); 
+
+	if(ret.response==1) {
+
+		// show info message and hide form
+		$(".info").slideUp();
+		$("#removal_info").html("<p>"+ret.info+"</p>");
+		$("#removal_info").slideDown();
+		return;
+
+	}
+
+
+} 
+
+//initialize the AJAX form
+$('#account_form').ajaxForm(options);
+$('#pass_form').ajaxForm(options_pass);
+$('#acc_removal_form').ajaxForm(options_remove);
+
+$("a.imgfield").fancybox();
+
+	{/literal}
+	var gmaps_on = {if $gmaps}1{else}0{/if};
+	// initialize google maps
+	if (gmaps_on) load_gmaps();
+	{literal}
+
+
+});
+//]]>
+</script>
+{/literal}
+
+{include file="footer.html"}
+{/if}

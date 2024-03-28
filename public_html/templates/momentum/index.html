@@ -1,0 +1,146 @@
+{include file="header.html"}
+
+{literal}
+<style type="text/css">
+
+.inline-short-ad-details { {/literal}margin-{if $text_direction!="rtl"}left{else}right{/if}: {$ads_settings.thmb_width+30}{literal}px; }
+.smallimg { width: {/literal}{$ads_settings.thmb_width}{literal}px; height: {/literal}{$ads_settings.thmb_height}{literal}px; }
+{/literal}{if $appearance.max_cat_per_row!=3}{literal}
+.category_column { width: {/literal}{$width}{literal}%; }
+{/literal}{/if}{literal}
+
+</style>
+{/literal}
+
+<div class="main box">
+
+{* left column *}
+
+<div class="col-8 col-m-12 first_left_content"> 
+
+	{* first page content *}
+	{if $content}
+	{$content}
+	{/if}
+	{* end first page content *}
+
+	{if isset($firstpage_includes)}
+	{foreach from=$firstpage_includes item=l}
+	{include file="$l"}
+	{/foreach}
+	{/if}
+
+	{* ------ firstpage1 banners ------- *}
+	{if in_array("firstpage1", $banners_positions)}
+	{banner->getTemplateBanners p1='firstpage1' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{foreach from=$array_banners item=v}
+	<div class="center">{include file="banner.html" bclass="btypefp_lc"}</div><div class="clearfix"></div>
+	{/foreach}
+	{/if}
+	{* ------- end firstpage1 banners ------- *}
+
+	{if $appearance.first_page_type==1}
+	{include file="categories.html"}
+	{else}
+	{include file="tree_categories.html"}
+	{/if}
+
+
+	{* ------ firstpage2 banners ------- *}
+	{if in_array("firstpage2", $banners_positions)}
+	{banner->getTemplateBanners p1='firstpage2' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{foreach from=$array_banners item=v}
+	<div class="center">{include file="banner.html" bclass="btypefp_lc"}</div><div class="clearfix"></div>
+	{/foreach}
+	{/if}
+	{* ------- end firstpage2 banners ------- *}
+
+          <!-- quick access links -->
+	{* -------------- browse by location module -------------- *}
+	{if in_array("browse_location",$modules_array)}
+	{*<div class="clearfix"></div>*}
+	<br/>
+	{include file="modules/browse_location/browse_location.html"}
+	{/if}
+
+	{* -------------- browse by make module -------------- *}
+	{if in_array("browse_make",$modules_array)}
+	{*<div class="clearfix"></div>
+	<br/>*}
+	{include file="modules/browse_make/browse_make.html"}
+	{/if}
+          <!-- end quick access links -->
+</div>
+{* end left column *}
+
+{* right column *}
+<div class="col-4 col-m-12 first_right_content"> 
+
+{* ------ firstpage3 banners ------- *}
+{if in_array("firstpage3", $banners_positions)}
+{banner->getTemplateBanners p1='firstpage3' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{foreach from=$array_banners item=v}
+<div class="center">{include file="banner.html" bclass="btypefp_rc"}</div><div class="clearfix"></div>
+{/foreach}
+{/if}
+{* ------- end firstpage3 banners ------- *}
+
+{* -------------- latest ads -------------- *}
+{if $ads_settings.enable_latest}{include file="latest.html"}{/if}
+
+{* -------------- popular ads module -------------- *}
+{if in_array("popular_ads",$modules_array)}
+<div class="clearfix"></div>
+<br/>
+{include file="modules/popular_ads/popular_ads.html"}
+{/if}
+
+{* -------------- video ads module -------------- *}
+{if in_array("video_ads",$modules_array)}
+<div class="clearfix"></div>
+<br/>
+{include file="modules/video_ads/video_ads.html"}
+{/if}
+
+{* -------------- latest auctions module -------------- *}
+{if in_array("latest_auctions",$modules_array) && $ads_settings.enable_auctions}
+<div class="clearfix"></div>
+<br/>
+{include file="modules/latest_auctions/latest_auctions.html"}
+{/if}
+
+{* -------------- tag cloud module -------------- *}
+{if in_array("tag_cloud",$modules_array)}
+<div class="clearfix"></div>
+{include file="modules/tag_cloud/tag_cloud.html"}
+<div class="clearfix"></div>
+{/if}
+
+{* -------- social networks ---------- *}
+{if in_array("social_networks", $modules_array)}
+{include file="modules/social_networks/sn_page_plugin.html"}
+{/if}
+{* -------- end social networks ---------- *}
+
+{* ------ firstpage4 banners ------- *}
+{if in_array("firstpage4", $banners_positions)}
+{banner->getTemplateBanners p1='firstpage4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{foreach from=$array_banners item=v}
+<div class="center">{include file="banner.html" bclass="btypefp_rc"}</div><div class="clearfix"></div>
+{/foreach}
+{/if}
+{* ------- end firstpage4 banners ------- *}
+
+</div>{* end right column *}
+
+<div class="clearfix"></div>
+
+{if in_array("latest_visited", $modules_array) && $no_latest_visited}
+{include file="modules/latest_visited/listings.html"}
+{/if}
+
+
+</div>
+{* end main *}
+
+{include file="footer.html"}

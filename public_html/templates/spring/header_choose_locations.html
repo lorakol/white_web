@@ -1,0 +1,108 @@
+
+{if ','|explode:$settings.location_fields|@count>1}
+{include file="data/fancybox.html"}
+{/if}
+
+<div id="choose_location">
+{if !isset($crt_location) || !$crt_location}
+<a href="javascript:;" class="choose_location">{$lng.location.choose_location}&nbsp;<img id="choose_arrow" src="{$template_path}images/lang-arrow.png" alt="" /></a>
+{else}
+<span class="crt_location">{$crt_location}</span> <a href="javascript:;" class="choose_location" id="small_loc">{$lng.location.change}&nbsp;<img src="{$template_path}images/lang-arrow.png" alt="" /></a>
+{/if}
+</div>
+{if ','|explode:$settings.location_fields|@count==1}
+<div id="location_div" style="display: none;"></div>
+{/if}
+
+{literal}
+<script type="text/javascript">
+
+jQuery(document).ready(function() {
+
+{/literal}
+	{if ','|explode:$settings.location_fields|@count==1}
+	{literal}
+		$("#location_div").hide();
+		$("#choose_location").click(function(event){
+
+			if ($("#location_div").is(":visible") ) {
+				$("#choose_arrow").attr("src", "{/literal}{$template_path}{literal}images/lang-arrow.png");
+				$("#location_div").slideUp();
+			}
+			else {
+
+				event.stopPropagation();
+				$("#choose_arrow").attr("src", "{/literal}{$template_path}{literal}images/up-lang-arrow.png");
+
+				// get values for locations
+				$.ajax({
+					type		: "GET",
+					cache		: false,
+					url		: "{/literal}{$live_site}{literal}/include/get_locations.php",
+					data		: null,
+					success: function(data) {
+
+						var split_loc=data.split("|");
+						var no = split_loc.length;
+
+						{/literal}
+						var crt_loc = "{$location_array[$settings.location_fields]}";
+						var content ="<ul>";
+						{if isset($crt_location) && $crt_location}content += "<li><a class=\"gray\" href='javascript:;' onclick='changeLocation(\"{$live_site}\", \"{$settings.location_fields}|\")'>{$lng.location.all_locations}&nbsp;&nbsp;&nbsp;&nbsp;<img src=\"{$template_path}images/black_delete.png\"></a></li>";{/if}
+						{literal}
+						for (var j=0;j<no;j++) {
+							{/literal}
+							var cl="";
+							if(crt_loc==split_loc[j]) cl=" class='crt_loc' ";
+							content += "<li><a href='javascript:;'"+cl+" onclick='changeLocation(\"{$live_site}\", \"{$settings.location_fields}|"+split_loc[j]+"\")'>"+split_loc[j]+"</a></li>";
+							{literal}
+							//if( j>0 && j%10==0 && j!=no-1) content+= "</ul><div class=\"clearfix\"></div><ul>";
+						}
+						content +="</ul>";
+
+						$("#location_div").html(content);
+					
+						$("#location_div").css({ top: $("#choose_location").position().top+20, left: 		$("#choose_location").position().left});
+						$("#location_div").slideDown();
+
+					} // end data
+				});// end ajax
+			} // end else
+		});
+		jQuery(document).click(function(){
+			$("#choose_arrow").attr("src", "{/literal}{$template_path}{literal}images/lang-arrow.png");
+			$("#location_div").slideUp();
+		});
+	{/literal}
+	{else}	{* multiple location fields *}
+	{literal}
+		$("a.choose_location").fancybox({
+		'width'         		: 850,
+		'height'        		: 700,
+		'transitionIn'		: 'none',
+		'transitionOut'		: 'none',
+		'margin'		: '0',
+		'padding'		: '0',
+		'titleShow'		: false,
+		'type'			: 'iframe',
+		'href'			: '{/literal}{$live_site}/include/show_locations.php{literal}',
+		// fix to resize height for iframes
+		'scrolling'		: 'no',
+		'onComplete' : function() {
+		$('#fancybox-frame').load(function() { // wait for frame to load and then gets it's height
+
+			$('#fancybox-content').height($(this).contents().find('body').height()+50);
+
+			});
+		},
+		'onClosed': function() {
+			parent.location.reload(true);
+		}
+		});
+	{/literal}
+	{/if}
+{literal}
+});
+
+</script>
+{/literal}

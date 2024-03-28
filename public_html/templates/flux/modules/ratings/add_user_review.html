@@ -1,0 +1,262 @@
+{if $rating_nologin}
+	<p>{$lng_ratings.login_to_post|replace:'::LOGIN_LINK::':$login_link}</p>
+{elseif $same_user}
+	<p>{$lng_ratings.you_cannot_rate_your_user}</p>
+{elseif $voted}
+	<p>{$lng_ratings.you_already_rated_listing}</p>
+{else}
+
+<h3 class="heading pb20">{$lng_ratings.add_review}</h3>
+
+<script>
+
+var reditor=0;
+
+</script>
+
+{if $ratings_settings.html_editor}
+
+<script src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+<script>
+
+reditor=1;
+{literal}
+	function loadReviewsEditor() {
+	myNicEditor = new nicEditor({iconsPath : '{/literal}{$live_site}{literal}/libs/nicEdit/nicEditorIcons.gif', buttonList : ['bold','italic','underline', 'left', 'center', 'right', 'justify', 'ul', 'ol', 'indent', 'outdent', 'forecolor', 'bgcolor', 'hr']}).panelInstance('ratings_content');
+	}
+{/literal}
+</script>
+
+{/if}
+
+		<div id="ratings_info" class="info" style="display: none;">
+		<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+		<span class="content"></span>
+		</div>
+
+		<form name="ratings_form" id="ratings_form" method="post" action="{$live_site}/modules/ratings/add_listing_review.php?post=1">
+
+		<div id="ratings_div" class="form2">
+
+		<input type="hidden" name="user_id" id="user_id" value="{$id}" />
+
+		<ul>
+
+		{if $ratings_settings.use_title}
+		<li>
+		<label for="ratings_title">{$lng_ratings.title}{if $ratings_settings.ar_use_title==1}<span class="mandatory"> *</span>{/if}</label>
+		<input name="ratings_title" id="ratings_title" type="text" />
+		</li>
+		{/if}
+
+		{if $ratings_settings.use_name}
+		<li>
+		<label for="ratings_name">{$lng_ratings.name}<span class="mandatory"> *</span></label>
+		<input name="ratings_name" id="ratings_name" type="text" {if isset($current_user) && isset($current_user[$settings.contact_name_field]) && $current_user[$settings.contact_name_field]}value="{$current_user[$settings.contact_name_field]}"{/if} />
+		</li>
+		{/if}
+
+		{if $ratings_settings.use_email}
+		<li>
+		<label for="ratings_email">{$lng_ratings.email}{if $ratings_settings.use_email==1}<span class="mandatory">*</span>{/if}</label>
+		<input name="ratings_email" id="ratings_email" type="text" {if isset($current_user) && $current_user.email}value="{$current_user.email}"{/if} />
+		</li>
+		{/if}
+
+		{if $ratings_settings.use_website}
+		<li>
+		<label for="ratings_website">{$lng_ratings.website}{if $ratings_settings.use_website==1}<span class="mandatory">*</span>{/if}</label>
+		<input name="ratings_website" id="ratings_website" type="text" {if isset($current_user) && isset($current_user.website) && $current_user.website}value="{$current_user.website}"{/if} />
+		</li>
+		{/if}
+
+		<li>
+		<input type="hidden" name="rating" id="rating" />
+		<label class="lfloat">{$lng_ratings.rating}&nbsp;<span class="mandatory">*</span>&nbsp;&nbsp;</label>
+		<div style="padding-top: 5px;margin-top: 5px;">
+		{section name=loop start=0 loop=5 step=1}
+		<input name="star" type="radio" class="star" value="{$smarty.section.loop.index+1}"/>
+		{/section}
+		</div>
+		<div class="clearfix"></div>
+		</li>
+		
+		<li><textarea name="ratings_content" id="ratings_content" rows="5"></textarea></li>
+		
+		{capture name=some_content assign=field_name}terms_{$crt_lang}{/capture}
+		{if $ratings_settings[$field_name]}<li><p>{$ratings_settings[$field_name]}</p></li>{/if}
+
+		{if $ratings_settings.captcha==1 || ($ratings_settings.captcha==2 && !$logged_in)}
+		<li>
+		{if $settings.enable_recaptcha}
+		{include file="data/recaptcha.html" extension="_rev"}
+		{else}
+		{include file="data/random_image.html"}
+		{/if}
+		</li>
+		{/if}
+		</ul>
+		<br/>
+
+		<div class="buttons">
+		<input type="submit" class="button" name="AddReview" id="AddReview" value="{$lng_ratings.post_review}" />
+		</div>
+
+		</div>
+		</form>
+		<div class="clearfix"></div>
+
+
+{literal}
+<script>
+//<![CDATA[
+
+	$('.star').rating({
+ 	callback: function(value, link){
+		$("#rating").val(value);
+		}
+	});
+
+
+jQuery(document).ready(function() {
+
+	$("#ratings_info").hide();
+
+var options = { 
+
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function beforeSerialize(jqForm, options) {
+
+	$("body").addClass("loading");
+
+	{/literal}{if $ratings_settings.html_editor}{literal}
+	// capturing nicEditor content
+	for(var i=0;i<myNicEditor.nicInstances.length;i++){myNicEditor.nicInstances[i].saveContent();}
+	{/literal}{/if}{literal}
+
+	// return false to cancel submit
+
+}
+
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$("#ratings_info").find("span.content").html("<p>"+ret.info+"</p>");
+				$("#ratings_info").show();
+				$("#ratings_div").slideUp(1000);
+				$('html,body').animate({scrollTop:$("#ratings_info").offset().top}, 'slow');
+
+				var cwebsite = $("#ratings_website").val();
+				var cname = $("#ratings_name").val();
+				var content = $("#ratings_content").val();
+				var ctitle = $("#ratings_title").val();
+				var rating = $("#rating").val();
+
+				// if added and don't have to be approved, rewrite the reviews with the last one.
+				{/literal}
+
+				{if $ratings_settings.admin_verification==0 || ($ratings_settings.admin_verification==2 && $logged_in)}
+				var str='';
+
+				str+='<div class="review"><table cellpadding="0" cellspacing="0" width="100%"><tr>';
+				{if $ratings_settings.logo_field && isset($current_user) && $current_user[$ratings_settings.logo_field]}str+='<td valign="top" width="80"><a href="{$live_site}/user_listings.php?id={$current_user.id}"><img src="{$live_site}/uploads/{$ratings_settings.logo_field}/{$current_user[$ratings_settings.logo_field]}"></a></td>';{/if}
+
+				str+='<td valign="top"><div class="dialogbox"><div class="body"><span class="tip tip-left"></span><div class="message"><div class="lfloat">'
+
+				{literal}
+				for(var idx=0; idx<5;idx++) {
+				{/literal}
+				str+='<img src="{$template_path}modules/ratings/css/images/star'; if(rating>idx) str+='_on'; else str+='_off'; str+='.gif" />';
+				{literal}
+				}
+				{/literal}
+				str+='</div>';
+
+				{if $ratings_settings.use_title}str+='<div class="bold lfloat">'+ctitle+'</div>';{/if}
+
+				str+='<div class="clearfix"></div><div class="small">';
+				{if $ratings_settings.use_name && cname}str+='{$lng.general.by}&nbsp;'+cname+'&nbsp;{$lng.messages.on}&nbsp;';{/if}
+				str+='{$smarty.now|date_format}</div><p>'+content.replace(/\n/g,"<br/>")+'</p>';
+				{if $ratings_settings.use_website}str+='<div><a href="'+cwebsite+'">'+cwebsite+'</a></div>';{/if}
+
+				str+='</div></div></div></td></tr></table></div>';
+				
+				$("#ratings_form").after(str);
+
+				var old_reviews_no = parseInt(parent.$("#no_reviews").html());
+				$("#no_reviews").html(old_reviews_no+1);
+				$("#tab_no_reviews").html(old_reviews_no+1);
+
+				{literal}
+				$('html,body').animate({scrollTop:$("#reviews_container").offset().top}, 'slow');
+				{/literal}
+
+				{/if}
+				{literal}
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			$("#ratings_info").hide();
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				
+				if(err_field=="alert_window") { alert(err_string); $('input[type="submit"]').prop('disabled', true); break; }
+				
+				$("#"+err_field).addClass("err");
+
+				{/literal}{if $ratings_settings.html_editor}{literal}
+				// nicEditor fix
+				if(err_field=="ratings_content") { 
+					$("#ratings_content_elm").addClass("err");
+					$("#"+err_field).closest( "li" ).prepend('<label class="err_label">'+err_string+'</label>');
+				}
+				else 
+				{/literal}{/if}{literal}
+					$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			{/literal}{if ($ratings_settings.captcha==1 || ($ratings_settings.captcha==2 && !$logged_in)) && $settings.enable_recaptcha}
+			// reload recaptcha
+			gReCaptchaReset("_rev");
+			{/if}{literal}
+
+
+} 
+
+ $('#ratings_form').ajaxForm(options);
+
+});
+
+//]]>
+</script>
+{/literal}
+
+{/if}{* end if not logged *}

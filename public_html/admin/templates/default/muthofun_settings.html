@@ -1,0 +1,23 @@
+<div class="form_container">
+
+{if $error != ""}<div class="error">{$error}</div>{/if}
+{if $info != ""}<div class="info">{$info}</div>{/if}
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.username}</div>
+	<div class="right_form"><input type="text" maxlength="100" size="40" name="username" id="username" value="{$processor_settings.username}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.password}</div>
+	<div class="right_form"><input type="text" maxlength="100" size="40" name="password" id="password" value="{$processor_settings.password}" /></div>
+</div>
+
+<div class="form_footer">
+	<div class="buttons rfloat" {if $demo}onClick="alert('{$lng.general.errors.demo}');return false;"{/if}>
+		<span class="positive"><input type="submit" name="Submit_muthofun" value="{$lng.general.submit}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+</div> {* end form_container *}

@@ -1,0 +1,76 @@
+{* ------ footer banners ------- *}
+{if in_array('footer',$banners_positions)}
+{banner->getTemplateBanners p1='footer' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{if $array_banners|@count}
+<div class="centered bbox">
+{foreach from=$array_banners item=v}
+<div class="center fb">{include file="banner.html" bclass="btype728"}</div>
+{/foreach}
+<div class="clearfix"></div>
+</div>
+{/if}{* if count *}
+{/if}
+{* ------- end footer banners ------- *}
+
+{* -------------- news module -------------- *}
+{if $self_noext=="index" && in_array("news",$modules_array) && $news|@count}
+{include file="modules/news/news_summary.html"}
+{/if}
+{* ------------ end news module ------------ *}
+
+<div id="footer" class="clearfix">
+
+	{* -------- social networks ---------- *}
+	{if in_array("social_networks", $modules_array)}
+	{include file="modules/social_networks/sn_buttons.html"}
+	{/if}
+	{* -------- end social networks ---------- *}
+
+
+	<div class="rfooter">
+	<div class="footer_text">{$appearance.footer_text}</div>
+	<ul class="secnavbar">
+	<li><a href="{$live_site}/contact.php" class="contact">{$lng.navbar.contact}</a></li>
+	{foreach from=$sec_navbar item=cp }
+	<li>
+	{if $cp.type==1}
+	<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeCustomPageLink p1=$cp.id p2=$cp.title p3=$cp.slug}{else}{$live_site}/content.php?id={$cp.id}{/if}" {if $cp.blank==1}target="_blank"{/if}>
+	{else}<a href="{$cp.hreflink}" {if $cp.blank==1}target="_blank"{/if}>
+	{/if}
+	{$cp.title}</a>
+	</li>
+	{/foreach}
+	</ul>
+	</div> {* end rfooter *}
+
+</div>
+
+{if $appearance.show_footer_categ}
+	<div class="center mt10 ext_text">{$footer_links}</div>
+    <!-- end: #footer_categories -->
+{/if}
+
+{if $is_mobile}
+	<div class="center"><div class="btn4 mt10 mb10 center" style="display: block !important; width: 200px; margin-right: auto !important; margin-left: auto !important;">
+		<strong><a href="javascript:;" onclick="document.cookie='mobile=1; path=/; expires='+exdate.toUTCString()+'; {if $settings.enable_locations && $settings.enable_subdomains}domain={$main_domain};{/if}';window.location.reload( false );">{$lng.general.mobile_version}</a></strong>
+	</div><div class="clearfix"></div></div>
+{/if}
+
+{if $appearance.show_footer==1 && $appearance.footer_pic!=''}
+<div class="center mt10">
+		{if $appearance.footer_pic_link!=''}<a href="{$appearance.footer_pic_link}" target="_blank">{/if}
+		{if $appearance.footer_is_flash}
+		{include file="data/flash.html" img_name=$appearance.footer_pic img_width=$appearance.footer_pic_width img_height=$appearance.footer_pic_height}
+		{else}
+		<img src="{$live_site}/images/{$appearance.footer_pic}" alt="" />
+		{/if}	
+		{if $appearance.footer_pic_link!=''}</a>{/if}
+</div>
+{/if}	
+
+</div> {* end page *}
+
+{if isset($bottom_content)}{$bottom_content}{/if}
+
+ </body>
+</html>

@@ -1,0 +1,24 @@
+<section id="latest_ads">
+	<div class="tab_content" id="latest_tab_content">
+		{foreach name="listings" from=$latest item=v}
+		{include file="short_listing.html"}
+		{/foreach}
+
+	{if $no_latest}
+		<div><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.recent_ads}{else}recent_ads.php{/if}"><h2 class="view_more">{$lng.listings.view_all_latest}</h2></a></div>
+		<div class="clearfix"></div>
+	{/if}
+	<hr/>
+	</div>
+</section>
+<style>
+.latest_ads { padding: 20px; }
+.classified { text-align: left; }
+@media all and (min-width: 800px) {
+	.classified .smallimg { width: {$ads_settings.thmb_width+2}px; height: {$ads_settings.thmb_height+2}px; }
+	.rclass { {if $text_direction=="rtl"}margin-right: {$ads_settings.thmb_width+10}px;{else}margin-left: {$ads_settings.thmb_width+10}px;{/if} min-height: {$ads_settings.thmb_height+2}px;}
+}
+.rclass { min-height: {$ads_settings.thmb_height+2}px;}
+.highlited { background: {$ads_settings.highlited_color}; }
+
+</style>

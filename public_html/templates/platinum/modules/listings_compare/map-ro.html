@@ -1,0 +1,5 @@
+{if $settings.map_type=="gmaps"}
+    {include file="modules/listings_compare/gmap-ro.html" v=$v t=$t}
+{else}
+    {include file="modules/listings_compare/osm-ro.html" v=$v t=$t}
+{/if}

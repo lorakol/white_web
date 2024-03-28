@@ -1,0 +1,33 @@
+{if $showcase_enabled}
+
+{if !$v.showcase}
+<a href="javascript:;" onclick="onAddToShowcase({$v.id})"><div class="btn3 btn_smaller">{$lng_sw.add_to_showcase|replace:" ":"&nbsp;"}</div></a>
+{else}
+<a href="javascript:;" onclick="onRemoveFromShowcase({$v.id})"><div class="btn3 btn_smaller">{$lng_sw.remove_from_showcase|replace:" ":"&nbsp;"}</div></a>
+{/if}
+
+<script>
+function onAddToShowcase(id)
+{
+
+	var url_str="modules/showcase/actions.php?action=add_showcase&id="+id;
+
+	$.get( url_str, function( data ) {
+		location.reload(true);
+	});
+
+}
+
+function onRemoveFromShowcase(id)
+{
+
+	var url_str="modules/showcase/actions.php?action=remove_showcase&id="+id;
+
+	$.get( url_str, function( data ) {
+		location.reload(true);
+	});
+
+}
+</script>
+{/if}
+

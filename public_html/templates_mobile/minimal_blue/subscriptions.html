@@ -1,0 +1,60 @@
+{include file="header.html"}
+<div id="heading">{$lng.useraccount.subscriptions}</div>
+
+<div class="clearfix"></div>
+
+{foreach from=$subscriptions_array item=v}
+
+<div class="classified_nl">
+
+<div class="classifieds_content">
+<h3>{$v.package_name}</h3>
+
+{$lng.subscriptions.remaining_ads}: {if $v.ads_left==-1}{$lng.general.unlimited}{else}{$v.ads_left}{/if}
+
+{if $v.recurring}<font color="#47b51c">{$lng.subscriptions.recurring}</font><br/>{/if}
+{$lng.subscriptions.date_start}: {$v.date_start_nice}<br/>
+{if $v.date_renew_nice && $v.date_renew!=$v.date_start}{$lng.subscriptions.date_renew}: {$v.date_renew_nice}<br/>{/if}
+{if $v.date_end_nice}{$lng.subscriptions.date_end}: {$v.date_end_nice}{/if}
+</div>
+
+<div class="clearfix"></div>
+<div class="icons">
+	{if $v.fixed==0}
+		<span><a href="javascript:;" onclick="onDelete('{$v.id}','{$lng.subscriptions.confirm_delete|addslashes}', 'usr_pkg');">
+		<img src="{$template_path}images/delete.gif" class="tooltip" title="{$lng.general.delete}" alt=""></a></span>
+	{/if}
+
+</div>
+<div class="class_buttons">
+{if $v.active}
+	<div class="buttonwrapper"><div class="activebutton"><span class="button">{$lng.listings.active}</span></div></div>
+{else}
+	<div class="buttonwrapper"><div class="inactivebutton"><span class="button">{$lng.listings.inactive}</span></div></div>
+{/if}
+{if $v.pending}
+	<div class="buttonwrapper"><div class="pendingbutton"><span class="button">{$lng.listings.pending}</span></div></div>
+{/if}
+{if $v.expired}
+	<div class="buttonwrapper"><div class="expiredbutton"><span class="button">{$lng.listings.expired}</span></div></div>
+{/if}
+</div>
+<div class="clearfix"></div>
+</div>
+
+{/foreach}
+
+{if $no_subscriptions==0}
+	<div class="p10">
+	{$lng.subscriptions.no_subscriptions}
+	</div>
+{/if}
+
+<div class="p10">
+<div class="form_button"><strong><a href="subscribe.php">{$lng.subscriptions.add}</a></strong></div>
+</div>
+
+
+<div class="clearfix"></div>
+
+{include file="footer.html"}

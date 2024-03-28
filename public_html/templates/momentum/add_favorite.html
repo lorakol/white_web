@@ -1,0 +1,25 @@
+<div class="lgbox overlay_window">
+<div class="overlay-top-bg">{$lng.listings.add_to_favourites}</div>
+
+<div class="pdiv5">
+
+{if isset($info) && $info}
+<div class="info" {if isset($error) && $error}style="margin-bottom: 10px;"{/if}><p>{$info}</p></div>
+{/if}
+
+{if isset($error) && $error}
+<div class="error"><p>{$error}</p></div>
+{/if}
+
+</div> {* end pdiv5 *}
+
+<div class="overlay-bottom-bg">
+
+<div class="buttons">
+	<span class="button positive"><a href="javascript:;" onclick="window.location ='{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.favorites}{else}favorites.php{/if}'">{$lng.general.favourites}</a></span>
+	<span class="button negative"><a href="javascript:;" onclick="$.magnificPopup.instance.close()">{$lng.general.return}</a></span>
+</div>
+
+</div>
+</div> {* end lgbox *}
+

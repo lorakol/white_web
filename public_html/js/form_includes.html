@@ -1,0 +1,173 @@
+<script>
+//<![CDATA[
+
+{if isset($gmaps)}
+{foreach from=$gmaps item=v}
+
+	{if $v}
+
+	{include file="data/map.html" val=$tmp}
+	
+	{/if}
+{/foreach}
+{/if}
+
+{if isset($user_gmaps)}
+{foreach from=$user_gmaps item=v}
+
+	{if $v}
+
+	{include file="data/map.html" val=$tmp.user}
+	
+	{/if}
+{/foreach}
+{/if}
+
+{if $settings.map_type=="osm"}
+
+function init_osm() {
+
+    {if isset($gmaps)}
+    {foreach from=$gmaps item=v}
+	{if $v}
+	    init_osm_{$v.caption}();
+	{/if}
+    {/foreach}
+    {/if}
+
+    {if isset($user_gmaps)}
+    {foreach from=$user_gmaps item=v}
+	{if $v}
+	    init_osm_{$v.caption}();
+	{/if}
+    {/foreach}
+    {/if}
+
+} // end init_osm
+
+
+{else} {* if map_type=="gmap" *}
+
+
+function init_gmap() {
+
+
+	{if isset($gmaps)}
+	{foreach from=$gmaps item=v}
+		{if $v}
+			init_gmap_{$v.caption}();
+		{/if}
+	{/foreach}
+	{/if}
+
+	{if isset($user_gmaps)}
+	{foreach from=$user_gmaps item=v}
+		{if $v}
+			init_gmap_{$v.caption}();
+		{/if}
+	{/foreach}
+	{/if}
+
+	}
+
+{/if} {* endif map_type *}
+
+
+$(document).ready(function() {
+
+{assign var="phone_index" value="0"}
+{assign var="whatsapp_index" value="0"}
+	
+{foreach from=$fields_array item=v}
+
+	{if $v.type=='htmlarea'}
+		{assign var="htmlarea_exists" value="1"}
+		{include file="data/htmlarea.html"}
+	{/if}
+
+	{if ($v.type=='phone' || $v.type=='whatsapp') && $v.ext1==1}
+		{assign var="phone_exists" value="1"}
+		{include file="data/phone.html"}
+		{append var='phonearr' value={$v.caption} index=$phone_index}
+		{append var='phoneext' value={$v.extensions} index=$phone_index}
+		{assign var=phone_index value=$phone_index+1}
+	{/if}
+
+{/foreach}
+
+{if isset($user_fields)}
+{foreach from=$user_fields item=v}
+
+	{if $v.type=='htmlarea'}
+		{assign var="htmlarea_exists" value="1"}
+		{include file="data/htmlarea.html"}
+	{/if}
+
+	{if ($v.type=='phone' || $v.type=='whatsapp') && $v.ext1==1}
+		{assign var="phone_exists" value="1"}
+		{include file="data/phone.html"}
+		{append var='phonearr' value={$v.caption} index=$phone_index}
+		{append var='phoneext' value={$v.extensions} index=$phone_index}
+		{assign var=phone_index value=$phone_index+1}
+	{/if}
+
+{/foreach}
+{/if}
+
+});
+
+function recheckIntlPhone() {
+var arr_invalid_phones=[], index=0;
+
+{if isset($phone_exists) && $phone_exists}
+{foreach from=$phonearr item=t name=phonearr}
+
+    var err=0;
+    var len=0;
+
+    if($("#{$t}").val()) {
+
+    var countryData = $("#{$t}").intlTelInput("getSelectedCountryData");
+    if (countryData['areaCodes']!=null && countryData['areaCodes'] !== undefined && countryData['areaCodes'].length != 0) {
+	
+	
+	var len = countryData['areaCodes'][0].length;
+	var code = $("#{$t}").val().replace(/[^0-9]/, '').substr(0,len);
+	if($.inArray(code, countryData['areaCodes'])==-1) {
+	    err = 1;
+	}
+	
+    }
+
+    // if only some countries allowed check that there is a correct selected country
+/*    var str='{$phoneext[{$smarty.foreach.phonearr.index}]}';
+    if(str && !len) {
+	if(countryData.length === undefined || countryData === undefined || countryData.length==0) { err=1; }
+    
+    }
+*/
+    if(!$("#{$t}").intlTelInput("isValidNumber")) {
+	err=1;
+    }
+    
+    } // end if val entered
+    
+    if(err==1) {
+	arr_invalid_phones[index]='{$t}';
+	index++;
+    }
+    
+{/foreach}
+{/if}
+return arr_invalid_phones;
+} //end recheckIntlPhone()
+
+{if isset($gmaps)}
+{foreach from=$gmaps item=v}
+	{include file="data/map-autolocator.html"}
+{/foreach}
+{/if}
+
+
+//]]>
+</script>

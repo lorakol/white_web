@@ -1,0 +1,28 @@
+<td width="20%" valign="top">
+<div class="mt20 gallery_classified{if $v.highlited && $ads_settings.enable_highlited} highlited{/if} center gimg tooltip"  title="{$v.title|strip_tags:false}">
+{capture name=some_content assign=details_url}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title p3=$post_array.search_id p4=$v.category_id p5=$v.slug}{else}{$live_site}/details.php?id={$v.id}{/if}
+{/capture}
+
+{*	<div class="center mt20 gimg" style="position: relative">*}
+	<a href="{$details_url}" name="listing{$v.id}">
+	<img src="{$live_site}/{$v.image}" id="pic{$v.id}" class="pic" alt="{if $v.image_id}{$v.title|strip_tags:false|substr:0:100}{/if}"  />
+	</a>
+
+	{if $v.featured && $ads_settings.enable_featured}<div class="featured-icon"></div>{/if}
+	{if $v.sold}<div class="sold-bg">{$lng.listings.sold}</div>{/if}
+	{if $v.rented}<div class="rented-bg">{$lng.listings.rented}</div>{/if}
+	{if $v.no_pictures}<div class="images-no">{$v.no_pictures}</div>{/if}
+
+{*	</div>*}
+
+
+{*
+	<div class="gallery_title">
+	{if $v.priority}<div class="lfloat priorityg"><img src="{$template_path}images/priority{$v.priority}.png" alt="priority{$v.priority}" title="{$v.priority_name}" class="tooltip" /></div>{/if}
+	{if $v.video && $v.enable_video && $ads_settings.enable_video}<div class="lfloat videog"><img src="{$template_path}images/video-icon.png" alt="{$lng.listings.video}" title="{$lng.listings.video}" class="tooltip" /></div>{/if}
+	</div>
+*}
+	</div>
+</div>
+</td>

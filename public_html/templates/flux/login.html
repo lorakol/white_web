@@ -1,0 +1,92 @@
+{include file="header.html"}
+<div class="wait"></div>
+
+<script src="{$live_site}/libs/jQuery/jquery.js"></script>
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="mb40">
+<div class="login-box wbg centered mt40">
+<div class="heading form_heading nmt">{$lng.navbar.login}</div>
+
+<div class="login-content">
+
+{if !isset($step) || !$step}
+
+{if isset($general_info) && $general_info}<div class="mb30"><p>{$general_info}</p></div>{/if}
+
+<div class="error" style="display: none;"></div>
+
+<form name="login_form" id="login_form" method="post" action="login.php?post=1{if isset($loc) && $loc}&loc={$loc}{/if}">
+
+	<div class="fel">
+	{if $settings.enable_username}
+	<label>{$lng.login.username_or_email}</label>
+	<input name="username" id="username" type="text" maxlength="60" tabindex="1"/>
+	{else}
+	<label>{$lng.useraccount.email}</label>
+	<input name="email" id="email" type="text" maxlength="60" tabindex="1"/>
+	{/if}
+	</div>
+
+	<div class="fel">
+	<label class="lfloat">{$lng.login.password}</label>
+	<div class="rfloat"><a href="{$live_site}/password_recovery.php" id="password_recovery">{$lng.login.forgot_pass}</a></div>
+	<div class="clearfix"></div>
+	<input name="password" id="password" type="password" maxlength="50" tabindex="2"/>
+	</div>
+
+	{if $settings.login_captcha}
+	{if $settings.enable_recaptcha}
+	{include file="data/recaptcha.html"}
+	{else}
+	{include file="data/random_image.html"}
+	{/if}
+	{/if}
+
+	<div class="mt30 mb20">
+	<div class="lfloat half" style="line-height: 40px;"><input type="checkbox" name="remember" id="remember" class="inline" tabindex="3" />&nbsp;{$lng.remember_me}</div>
+	<div class="rfloat half raligned"><input type="submit" class="button" name="Login" id="Login" value="{$lng.login.login}" /></div>
+	<div class="clearfix"></div>
+	</div>
+
+</form>
+
+	{* -------- connect ---------- *}
+	{if in_array("connect", $modules_array)}
+	{include file="modules/connect/connect.html"}
+	{/if}
+	{* -------- end connect ---------- *}
+
+{else}
+{* ------------- Two Factor Authentication ------------- *}
+<div class="heading">{$lng.login.2step_verification}</div>
+
+{if isset($tfa_info) && $tfa_info}<div class="mb30"><p>{$tfa_info}</p></div>{/if}
+<div class="error" style="display: none;"></div>
+
+<form name="login_form" id="login_form" method="post" action="login.php?step=2&post=1&auth_name={$auth_name}{if isset($loc) && $loc}&loc={$loc}{/if}">
+
+	<div class="mt30 mb20">
+	<input type="text" name="otp" id="otp" />
+	</div>
+
+	<div class="mb20">
+	<input type="submit" class="button wide_button" name="Login" id="Login" value="{$lng.login.login}" />
+	</div>
+
+</form>
+
+{/if}
+	
+</div> {* end login-content *}
+
+<div class="login_footer">
+{$lng.login.dont_have_account}
+<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.register}{else}register.php{/if}" class="button positive wide_button" target="_parent">{$lng.login.register_for_free}</a>
+</div>
+
+</div> {* end login-box *}
+</div>
+
+{include file="js/login_js.html"}
+{include file="footer.html"}

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="{$crt_lang_code}">
+
+<head>
+<title>{$page_info.title}</title>
+
+<meta charset="{$appearance.charset}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<meta name="description" content="{$page_info.meta_description}" />
+<meta name="keywords" content="{$page_info.meta_keywords}" />
+{if (isset($noindex) && $noindex) || $page_info.noindex==1}
+<meta NAME="robots" content="noindex, nofollow" />
+{else}
+<meta name="robots" content="index, follow" />
+{/if}
+
+{if $page_info.canonical}<link rel="canonical" href="{$page_info.canonical}"/>
+{/if}
+{if $self_noext=="details" && in_array("social_networks", $modules_array)}
+{include file="modules/social_networks/sn_meta.html"}
+{/if}
+
+{if isset($head_includes)}
+{foreach from=$head_includes item=l}
+{include file="$l"}
+{/foreach}
+{/if}
+
+<link href="{$template_path}css/style{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+{if $appearance.template_colorscheme}<link href="{$template_path}css/style_{$appearance.template_colorscheme}{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>{/if}
+
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Noto+Sans"/>
+
+{if $self_noext=="listings"}
+<script src="{$live_site}/js/search2.js"></script>
+{elseif $self_noext=="details"}
+<script src="{$live_site}/js/details2.js"></script>
+{elseif $self_noext=="index"}
+<script src="{$live_site}/js/index2.js"></script>
+{elseif $self_noext=="user_listings" || $self_noext=="store"}
+<script src="{$live_site}/js/ul2.js"></script>
+{else}
+<script src="{$live_site}/js/base2.js"></script>
+{/if}
+
+{if isset($htmlarea) && $htmlarea}<script type="text/javascript" src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+{/if}
+
+<script type="text/javascript">
+//<![CDATA[
+
+// redirect if media queries are not enabled
+function mediaQueriesEnabled () {
+    return (typeof window.matchMedia != "undefined" || typeof window.msMatchMedia != "undefined");
+}
+
+function isIE () {
+  var myNav = navigator.userAgent.toLowerCase();
+  return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
+}
+
+if (isIE () && isIE () < 9) window.location.href="{$live_site}/bns.php";
+// end redirect if media queries are not enabled
+
+site_width={$appearance.outer_table};
+{if $settings.google_maps_api_key}gmak='{$settings.google_maps_api_key}';{/if}
+
+gmalng='{if isset($ads_settings.gm_api_lang)}{$ads_settings.gm_api_lang}{/if}';
+gmareg='{if isset($ads_settings.limit_location_autosuggest)}{$ads_settings.limit_location_autosuggest}{/if}';
+
+{*
+{if $ads_settings.enable_location_autosuggest}places=1;{else}places=0;{/if}
+{if $ads_settings.enable_distance_search}dsearch=1;{else}dsearch=0;{/if}
+*}
+places=0;
+dsearch=0;
+
+exdate=new Date();
+exdate.setDate(exdate.getDate() + 365);
+
+{* if multilanguage and no cookie for language set *}
+{*
+{if $languages|@count>1 && !$cookie_lang}
+
+crt_lang = "{$crt_lang}";
+var type=navigator.appName
+if (type=="Netscape") var lang = navigator.language
+else var lang = navigator.userLanguage
+var lang = lang.substr(0,2)
+
+{foreach from=$languages item=l}{literal}
+if (lang == "{/literal}{$l.code}{literal}" && crt_lang!="{/literal}{$l.id}{literal}") {
+document.cookie='default_lang={/literal}{$l.id}{literal}; path=/; expires='+exdate.toUTCString()+'; {/literal}{if $settings.enable_locations && $settings.enable_subdomains}domain={$main_domain};{/if}{literal}';
+window.location.reload( false );
+}{/literal}
+{/foreach}
+
+{/if}
+*}
+var frontend = 1;
+var no_languages = {$languages|@count};
+{literal}
+
+$(document).ready(function(){
+// alert(window.innerWidth);
+	// rss
+	{/literal}{if isset($no_rss) && $no_rss>1}{literal}
+
+		var w = $("#rss-drop-down").width();
+		$("#rss-drop-down").css({ left: $("#rss-link").position().left-20, width: w });
+
+		$("#rss-drop-down").hide();
+
+		if(window.innerWidth>600) {
+
+			$('#rss-link').on('click mouseover', function(event) {
+
+				showRSS();
+
+			});
+
+		} else {
+
+			$('#rss-link').on('click', function(event) {
+
+				showRSS();
+
+			});
+
+		}
+
+
+		function showRSS() {
+
+			if($("#rss-drop-down").is(":visible") ) return false;
+
+			$(".submenu").slideUp('fast');
+			//$(".submenu1").slideUp('fast');
+			$(".submenu2").slideUp('fast');
+			$("#rss-drop-down").slideDown('fast');
+
+			return false; // do not manage other click events
+
+		}
+
+		$("#rss-drop-down").hover(function() {
+
+			}, function(){
+				$("#rss-drop-down").slideUp('fast');
+			});
+
+/*		$("#rss-link").hover(function() {
+			}, function(){
+				$("#rss-drop-down").slideUp('fast');
+			});
+*/
+	{/literal}{/if}{literal}
+
+
+	$("a.nav-parent").click(function() { 
+
+		$(this).parent().find("ul.navlinkmenu:first").slideDown('fast').show();
+
+		$(this).parent().hover(function() {
+		}, function(){
+			$(this).parent().find("ul.navlinkmenu").slideUp('fast');
+		});
+
+	});
+
+
+/*
+	// navigation bar submenu
+	$("a.nav-parent").click(function() { 
+
+		var cpid = jQuery(this).attr("id").substr(7);
+		$("#cp-submenu"+cpid).show();
+		return false; // do not manage other click events
+	});
+*/
+	// languages
+	if( no_languages > 1 ) {
+
+		$("#languages-menu").hide();
+
+		if(window.innerWidth>600) {
+
+			$('#show_language').on('click mouseover', function(event) {
+
+				showLanguages();
+
+			});
+		} else {
+
+			$('#show_language').on('click', function(event) {
+
+				showLanguages();
+
+			});
+
+		}
+
+		function showLanguages() {
+
+			if($("#languages-menu").is(":visible") ) return false;
+
+		//$("#show_language").click(function(event){
+			$(".submenu").slideUp('fast');
+			//$(".submenu1").slideUp('fast');
+			$(".submenu2").slideUp('fast');
+			$("#languages-menu").slideDown('fast');
+
+			return false; // do not manage other click events
+
+		}
+
+		$("#languages-menu").hover(function() {
+			}, function(){
+				$("#languages-menu").slideUp('fast');
+			});
+
+	}// end if no_languages>1
+
+	$("#show-admin-menu").click(function(event){
+
+//		event.stopPropagation();
+		$(".submenu").slideUp('fast');
+		//$(".submenu1").slideUp('fast');
+		$(".submenu2").slideUp('fast');
+		$("#admin-menu").slideDown('fast');
+
+		return false; // do not manage other click events
+	});
+	$("#admin-menu").hover(function() {
+		}, function(){
+			$("#admin-menu").slideUp('fast');
+		});
+
+
+	$("#show-user-menu").click(function(event){
+
+//		event.stopPropagation();
+		$(".submenu").slideUp('fast');
+		//$(".submenu1").slideUp('fast');
+		$(".submenu2").slideUp('fast');
+		$("#user-menu").slideDown('fast');
+
+		return false; // do not manage other click events
+
+	});
+	$("#user-menu").hover(function() {
+		}, function(){
+			$("#user-menu").slideUp('fast');
+		});
+
+	$(".menu").click(function(event){
+
+		if($("#topnav").is(":visible") )
+			$("#topnav").slideUp('fast');
+		else 	
+			$("#topnav").slideDown('fast');
+
+	});
+
+	$('a.contact').magnificPopup({
+	type: 'ajax',
+	showCloseBtn: true,
+	closeBtnInside:true
+	});
+
+	// compare button scroll
+	$(window).scroll(function () {
+
+ 		set = $(document).scrollTop()+400+"px";
+ 		$('#compare_button').animate({top:set},{duration:500,queue:false});
+
+ 	}); // end compare button
+
+ 	// show left and right banners only if the window is wide enough
+ 	if( window.innerWidth >= site_width+100) {
+ 	
+	// get position for left and right banners
+	var left_page_pos = $(".page").offset().left;
+	var right_page_pos = left_page_pos + $(".page").width()+10;
+	var top_page_pos = $(".page").offset().top;
+
+{/literal}
+{if in_array('left',$banners_positions)}
+{literal}
+
+	$(".left_banners").css({top: top_page_pos, left: left_page_pos-$(".left_banners").width()-10, position:'absolute'});
+	$(".left_banners").fadeIn();
+
+{/literal}
+{/if}
+{if in_array('right',$banners_positions)}
+{literal}
+	$(".right_banners").css({top: top_page_pos, left: right_page_pos, position:'absolute'});
+	$(".right_banners").fadeIn();
+{/literal}
+{/if}
+{literal}
+
+	lb_height = $(".left_banners").height();
+	rb_height = $(".right_banners").height();
+	page_bottom = $("#footer").offset().top;
+
+  	$(window).scroll(function () {
+
+ 		set2 = $(document).scrollTop()+20;
+
+		if(set2<top_page_pos) set3 = top_page_pos+"px";
+		else set3 = set2+"px";
+
+{/literal}
+{if in_array('left',$banners_positions)}
+{literal}
+ 		if(set2+lb_height<page_bottom)
+ 		$('.left_banners').animate({top:set3},{duration:500,queue:false});
+{/literal}
+{/if}
+{if in_array('right',$banners_positions)}
+{literal}
+ 		if(set2+rb_height<page_bottom)
+ 		$('.right_banners').animate({top:set3},{duration:500,queue:false});
+{/literal}
+{/if}
+{literal}
+
+	}); // end on window scroll
+
+	} // end show left and right banners only if the window is wide enough
+	
+	
+$(".checkbox-dropdown").click(function () {
+
+    $(this).toggleClass("is-active");
+	var caption = $(this).attr("id").substr(3);
+    
+    var list_name = "checkbox-dropdown-list_"+caption;
+    if($('#'+list_name+':visible').length)
+        $('#'+list_name).hide();
+    else
+        $('#'+list_name).show();        
+        
+});
+
+$(".checkbox-dropdown ul").click(function(e) {
+    e.stopPropagation();
+});
+	
+	
+}); // end document ready
+
+{/literal}
+{if in_array('left',$banners_positions) || in_array('right',$banners_positions)}
+{literal}
+
+// show left and right banners only if the window is wide enough
+if( window.innerWidth >= site_width+100) {
+
+$(window).on("resize", function(){
+
+	// get position for left and right banners
+	left_page_pos = $(".page").offset().left;
+	right_page_pos = left_page_pos + $(".page").width()+10;
+	top_page_pos = $(".page").offset().top;
+
+{/literal}
+{if in_array('left',$banners_positions)}
+{literal}
+
+	$(".left_banners").css({top: top_page_pos, left: left_page_pos-$(".left_banners").width()-10, position:'absolute'});
+	$(".left_banners").fadeIn();
+
+{/literal}
+{/if}
+{if in_array('right',$banners_positions)}
+{literal}
+	$(".right_banners").css({top: top_page_pos, left: right_page_pos, position:'absolute'});
+	$(".right_banners").fadeIn();
+{/literal}
+{/if}
+{literal}
+
+}); // end on resize
+
+} // end show left and right banners only if the window is wide enough
+
+{/literal}
+{/if}
+
+function onMultisearch(caption, chk_name, chk_value) {
+
+	var mselect_val = $("#qs_"+caption).val();
+
+	// add element to multiselect selected value
+	if($("#"+chk_name).is(":checked"))		
+		mselect_val = mselect_val+"|"+chk_value;
+	else // remove element from multiselect selected value 
+		mselect_val = mselect_val.replace(chk_value,'');
+
+	// trim | 	
+	mselect_val = mselect_val.replace(/^\|+|\|+$/g, '');
+	$("#qs_"+caption).val(mselect_val)
+
+}
+
+//]]>
+</script>
+
+
+{if $seo_settings.analytics_code}
+{$seo_settings.analytics_code}
+{/if}
+
+</head>
+<body>
+
+{if in_array("adisclaimer", $modules_array)}
+{include file="modules/adisclaimer/disclaimer.html"}
+{/if}
+
+<style type="text/css">
+{literal}
+
+.logo { background: url('{/literal}{$live_site}/images/{$appearance.small_header_pic}{literal}') no-repeat; {/literal}width:{$appearance.small_header_pic_width}px; height:{$appearance.small_header_pic_height}px;{literal} }
+
+@media all and (max-width: {/literal}{$appearance.outer_table}{literal}px)
+{
+	body { background: #fff !important;}
+	#header { background: none !important; border-bottom: 1px solid #e0e0e0; }
+	.fads { border-bottom: 1px solid #e0e0e0 !important; background: #f9f9f9 !important; }
+	.hb{ margin-top: 10px; margin-bottom: 10px; }
+	.fb{ margin-top: 0; margin-bottom: 0; }
+
+}
+
+@media all and (min-width: {/literal}{$appearance.outer_table}{literal}px)
+{
+
+	body { background: url("{/literal}{$template_path}{literal}images/bg.jpg"); }
+	#topnav { min-width: {/literal}{$appearance.outer_table}{literal}px; }
+	#header { min-width: {/literal}{$appearance.outer_table}{literal}px; }
+	.top-notice { min-width: {/literal}{$appearance.outer_table}{literal}px; }
+	.page_bounds { min-width: {/literal}{$appearance.outer_table}{literal}px; width: {/literal}{$appearance.outer_table}{literal}px;  margin: 0 auto !important;}
+	.logo { background: url('{/literal}{$live_site}/images/{$appearance.header_pic}{literal}') no-repeat; {/literal}width:{$appearance.header_pic_width}px; height:{$appearance.header_pic_height}px;{literal} }
+	.fads { margin: 20px 0 0 0; }
+	.main { margin: 20px 0 0 0; padding: 30px 0 0 0;}	
+	.first_left_content { padding: 0 35px 20px 35px !important; }
+	.first_right_content { {/literal}{if $text_direction=="rtl"}padding: 0 0 20px 20px !important;{else}padding: 0 20px 20px 0 !important;{/if}{literal} }
+
+	
+}
+
+@media all and (min-width: {/literal}{$appearance.outer_table+80}{literal}px)
+{
+
+	a.right 	{ {/literal}{if $text_direction=="rtl"}left{else}right{/if}{literal}: -40px; }
+	a.left		{ {/literal}{if $text_direction=="rtl"}right{else}left{/if}{literal}: -40px; } 
+
+}
+{/literal}
+</style>
+
+{if in_array("listings_compare", $modules_array) && isset($cmp) && $cmp}
+<a href="{$live_site}/modules/listings_compare/compare.php"><div id="compare_button">{$lng_compare.compare}</div></a>
+{/if}
+
+{if isset($top_content)}{$top_content}{/if}
+
+{* ----------- quick search category ------------ *}
+
+	<div class="qs_cat_dd dwin">
+	<ul class="nolist list2">
+		<li id="cat" title="{$lng.search.all_categories}" class="change_cat bold">{$lng.search.all_categories}</li>
+		{foreach from=$categories item=v name=cat}
+		<li id="cat{$v.id}" title="{$v.name}" class="change_cat mlink{if $v.parent} bold{/if}">{$v.str}{$v.name}</li>
+		{/foreach}
+	</ul>
+	</div>
+
+{* ----------- end quick search category ------------ *}
+
+{if !isset($bloc)}{$bloc=''}{/if}
+
+{if in_array('left',$banners_positions)}
+{* ----------- left banners ------------ *}
+<div class="left_banners" style="display: none;">
+{banner->getTemplateBanners p1='left' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners raligned">{include file="banner.html" bclass="btype_side"}</div>
+	{/foreach}
+</div>
+{* ----------- end left banners ------------ *}
+{/if}
+
+{if in_array('right',$banners_positions)}
+{* ----------- right banners ------------ *}
+<div class="right_banners" style="display: none;">
+{banner->getTemplateBanners p1='right' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners">{include file="banner.html" bclass="btype_side"}</div>
+	{/foreach}
+</div>
+{* ----------- end right banners ------------ *}
+{/if}
+
+{if in_array("social_networks", $modules_array) && (($self_noext=="index" && $sn_settings.enable_fb_page_plugin) || ($self_noext=="details" && ($sn_settings.enable_fb_like_button ||  $sn_settings.enable_fb_comments)))}
+{include file="modules/social_networks/init_fb_sdk.html"}
+{/if}
+
+{* ---------- background takeover ad --------- *}
+{if in_array('background',$banners_positions)}
+{banner->getTemplateBanners p1='background' p2=$section p3=$cat p4=$bloc assign='bg_banners'}
+
+<style type="text/css">
+
+{literal}
+
+#skin {
+	position: absolute;
+	width: 100%;
+	height: {/literal}{$bg_banners[0].size[1]}{literal}px;
+	margin-left: auto;
+	margin-right: auto;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+}
+
+#background
+{
+	background: url({/literal}{$live_site}/images/baners/{$bg_banners[0].filename}{literal}) no-repeat 50% 0;
+	background-color: #dee0e2;
+	width: 100%;
+	height: {/literal}{$bg_banners[0].size[1]}{literal}px;
+	position: absolute;
+	top:0px;
+	z-index: 1;
+}
+{/literal}
+</style>
+
+<div id="background"><a href="{$bg_banners[0].link}" id="skin" target="_blank"></a></div>
+{/if}
+{* ---------- end background takeover ad --------- *}
+
+<div id="topnav">
+	<div class="page_bounds">
+	<ul class="nlinks">
+		<li><a href="{$live_site}/">{$lng.navbar.home}</a></li>
+
+{* ------------- custom pages ------------- *}
+		{foreach from=$main_navbar item=cp name=mainnav}
+	<li>
+
+{if $cp.parent}
+<a href="#" class="nav-parent">
+{elseif $cp.type==1}
+<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeCustomPageLink p1=$cp.id p2=$cp.title p3=$cp.slug}{else}{$live_site}/content.php?id={$cp.id}{/if}" {if $cp.blank==1}target="_blank"{/if}>
+{else}<a href="{$cp.hreflink}" {if $cp.blank==1}target="_blank"{/if}>
+{/if}
+{$cp.title}{if $cp.parent}&nbsp;&nbsp;{/if}</a>
+
+{if $cp.parent}
+<ul class="navlinkmenu submenu2 {if $cp.level>=2}raligned-menu{/if}">
+{else}
+</li>
+{/if}
+
+{if $smarty.foreach.mainnav.index!=$main_navbar|@count-1 && $cp.parent_id}
+{capture name=some_content assign=next_index}{$smarty.foreach.mainnav.index+1}{/capture}
+
+{if $cp.parent_id != $main_navbar.$next_index.parent_id && $main_navbar.$next_index.parent_id!=$cp.id}
+{section name=loop start=$cp.level loop=$cp.level-$main_navbar.$next_index.level step=-1}
+</ul>
+
+</li>
+{/section}
+{/if}
+{/if}
+
+{if $smarty.foreach.mainnav.index==$main_navbar|@count-1 && $cp.parent_id}
+{section name=loop start=$cp.level loop=$cp.level-1 step=-1}
+</ul>
+</li>
+{/section}
+{/if}
+
+		{/foreach}
+{* ------------- end custom pages ------------- *}
+
+	</ul>
+
+
+	{if $settings.enable_locations}
+		{include file="header_choose_locations.html"}
+	{/if}
+
+	{* right side navigation *}
+	<div class="rightnavbar">
+
+	{if $fav_array}
+	<div class="rightnavbar-link">
+	<div class="bullet-bg lfloat">{isset($fav_array) && $fav_array|@count}</div>
+	<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.favorites}{else}favorites.php{/if}">{$lng.general.favourites}</a>
+	</div>
+	{/if}
+
+	{if !$logged_in && !$is_admin}
+
+	{* login *}
+	<div class="rightnavbar-link mod_login">
+	<a href="{$live_site}/login.php" class="usr">{$lng.navbar.login}</a>
+	</div>
+	<div class="rightnavbar-link dir_login" >
+	<a href="{$live_site}/login.php" class="usr">{$lng.navbar.login}</a>
+	</div>
+
+	{* register *}
+	{if isset($no_groups) && $no_groups}
+	<div class="rightnavbar-link">
+	<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.register}{else}register.php{/if}" class="register">{$lng.navbar.register}</a>
+	</div>
+	{/if}{* endif $no_groups *}
+
+	{elseif $logged_in}
+
+	<div class="rightnavbar-link">
+	<a href="javascript:;" id="show-user-menu" class="usrmenu">{$logged_in}</a>
+
+	{* user drop down menu *}
+	<ul id="user-menu" class="submenu2 dwin" style="display: none;">
+
+		<li class="first"><a href="{$live_site}/useraccount.php">{$lng.useraccount.statistics}</a></li>
+
+		{if isset($crt_usr_sett) && $crt_usr_sett.post_ads}
+		<li><a href="{$live_site}/my_listings.php">{$lng.useraccount.browse_your_listings}</a></li>
+		{/if}
+
+		<li><a href="{$live_site}/account_info.php">{$lng.useraccount.modify_account_info}</a></li>
+
+		{if in_array("change_fg_theme", $modules_array)}
+		{include file="modules/change_fg_theme/settings_lnk.html"}
+		{/if}
+
+
+		{if $is_aff}
+
+		<li><a href="{$live_site}/affiliate_revenue.php">{$lng.affiliates.revenue_history}</a></li>
+
+		<li><a href="{$live_site}/affiliate_payments_history.php">{$lng.affiliates.payments_history}</a></li>
+
+		{/if}
+
+		{if isset($crt_usr_sett) && $crt_usr_sett.post_ads}
+
+		<li><a href="{$live_site}/order_history.php">{$lng.useraccount.order_history}</a></li>
+
+		{if $subscription_exists}<li><a href="{$live_site}/subscriptions.php">{$lng.useraccount.subscriptions}</a></li>{/if}
+
+		{if $bulk_uploads}
+		<li><a href="{$live_site}/bulk_uploads.php">{$lng.useraccount.bulk_uploads}</a></li>
+		{/if}
+
+		{if $settings.internal_messaging}
+		<li><a href="{$live_site}/messages.php">{$lng.useraccount.messages}</a></li>
+		{/if}
+
+		{/if} {* end if post ads *}
+
+		{if $ads_settings.alerts_enabled}
+		<li><a href="{$live_site}/alerts.php?action=user&id={$crt_usr}">{$lng.alerts.email_alerts}</a></li>
+		{/if}
+
+		{if $ads_settings.saved_searches_enabled}
+		<li class="last"><a href="{$live_site}/saved_searches.php?id={$crt_usr}">{$lng.useraccount.saved_searches}</a></li>
+		{/if}
+
+		{if $is_mod}
+		<li class="first last adminpanel"><a href="{$live_site}/{$admin_folder}">{$lng.navbar.administrator_panel}</a></li>
+		{/if}
+
+		<li class="separator"></li>
+		<li class="signout"><a href="{$live_site}/logout.php">{$lng.navbar.logout}</a></li>
+
+
+	</ul>
+
+	</div>
+
+	{elseif $is_admin}
+
+	<div class="rightnavbar-link">
+	<a  href="javascript:;" id="show-admin-menu" class="usrmenu">{$settings.admin_name}</a>
+
+	{* admin drop down menu *}
+	<ul id="admin-menu" class="submenu2 dwin" style="display: none;">
+	<li class="first last adminpanel"><a href="{$live_site}/{$admin_folder}">{$lng.navbar.administrator_panel}</a></li>
+	<li class="signout"><a href="{$live_site}/logout.php">{$lng.navbar.logout}</a></li>
+	</ul>
+
+
+	</div>
+
+
+	{/if} {* end if !$logged_in && !$is_admin *}
+
+	{* rss *}
+	{if isset($no_rss) && $no_rss}
+	<div class="rightnavbar-link">
+
+		{if $no_rss>1}
+		<a href="javascript:;" class="rss" id="rss-link">{$lng.navbar.rss}</a>
+
+		<ul id="rss-drop-down" class="submenu dwin" style="display: none;">
+		{foreach from=$rss_array item=v}
+		<li><a href="{if $v.feedburner}{$v.feedburner}{else}{$live_site}/feed.php{if $no_rss>1}?id={$v.id}{/if}{/if}"><img src="{$template_path}images/rss-icon-orange.png" class="rspace5" alt="{$v.short_title}"/>{$v.short_title}</a></li>
+		{/foreach}
+		</ul>
+
+		{else}
+		<a href="{if $rss_array[0].feedburner}{$rss_array[0].feedburner}{else}{$live_site}/feed.php{/if}" class="rss">{$rss_array[0].short_title}</a>
+		{/if}
+
+	</div>
+	{/if}
+
+
+	{* languages *}
+
+	{if $languages|@count>1}
+
+	<div class="langnav">
+
+	<div class="btn8-right-arrow mt7" id="show_language">
+	<span id="languages_arrow">{$crt_lang_name}{if $crt_lang_flag}&nbsp;<img src="{$live_site}/images/languages/{$crt_lang_flag}" alt="{$crt_lang_name}" />{/if}</span>
+	</div>
+
+	<ul id="languages-menu" class="submenu dwin" style="display: none;">
+	{foreach from=$languages item=v}
+	{if $v.id!=$crt_lang}
+	<li><a href="javascript:;" onclick="document.cookie='default_lang={$v.id}; path=/; expires = '+exdate.toUTCString()+'; {if $settings.enable_locations && $settings.enable_subdomains}domain={$main_domain};{/if}'; window.location.reload( false );">{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />&nbsp;{/if}{$v.name}</a></li>
+	{/if}
+	{/foreach}
+	</ul>
+
+	</div> {* end langnav *}
+
+	{else}
+	<div class="lfloat"><div style="display: inline-block; height: 24px; line-height: 24px;"></div></div>
+	{/if}
+{* end languages *}
+	</div>{* end right side navigation *}
+	</div>{* end page_bounds *}
+</div>{* end topnav *}
+<div class="clearfix"></div>
+
+<div id="header">
+
+<div class="page_bounds">
+
+	{*  --------------- top logo ------------- *}
+      <div class="top-logo">
+	{* store banner *}	
+	{if isset($store_banner) && $store_banner}
+	{if $store_banner_ext=='swf'}
+		{include file="data/flash.html" img_name=$store_banner img_width=$store_banner_width img_height=$store_banner_height}
+	{else}<img src="{$live_site}/images/store/{$store_banner}" alt="" />{/if}
+{elseif $appearance.show_header==1 && $appearance.header_pic!=''}
+	
+	{if $appearance.header_pic_link!=''}<a href="{$appearance.header_pic_link}">{/if}
+	
+	{* header picture flash *}
+
+	{if $appearance.header_is_flash}
+		{include file="data/flash.html" img_name=$appearance.header_pic img_width=$appearance.header_pic_width img_height=$appearance.header_pic_height}
+	{else}
+
+{* header picture *}
+<div class="logo">&nbsp;</div>{/if}{if $appearance.header_pic_link!=''}</a>{/if}
+
+{* default template header picture *}
+
+{elseif $appearance.show_header==1 && !$appearance.header_pic!=''}{if $appearance.header_pic_link!=''}<a href="{$appearance.header_pic_link}">{/if}<div class="default_logo">&nbsp;</div>{if $appearance.header_pic_link!=''}</a>{/if}{/if}</div>{* end top-logo *}
+
+<div class="menu"><img src="{$template_path}images/menu.png"></div>
+
+{include file="quick-search.html"}
+
+</div> {* end page_bounds *}
+</div>{* end header *}
+
+<div class="clearfix"></div>
+
+{* start page *}
+<div class="page page_bounds">
+
+{* featured ads *}
+{if $self_noext|lower=="index" && isset($no_featured) && $no_featured && $ads_settings.enable_featured}
+{include file="featured.html"}
+{/if}
+{* end featured ads *}
+
+{if isset($db_error) && $db_error!=''}<div class="db_error error mt20">{$db_error}</div>{/if}
+
+{* ------ header banners ------- *}
+{if in_array('header',$banners_positions)}
+{banner->getTemplateBanners p1='header' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{if $array_banners|@count}
+{foreach from=$array_banners item=v}
+<div class="center hb">{include file="banner.html" bclass="btype728"}</div>
+{/foreach}
+<div class="clearfix"></div>
+{/if}{* if count *}
+{/if}
+{* ------- end header banners ------- *}

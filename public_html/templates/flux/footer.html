@@ -1,0 +1,143 @@
+
+<div class="page_bounds">
+
+{* ------ footer banners ------- *}
+{if in_array('footer',$banners_positions)}
+{banner->getTemplateBanners p1='footer' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{if $array_banners|@count}
+{foreach from=$array_banners item=v}
+<div class="center fbn">{include file="banner.html" bclass="btype728"}</div>
+{/foreach}
+<div class="clearfix"></div>
+{/if}{* if count *}
+{/if}
+{* ------- end footer banners ------- *}
+
+</div>{* end page_bounds *}
+</main>
+
+<footer>
+
+{if in_array("abdetector", $modules_array)}
+{include file="modules/abdetector/footer.html"}
+{/if}
+
+<div class="page_bounds fbc_inv">
+	<nav id="secnav" class="fb_inv">
+
+		{* main navigation custom pages *}
+		{if $main_navbar|@count}
+		<ul>
+		{foreach from=$main_navbar item=cp name=mainnav}
+
+			<li {if isset($cp.parent) && $cp.parent}class="parent"{/if}>
+			{if !isset($cp.parent) || !$cp.parent}
+				{if $cp.type==1}
+				<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeCustomPageLink p1=$cp.id p2=$cp.title p3=$cp.slug}{else}{$live_site}/content.php?id={$cp.id}{/if}" {if $cp.blank==1}target="_blank"{/if}>
+				{else}
+				<a href="{$cp.hreflink}" {if $cp.blank==1}target="_blank"{/if}>
+				{/if}
+			{/if}
+			{$cp.title}
+			{if !$cp.parent}
+				</a>
+			{/if}
+			</li>
+
+		{/foreach}
+		</ul>
+		{/if}
+
+		{* secondary navigation custom pages *}
+		{if $sec_navbar|@count}
+		<ul>
+		{foreach from=$sec_navbar item=cp name=secnav}
+			<li {if $cp.parent}class="parent"{/if}>
+			{if !$cp.parent}
+				{if $cp.type==1}
+				<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeCustomPageLink p1=$cp.id p2=$cp.title p3=$cp.slug}{else}{$live_site}/content.php?id={$cp.id}{/if}" {if $cp.blank==1}target="_blank"{/if}>
+				{else}
+				<a href="{$cp.hreflink}" {if $cp.blank==1}target="_blank"{/if}>
+				{/if}
+			{/if}
+			{$cp.title}
+			{if !$cp.parent}
+				</a>
+			{/if}
+			</li>
+		{/foreach}
+		</ul>
+		{/if}
+
+		<ul>
+			{if !$logged_in && !$is_admin}
+			<li><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.login}{else}login.php{/if}">{$lng.navbar.login}</a></li>
+			{else}
+			<li><a href="{$live_site}/useraccount.php">{$lng.navbar.my_account}</a></li>
+			{/if} {* end if logged in *}
+
+			{capture name=nl_link assign=nl_link}{if $seo_settings.enable_mod_rewrite}{$sef_links.new_listing}{else}new_listing.php{/if}{/capture}
+			<li><a href="{$live_site}/{if $logged_in || $settings.nologin_enabled}{$nl_link}{else}{if $seo_settings.enable_mod_rewrite}{$sef_links.login}{else}login.php{/if}?loc={$nl_link}{/if}">{$lng.listings.post_your_ad}</a></li>
+
+			<li><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.contact}{else}contact.php{/if}">{$lng.navbar.contact}</a></li>
+
+			{if in_array("social_networks", $modules_array) && ( isset($no_rss) && $no_rss>1) }
+			<li class="parent mt10">{$lng.navbar.rss}</li>
+
+			{foreach from=$rss_array item=v}
+			<li><a href="{if $v.feedburner}{$v.feedburner}{else}{$live_site}/feed.php{if $no_rss>1}?id={$v.id}{/if}{/if}"><img src="{$template_path}images/rss-icon.png" class="rspace5" alt="{$v.short_title}"/>{$v.short_title}</a></li>
+			{/foreach}
+
+			{/if}
+
+		</ul>
+	</nav>
+
+	<div class="frs">
+		{* -------- social networks ---------- *}
+		{if in_array("social_networks", $modules_array)}
+		{include file="modules/social_networks/sn_buttons.html"}
+		{/if}
+		{* -------- end social networks ---------- *}
+		<div id="copyright">{$appearance.footer_text}</div>
+
+		{if $appearance.show_footer==1 && $appearance.footer_pic!=''}
+		<div class="mt10 ml10">
+		{if $appearance.footer_pic_link!=''}<a href="{$appearance.footer_pic_link}" target="_blank">{/if}
+		{if $appearance.footer_is_flash}
+		{include file="data/flash.html" img_name=$appearance.footer_pic img_width=$appearance.footer_pic_width img_height=$appearance.footer_pic_height}
+		{else}
+		<img src="{$live_site}/images/{$appearance.footer_pic}" alt="" />
+		{/if}
+		{if $appearance.footer_pic_link!=''}</a>{/if}
+</div>
+{/if}
+
+
+	</div>
+	
+</div>
+
+	{if $is_mobile}
+	<div class="center"><div class="wide_btn2" style="display: block !important; width: 200px; margin-right: auto !important; margin-left: auto !important;">
+		<a href="javascript:;" onclick="document.cookie='mobile=1; path=/; expires='+exdate.toUTCString()+'; {if $settings.enable_locations && $settings.enable_subdomains}domain={$main_domain};{/if}';window.location.reload( false );">{$lng.general.mobile_version}</a>
+	</div><div class="clearfix"></div></div>
+	{/if}
+
+
+</footer>
+
+{if in_array("listings_compare", $modules_array)}
+<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}compare{else}modules/listings_compare/compare.php{/if}" class="tooltip {if !isset($cmp) || !$cmp}hidden{/if}" title="{$lng_compare.compare}"><div id="compare_button" class="side_button"><div class="line line1">&nbsp;</div><div class="line line2">&nbsp;</div></div></a>
+{/if}
+
+<a href="#top" class="cd-top side_button">{$lng.general.to_top}</a>
+
+{if in_array("change_color", $modules_array)}
+{include file="modules/change_color/side_picker.html"}
+{/if}
+
+{if isset($bottom_content)}{$bottom_content}{/if}
+
+ </body>
+</html>

@@ -1,0 +1,35 @@
+<div class="sn_buttons">
+
+{if $sn_settings.facebook_page_link}<!--
+--><a target="_blank" href="{$sn_settings.facebook_page_link}"><img src="{$template_path}modules/social_networks/images/sn_facebook.png" alt="{$lng_sn.facebook}" /></a><!--
+-->{/if}<!--
+
+-->{if $sn_settings.twitter_account}<!--
+--><a href="https://www.twitter.com/{$sn_settings.twitter_account}" target="_blank"><img src="{$template_path}modules/social_networks/images/sn_twitter.png" alt="{$lng_sn.twitter}" /></a><!--
+-->{/if}<!--
+
+-->{if $sn_settings.gplus_page_link}<!--
+--><a target="_blank" href="{$sn_settings.gplus_page_link}"><img src="{$template_path}modules/social_networks/images/sn_gplus.png" alt="{$lng_sn.gplus}" /></a><!--
+-->{/if}<!--
+
+-->{if $sn_settings.youtube_link}<!--
+--><a target="_blank" href="{$sn_settings.youtube_link}"><img src="{$template_path}modules/social_networks/images/sn_youtube.png" alt="{$lng_sn.youtube}" /></a><!--
+-->{/if}<!--
+
+-->{if $sn_settings.pinterest_link}<!--
+--><a target="_blank" href="{$sn_settings.pinterest_link}"><img src="{$template_path}modules/social_networks/images/sn_pinterest.png" alt="{$lng_sn.pinterest}" /></a><!--
+-->{/if}<!--
+
+-->{if $sn_settings.instagram_link}<!--
+--><a target="_blank" href="{$sn_settings.instagram_link}"><img src="{$template_path}modules/social_networks/images/sn_instagram.png" alt="{$lng_sn.instagram}" /></a><!--
+-->{/if}<!--
+
+-->{if $sn_settings.linkedin_link}<!--
+--><a target="_blank" href="{$sn_settings.linkedin_link}"><img src="{$template_path}modules/social_networks/images/sn_linkedin.png" alt="{$lng_sn.linkedin}" /></a><!--
+-->{/if}<!--
+
+-->{if isset($no_rss) && $no_rss==1}<!--
+--><a target="_blank" href="{if $rss_array[0].feedburner}{$rss_array[0].feedburner}{else}{$live_site}/feed.php{/if}"><img src="{$template_path}modules/social_networks/images/sn_rss.png" alt="{$lng.navbar.rss}" /></a><!--
+-->{/if}
+
+</div>

@@ -1,0 +1,50 @@
+{if $no_latest}
+<!-- LATEST ADS -->
+<div class="heading heading_large heading1">{$lng.general.latest_ads}</div>
+<div class="heading_large_under heading1-under"></div>
+
+	{section name=loop start=0 loop=$no_latest step=1}
+
+		{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$latest[loop].id p2=$latest[loop].title p3='' p4=$latest[loop].category_id p5=$latest[loop].slug}{else}{$live_site}/details.php?id={$latest[loop].id}{/if}{/capture}
+
+		<div class="lbox inline-lbox">
+
+			<div class="gallery-img-bg smallimg lfloat">
+			<a href="{$details_url}"><img class="limg" id="lpic{$latest[loop].id}" src="{$live_site}/{$latest[loop].image}" alt="{if $latest[loop].image_id}{$latest[loop].title|strip_tags:false|substr:0:100}{/if}" /></a>
+			{if $latest[loop].sold}<div class="sold-bg">{$lng.listings.sold}</div>{/if}
+			{if $latest[loop].rented}<div class="rented-bg">{$lng.listings.rented}</div>{/if}
+			</div>
+
+			<div class="inline-short-ad-details">
+			{if $data_set=="cars" && ($latest[loop].make || $latest[loop].model)}
+			<h3><a href="{$details_url}">{$latest[loop].make} {$latest[loop].model}</a></h3>
+			{else}
+			<h3><a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$latest[loop].title|mb_truncate:40:"...":"UTF-8"}{else}{$latest[loop].title|truncate:40:"...":false}{/if}</a></h3>
+			{/if}
+			{$latest[loop].location_str}
+			
+			{if $ads_settings.enable_price}
+		
+			{if in_array("price_extra",$modules_array) && isset($pe_settings[$latest[loop].fieldset])}
+	
+			{include file="modules/price_extra/latest.html"}
+	
+			{else}
+
+			{if $latest[loop].price>=0}<div class="small-dark-gray">{$latest[loop].price_curr}</div>{/if}
+ 
+			{/if}
+			
+			{/if} {* end if enable price *}
+
+			
+			<div class="small-light">{$latest[loop].date_nice}</div>
+			</div>
+			
+		</div>
+
+	{/section}
+
+<!-- END LATEST ADS -->
+
+{/if} {* end if $no_latest *}

@@ -1,0 +1,5 @@
+{if $settings.map_type=="gmaps"}
+    {include file="data/gmap-autolocator.html" v=$v}
+{else}
+    {include file="data/osm-autolocator.html" v=$v}
+{/if}

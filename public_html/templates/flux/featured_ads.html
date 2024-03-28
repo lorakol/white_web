@@ -1,0 +1,103 @@
+{include file="header.html"}
+
+{if $no_listings>0}
+
+{capture name=some_content assign=fheight}{math equation="w+w1" w=$ads_settings.thmb_height w1=20}{/capture}
+
+<style type="text/css">
+@media all and (min-width: 800px) {
+	.smallimg { width: {$ads_settings.thmb_width+2}px; height: {$ads_settings.thmb_height+2}px; }
+	.rclass { {if $text_direction=="rtl"}margin-right: {$ads_settings.thmb_width+10}px;{else}margin-left: {$ads_settings.thmb_width+10}px;{/if} min-height: {$ads_settings.thmb_height+2}px;}
+}
+.rclass { min-height: {$ads_settings.thmb_height+2}px;}
+.highlited { background: {$ads_settings.highlited_color}; }
+</style>
+
+{/if}
+
+<div class="page_bounds">
+<div class="page_title mb40"><h1>{$lng.general.featured_ads}</h1></div>
+
+<div class="wbg p30 mb40">
+
+	{include file="order_listings.html"}
+
+	<div class="search_res">
+	
+	{if $no_listings>0 && $ads_settings.enable_map_search}
+	{include file="listings_map.html"}
+	{/if} {* end if no listings *}
+
+	{* ------ listings2 banners ------- *}
+	{if in_array('listings2',$banners_positions)}
+	{banner->getTemplateBanners p1='listings2' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{foreach from=$array_banners item=v}
+	<div class="center mt10">{include file="banner.html" bclass="btypelp_rc"}</div><div class="clearfix"></div>
+	{/foreach}
+	<div class="clearfix"></div>
+	{/if}
+	{* ------- end listings2 banners ------- *}
+
+	{if $no_listings>0}
+	
+		{foreach name="listings" from=$listings_array item=v}
+			{include file="short_listing.html"}
+
+			{if ($smarty.foreach.listings.index+1)==$appearance.ads_per_page/2|ceil && $smarty.foreach.listings.index!=$listings_array|@count-1}
+			{* ------ listings4 banners ------- *}
+			{if in_array('listings4',$banners_positions)}
+			{banner->getTemplateBanners p1='listings4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+			{if $array_banners|@count}<div class="clearfix" style="margin: 10px 0 10px 0;"></div><div class="dcenter">{/if}
+			{foreach from=$array_banners item=v}
+			<div class="center">{include file="banner.html" bclass="btypelp_rc"}</div><div class="clearfix"></div>
+			{/foreach}
+			{if $array_banners|@count}</div>{/if}{/if}
+			{* ------- end listings4 banners ------- *}
+			{/if}
+
+		{/foreach}
+
+		{* ------ listings3 banners ------- *}
+		{if in_array('listings3',$banners_positions)}
+		{banner->getTemplateBanners p1='listings3' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+		{foreach from=$array_banners item=v}
+		<div class="center mt10">{include file="banner.html" bclass="btypelp_rc"}</div><div class="clearfix"></div>
+		{/foreach}
+		<div class="clearfix"></div>
+		{/if}
+		{* ------- end listings3 banners ------- *}
+	{/if}
+	</div> {* end search_res *}
+	
+	{if $no_listings>0}
+	<div class="center mt10 mb10">
+	{include file="paginator.html"}
+	</div>
+	{/if}
+
+</div>
+
+</div> {* end page_bounds *}
+{literal}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+$('a.addtofav').click(function() {
+
+	var live_site = '{/literal}{$live_site}{literal}';
+	var listing_id = $(this).attr("id").substr(3);
+	makeFavorite(listing_id, live_site);
+	
+	$(this).animate({
+        opacity: '0.3'
+    });
+	
+  }
+);
+
+});
+</script>
+{/literal}
+
+{include file="footer.html"}

@@ -1,0 +1,36 @@
+{if isset($adult_disclaimer) && $adult_disclaimer==1 && !isset($disclaimer_accepted)}
+{include file="data/magnific-popup.html"}
+<link href="{$template_path}modules/adisclaimer/style.css" rel="stylesheet" type="text/css"/>
+<div id="terms" class="adisclaimer hidden">
+
+<form name="agree_disclaimer" method="post">
+
+<input type="hidden" name="get_json" value='{$get_json}' />
+
+{if isset($disclaimer_text)}{$disclaimer_text}{/if}
+<br/><br/>
+<div class="dcenter">
+<div class="buttons">
+<span class="positive"><input type="submit" name="Accept_disclaimer" value="{$lng.general.accept}" /></span>
+<span class="negative"><input type="submit" name="Decline_disclaimer" value="{$lng.general.decline}" /></span>
+</div>
+</div>
+</form>
+
+</div>
+
+<script>
+$(document).ready(function() {
+$(".adisclaimer").show();
+$.magnificPopup.open({
+	type: 'inline',
+	modal: true,
+	items: {
+		src: $('.adisclaimer')
+	}
+});
+});
+</script>
+
+
+{/if}

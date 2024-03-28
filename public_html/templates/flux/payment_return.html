@@ -1,0 +1,11 @@
+{include file="header.html"}
+
+<div class="page_bounds">
+	<div class="pt30">
+		{if isset($info)}<div class="info"><p>{$info}</p></div>{/if}
+		{if isset($result)}<div id="result" class="mt20">{$result}</div>{/if}
+		{if isset($error)}<div class="error"><p>{$error}</p></div>{/if}
+	</div>
+</div>
+
+{include file="footer.html"}

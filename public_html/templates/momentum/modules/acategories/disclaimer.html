@@ -1,0 +1,23 @@
+{include file="header.html"}
+
+<link href="{$template_path}modules/acategories/style.css" rel="stylesheet" type="text/css"/>
+
+<div class="main1 box">
+<div class="pdiv2">
+<form name="accept" method="post">
+
+<input type="hidden" name="get_json" value='{if isset($get_json)}{$get_json}{/if}' />
+
+{if isset($disclaimer)}{$disclaimer}{/if}
+<br/><br/>
+<div class="dcenter">
+<div class="buttons">
+<input type="submit" class="button positive" name="Accept" value="{$lng.general.accept}" />
+<input type="submit" class="button negative" name="Decline" value="{$lng.general.decline}" />
+</div>
+</div>
+</form>
+</div>
+</div>
+
+{include file="footer.html"}

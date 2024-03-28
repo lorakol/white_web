@@ -1,0 +1,21 @@
+{if isset($pe_settings[$pe_listing.fieldset]) && $pe_settings[$pe_listing.fieldset]}{assign var="pe_fieldset" value=$pe_listing.fieldset}{else}{assign var="pe_fieldset" value="0"}{/if}
+{if $pe_listing.price>0 || ($pe_listing.price==0 && $pe_settings[$pe_fieldset].use_free==0)}
+
+	{if $pe_listing.price>0 && $pe_settings[$pe_fieldset].use_negotiable==1 && $pe_listing.negotiable==1}
+		<div class="lfloat sq-btn sq-btn1 mt5">{$pe_settings[$pe_fieldset].lang[$crt_lang].negotiable}</div>
+	{else}
+		<div class="lprice">{$pe_listing.price_curr}</div>
+		{if $pe_listing.price>0 && $pe_settings[$pe_fieldset].use_extra_option1==1 && $pe_listing.extra_option1==1}
+		<div class="lfloat sq-btn sq-btn1 mt5 space5">{$pe_settings[$pe_fieldset].lang[$crt_lang].extra_option1}</div>
+		{/if}
+		{if $pe_listing.price>0 && $pe_settings[$pe_fieldset].use_extra_option2==1 && $pe_listing.extra_option2==1}
+		<div class="lfloat sq-btn sq-btn1 mt5 space5">{$pe_settings[$pe_fieldset].lang[$crt_lang].extra_option2}</div>
+		{/if}
+	{/if}
+	
+{elseif $pe_listing.price==0 && $pe_settings[$pe_fieldset].use_free==1}
+	<div class="lfloat sq-btn sq-btn2 free-btn mt5">{$pe_settings[$pe_fieldset].lang[$crt_lang].free|replace:" ":"&nbsp;"}</div>
+{elseif $pe_listing.price==-1 && $pe_settings[$pe_fieldset].use_tags==1 && $pe_listing.price_tag}
+	<div class="lfloat sq-btn sq-btn1 mt5">{$pe_listing.price_tag|replace:" ":"&nbsp;"}</div>
+{/if}
+

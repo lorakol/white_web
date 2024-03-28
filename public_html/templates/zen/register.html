@@ -1,0 +1,434 @@
+{if $step==1}
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<script type="text/javascript" src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.number.min.js"></script>
+
+<link rel="stylesheet" href="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.css">
+<script src="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.min.js"></script>
+{include file="data/fancybox.html"}
+<link rel="stylesheet" href="{$live_site}/libs/leaflet/leaflet.min.css"/>
+<script src="{$live_site}/libs/leaflet/leaflet.js"></script>
+
+<div id="form_container">
+
+{if $no_groups>1 && !$only_group}
+<div class="form_content mt20">
+<div style="margin: auto;" id="select_group">
+
+{if $groups_array|@count>=3}{assign var="percent" value="32"}{assign var="seppercent" value="2"}{else}{assign var="percent" value="48"}{assign var="seppercent" value="4"}{/if}
+
+<table  width="100%" align="center" cellspacing="0" cellspacing="0">
+	<tr>
+{foreach name=groups from=$groups_array item=v}
+		<td width="{$percent}%">
+
+			<div class="box3-head"><div class="box3-head-left"><div class="box3-head-right">
+				{$v.name}
+			</div></div></div>
+
+			<div class="box3-left"><div class="box3-right" id="inner{$v.id}">
+			<div class="prereg"><p class="group_description">{$v.description}</p></div>
+
+			</div></div>
+
+			<div class="box3-footer"><div class="box3-footer-left"><div class="box3-footer-right" style="text-align: center;">
+			<div class="form_button" style="margin: 20px auto auto 20px;"><strong><a href="javascript:;" class="select_group" id="select_group{$v.id}" alt="{$v.id}^{$v.name}">{$lng.register.select_group}</a></strong></div>
+			</div></div></div>
+
+		</td>
+		{if $smarty.foreach.groups.index%3!=2 && $smarty.foreach.groups.index!=$groups_array|@count-1}<td width="{$seppercent}%"></td>{/if}
+
+	{if $smarty.foreach.groups.index%3==2 && $smarty.foreach.groups.index!=$groups_array|@count-1}
+	</tr>
+	<tr>
+	{/if}
+
+{/foreach}
+
+	</tr>
+
+</table>
+<br/>
+<script type="text/javascript">
+{literal}
+$(document).ready(function() {
+	{/literal}
+	var max=0;
+	{foreach name=groups from=$groups_array item=v}	
+		var divid = "#inner{$v.id}";
+		{literal}
+		if($(divid).height()>max) max = $(divid).height();
+		{/literal}
+	{/foreach}
+
+	{foreach name=groups from=$groups_array item=v}	
+		var divid = "#inner{$v.id}";
+		{literal}
+		$(divid).height(max);
+		{/literal}
+	{/foreach}
+
+	{literal}
+
+});
+{/literal}
+</script>
+
+</div> {* end select_group *}
+
+<div id="group_selected" class="pt30" style="display: none;" >
+	
+	<label class="inline lfloat">{$lng.register.group}:</label><span class="tag"></span>
+	<div class="form_button">
+		<strong><a id="change_group" class="gray" href="javascript:;">{$lng.register.change_group}</a></strong>
+	</div>
+	
+</div> {* end group_selected *}
+
+</div> {* end form_content *}
+{/if}
+
+<form name="users_form" id="users_form" method="post" action="register.php?step=3" enctype="multipart/form-data">
+
+<input type="hidden" name="group" id="group" value="{if isset($only_group) && $only_group}{$only_group}{/if}" />
+
+<div id="register_form"></div>
+
+</form>
+
+<div id="registered" style="display: none">
+<br/><br/>
+<div class="info"><p>{if isset($info)}{$info}{/if}</p></div>
+<br/><br/>
+</div> {* end registered *}
+
+</div> {* end form_contend *}
+</div> {* end end form_container *}
+
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+function usernameChecker() {
+
+	//var username_enc = base64_encode($("#username").val());
+//var username_enc = $("#username").val();
+	$.post("{/literal}{$live_site}{literal}/include/username_checker.php", $( "#users_form" ).serialize() , function(data){ 
+
+		data_split = data.split("|");
+		var error = data_split[0];
+		var info = data_split[1];
+		if(info) {
+			$("#username_available").html(info);
+			$("#username_available").show();
+			$("#username_error").hide();
+		}
+		else if(error) {
+			$("#username_error").html(error);
+			$("#username_error").show();
+			$("#username_available").hide();
+		}
+
+	});
+
+}
+
+$(document).ready(function() {
+
+
+var options = { 
+       // target:        '#output1',   // target element(s) to be updated with server response 
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  beforeSubmit,  // pre-submit callback 
+        success:       successResponse  // post-submit callback 
+ 
+        // other available options: 
+        //url:       url         // override for form's 'action' attribute 
+        //type:      type        // 'get' or 'post', override for form's 'method' attribute 
+        //dataType:  null        // 'xml', 'script', or 'json' (expected server response type) 
+        //clearForm: true        // clear all form fields after successful submit 
+        //resetForm: true        // reset the form after successful submit 
+ 
+        // $.ajax options can be used here too, for example: 
+        //timeout:   3000 
+    }; 
+
+function beforeSerialize(jqForm, options) {
+
+$("body").addClass("loading"); 
+
+	{/literal}{if $htmlarea_exists}{literal}
+	// capturing nicEditor content
+	for(var i=0;i<data_htmlarea.nicInstances.length;i++){data_htmlarea.nicInstances[i].saveContent();}
+	{/literal}{/if}{literal}
+
+	// international phones errors
+	var extra_phone_error = recheckIntlPhone();
+	if(extra_phone_error.length>0) {
+
+		// clean all fields possible err class
+		$(".err").removeClass("err");
+		// remove all err_labels
+		$(".err_label").remove();
+			
+		for (var i = 0, len = extra_phone_error.length; i < len; i++) {
+
+			$("#"+extra_phone_error[i]).addClass("err");
+			// add as child to first right_form
+			$("#"+extra_phone_error[i]).before('<label class="err_label">{/literal}{$lng.listings.errors.invalid_phone}{literal}</label>');
+			
+		}
+
+		$("body").removeClass("loading"); 
+
+		// move the page to the first err_label element
+		$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+		return false;
+			
+	} // end international phone error
+
+	// return false to cancel submit
+
+}
+
+// pre-submit callback 
+function beforeSubmit(formData, jqForm, options) { 
+
+    // formData is an array; here we use $.param to convert it to a string to display it 
+    // but the form plugin does this for you automatically when it submits the data 
+    var queryString = $.param(formData); 
+ 
+    // jqForm is a jQuery object encapsulating the form element.  To access the 
+    // DOM element for the form do this: 
+    // var formElement = jqForm[0]; 
+ 
+    //alert('About to submit: \n\n' + queryString); 
+ 
+    // here we could return false to prevent the form from being submitted; 
+    // returning anything other than false will allow the form submit to continue 
+    return true; 
+} 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+    // for normal html responses, the first argument to the success callback 
+    // is the XMLHttpRequest object's responseText property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'xml' then the first argument to the success callback 
+    // is the XMLHttpRequest object's responseXML property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'json' then the first argument to the success callback 
+    // is the json data object returned by the server 
+ 
+    //alert('status: ' + statusText + '\n\nresponseText: \n' + responseText + 
+    //    '\n\nThe output div should have already been updated with the responseText.'); 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+
+			// ad saved correctly
+			if(ret.response==1) {
+
+				// clean all fields possible err class
+				$(".err").removeClass("err");
+				// remove all err_labels
+				$(".err_label").remove();
+
+				// show info message and hide form
+				$("#register_form").slideUp();
+				$("#group_selected").slideUp();
+				$(".info").html("<p>"+ret.info+"</p>");
+				$("#registered").slideDown();
+
+				$("body").removeClass("loading"); 
+
+				return;
+			}
+
+			if(ret.response==2) { // REDIRECT
+			
+				location.href=ret.redirect;
+				return;
+			
+			}
+
+			// response = 0 -> there are errors in submit ad process 
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			$("body").removeClass("loading"); 
+
+			{/literal}{if $settings.register_captcha && $settings.enable_recaptcha}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+//initialize the AJAX form
+$('#users_form').ajaxForm(options);
+
+$("a.imgfield").fancybox();
+/*
+	{/literal}
+	var gmaps_on = {if $gmaps}1{else}0{/if};
+	// initialize google maps
+	if (gmaps_on) load_gmaps();
+	{literal}
+*/
+{/literal}
+{if $only_group}
+
+	loadRegistrationForm({$only_group});
+
+
+{/if}
+{literal}
+
+// ----------- SELECT GROUP ----------
+$(document).on("click", ".select_group", function(){ 
+
+	// get current selected group
+	var group_no = parseInt(jQuery(this).attr("id").substr(12));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var group_id = split_res[0];
+	var group_name = split_res[1];
+
+	// set value for selected plan
+	$("#group").val(group_id);
+
+	$("#select_group").slideUp();
+
+	$("#group_selected span.tag").html(group_name);
+	$("#group_selected").slideDown();
+
+	loadRegistrationForm(group_id);
+
+}); // end select_plan click	
+	
+$(document).on("click", "#change_group", function(){ 
+
+	// empty plan value
+	$("#group").val(0);
+
+	// show plans box
+	$("#group_selected").slideUp();
+	$("#select_group").slideDown();
+
+	// hide registration form
+	$("#register_form").html("");
+	$("#register_form").show();
+
+}); // end change plan
+	
+});
+
+function loadRegistrationForm(group_id) {
+
+	var str = "";
+	if(group_id>0) str+="&group="+group_id;
+	// get custom fields
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/register.php?step=2"+str,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#register_form").html(data);
+			{/literal}
+			{if $settings.map_type=="gmaps"}
+ 			load_gmaps();
+			{else}
+			init_osm();
+			{/if}
+			{literal}
+		}// end data
+	}); // end ajax
+
+}
+
+
+//]]>
+</script>
+{/literal}
+
+{include file="footer.html"}
+{/if} {* end if step=1 *}
+
+{if $step==2}
+
+<div class="title">
+<h1>{$lng.navbar.register}{if $no_groups>1} {$lng.general.as} {$group_settings.name}{/if}</h1>
+<p>{$registration_info}</p>
+</div>
+
+<div class="form_content mt20">
+
+{include file="data/form_includes.html" fields_array=$user_fields user_fields=[]}
+<ul>
+
+{if $group_settings.affiliates}
+<li>
+	<label>{$lng.users.affiliate_paypal_email}<span class="mandatory"> *</span></label>
+	<input type="text" size="30" name="affiliate_paypal_email" id="affiliate_paypal_email"  value="{if isset($tmp.affiliate_paypal_email)}{$tmp.affiliate_paypal_email}{/if}" />
+	&nbsp;<span class="info_message">{$lng.users.info.affiliate_paypal_email}</span>
+<br/><br/>
+</li>
+{/if}
+
+{include file="custom_fields_form.html" fields_array=$user_fields user_fields=[] type="user"}
+
+{if $group_settings.store == 2}
+<li>
+	<label>{$lng.users.store_banner}</label>
+	<input type="file" name="store_banner"/>&nbsp;<span class="info_message">{$lng.users.info.store_banner}</span>
+</li>
+{/if}
+</ul>
+<br/>
+<br/>
+{if $settings.register_captcha}
+{if $settings.enable_recaptcha}
+{include file="data/recaptcha.html"}
+{else}
+{include file="data/random_image.html"}
+{/if}
+{/if}
+<br/>
+<div class="buttons">
+	<strong><input type="submit" name="Submit" value="{$lng.navbar.register}" /></strong>
+</div>
+
+<div class="clearfix"></div>
+</div> {* end form_content *}
+{/if} {* end if step=2 *}

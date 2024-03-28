@@ -1,0 +1,30 @@
+<div class="lgbox overlay_window">
+
+<div class="overlay-top-bg">{$lng_compare.remove_compare}</div>
+
+<div class="pdiv5">
+
+<div class="info">
+{if isset($all) && $all}
+<p>{$lng_compare.all_items_removed}</p>
+{else}
+<p>{$lng_compare.the_item} <b>"{$title}"</b> {$lng_compare.successfully_removed}</p>
+{/if}
+</div>
+
+</div> {* end pdiv5 *}
+
+
+<div class="overlay-bottom-bg">
+{if !isset($all) || !$all}
+<div class="buttons">
+	<span class="button positive"><a href="javascript:;" onclick="window.location ='{$live_site}/modules/listings_compare/compare.php'" id="compare">{$lng_compare.start_comparison}</a></span>
+</div>
+{/if}
+<div class="buttons">
+	<span class="button negative"><a href="javascript:;" onclick="$.magnificPopup.instance.close()" id="clear">{$lng_compare.return}</a></span>
+</div>
+
+</div>
+
+</div>

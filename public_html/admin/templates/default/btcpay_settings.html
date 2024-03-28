@@ -1,0 +1,122 @@
+<div class="form_container">
+
+{if $error != ""}<div class="error">{$error}</div>{/if}
+{if $info != ""}<div class="info">{$info}</div>{/if}
+
+  
+  <div class="clearfix">
+    <div class="left_form">{$lng.settings.epay_currency}</div>
+    <div class="right_form"><input type="text" maxlength="3" size="6" name="currency" id="currency" value="{$processor_settings.currency}" /> <div class="information">{$lng.settings.info.currency}</div>	</div>
+  </div>
+
+  <div class="clearfix">
+    <div class="left_form"><img src="{$template_path}images/info.png" class="tooltip icon" title="{$lng.settings.info.btcpay_server}" alt="" />&nbsp;{$lng.settings.btcpay_server}</div>
+    <div class="right_form"><input type="text" maxlength="100" size="60" name="server" id="server" value="{$processor_settings.server}" />	</div>
+  </div>
+  
+  <div class="clearfix">
+    <div class="left_form">{$lng.settings.btcpay_path}</div>
+    <div class="right_form">
+		<input type="text" maxlength="100" size="60" name="path" id="path" value="{$processor_settings.path}" />
+		<div class="buttons"><span class="positive"><a href="payment_settings.php?processor=btcpay&generate_keys=1">{$lng.general.regenerate}</a></span></div>
+		
+		{if isset($pairing_code) && $pairing_code}<br/>{$lng.settings.btcpay_pairing_code}: <b>{$pairing_code}</b><br/>
+		<div class="information">{$lng.settings.info.btcpay_pairing_code}</div>
+		{/if}
+		
+    </div>
+  </div>
+  
+<div class="clearfix">
+  <div class="left_form">{$lng.settings.btcpay_token}</div>
+  <div class="right_form">
+	<input type="text" maxlength="100" size="60" name="token" id="token" value="{$processor_settings.token}" />
+	<div class="buttons"><span class="positive"><a href="payment_settings.php?processor=btcpay&generate_token=1">{$lng.general.regenerate}</a></span></div>
+	</div>
+</div>
+
+<div class="clearfix">
+  <div class="left_form">{$lng.settings.btcpay_approved_when}</div>
+  <div class="right_form">
+      <select name="approvewhen" id="approvewhen">
+        <option value="paid" {if $processor_settings.approvewhen=="paid"}selected{/if}>paid</option>
+        <option value="confirmed" {if $processor_settings.approvewhen=="confirmed"}selected{/if}>confirmed</option>
+        <option value="complete" {if $processor_settings.approvewhen=="complete"}selected{/if}>complete</option>
+      </select>
+  </div>
+</div>
+
+<div class="clearfix mt20">
+	<div class="left_form">{$lng.settings.btcpay_testmode}</div>
+	<div class="right_form"><input type="checkbox" name="testmode" id="testmode" {if $processor_settings.testmode==1}checked="checked"{/if} /></div>
+</div>
+  
+<div class="clearfix">
+  <div class="left_form">{$lng.settings.btcpay_testtoken}</div>
+  <div class="right_form">
+	<input type="text" maxlength="100" size="60" name="testtoken" id="testtoken" value="{$processor_settings.testtoken}" />
+	<div class="buttons"><span class="positive"><a href="payment_settings.php?processor=btcpay&generate_test_token=1">{$lng.general.regenerate}</a></span></div>
+	
+	{if isset($test_pairing_code) && $test_pairing_code}<br/>{$lng.settings.btcpay_pairing_code}: <b>{$test_pairing_code}</b><br/>
+	<div class="information">{$lng.settings.info.btcpay_pairing_code}</div>
+	{/if}
+	</div>
+</div>
+  <div class="clearfix">
+    <div class="left_form"><img src="{$template_path}images/info.png" class="tooltip icon" title="{$lng.settings.info.btcpay_server}" alt="" />&nbsp;{$lng.settings.btcpay_testserver}</div>
+    <div class="right_form"><input type="text" maxlength="100" size="60" name="testserver" id="testserver" value="{$processor_settings.testserver}" />	</div>
+  </div>
+  
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.phone_field}</div>
+	<div class="right_form">
+		<select name="phone_field" id="phone_field">
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.phone_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+  
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.address_field}</div>
+	<div class="right_form">
+		<select name="address_field" id="address_field">
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.address_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+  
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.nologin_phone_field}</div>
+	<div class="right_form">
+		<select name="nologin_phone_field" id="nologin_phone_field">
+		{foreach from=$nologin_fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.nologin_phone_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+  
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.nologin_address_field}</div>
+	<div class="right_form">
+		<select name="nologin_address_field" id="nologin_address_field">
+		{foreach from=$nologin_fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.nologin_address_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+  
+<div class="form_footer">
+	<div class="buttons rfloat" {if $demo}onClick="alert('{$lng.general.errors.demo}');return false;"{/if}>
+		<span class="positive"><input type="submit" name="Submit_btcpay" value="{$lng.general.submit}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+</div>

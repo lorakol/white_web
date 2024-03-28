@@ -1,0 +1,13 @@
+{if $group_allowed && $v.active}
+
+{if ($v.repost==0 || $v.repost.active==0) && !$v.pending_repost}
+
+<div class="lfloat mr10"><a href="{$live_site}/modules/auto_repost/auto_repost.php?id={$v.id}"><div class="buttonwrapper"><div class="gray-button-left"><span class="gray-button-right">{$lng_repost.repost_your_ad|replace:" ":"&nbsp;"}</span></div></div></a></div>
+
+{elseif $v.repost.active==1}
+
+<div class="lfloat mr10"><a href="javascript:;"><div class="buttonwrapper"><div class="gray-button-left tooltip" title="{$v.repost.tasks_str}"><span class="gray-button-right">{$lng_repost.reposts_scheduled|replace:" ":"&nbsp;"}</span></div></div></a></div>
+
+{/if}
+
+{/if}

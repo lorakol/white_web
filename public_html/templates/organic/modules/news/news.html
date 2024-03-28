@@ -1,0 +1,29 @@
+{include file="header.html"}
+	<div id="page_content">
+
+	{capture name=some_content assign=field_name}title_{$crt_lang}{/capture}
+	<h1>{$news_settings[$field_name]}</h1>
+	<br/>
+	{if $no_news>0}
+
+	{if $no_news>$news_per_page} 
+	{include file="paginator.html"}
+	{/if}
+
+	{foreach name=listings from=$news item=v}
+	<div class="article_title">{$v.title}</div>
+	<div class="article_content">
+		{$v.content}
+		<div class="article_date">{$lng.listings.added_on} {$v.date_nice}</div>
+	</div>
+
+	{/foreach}
+
+	{if $no_news>$news_per_page} 
+	{include file="paginator.html"}
+	{/if}
+
+	{/if}
+	</div>
+
+{include file="footer.html"}

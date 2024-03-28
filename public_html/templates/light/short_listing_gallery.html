@@ -1,0 +1,36 @@
+<td width="25%" valign="top" class="gallery_classified{if $v.highlited && $ads_settings.enable_highlited} highlited{/if} {if $v.featured && $ads_settings.enable_featured} featured{/if}" {if $v.highlited && $ads_settings.enable_highlited}style='background: {$ads_settings.highlited_color};'{/if}>
+{if $v.featured && $ads_settings.enable_featured}<div class="featured-icon-gallery"></div>{/if}
+<div class="gallery_div">
+
+{capture name=some_content assign=details_url}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title p3=$post_array.search_id p4=$v.category_id p5=$v.slug}{else}{$live_site}/details.php?id={$v.id}{/if}
+{/capture}
+
+	<a href="{$details_url}" name="listing{$v.id}">
+	<img src="{$live_site}/{$v.image}" id="pic{$v.id}" class="pic" alt="{if $v.image_id}{$v.title|strip_tags:false|substr:0:100}{/if}" />
+	</a>
+
+	{if $v.rented && $ads_settings.enable_rented}<div class="rented" id="rented{$v.id}" style="display: none;"></div>{elseif $v.sold && $ads_settings.enable_sold}<div class="sold" id="sold{$v.id}" style="display: none;"></div>{/if}
+
+<h3><a href="{$details_url}" id="title{$v.id}">{$v.title}</a></h3>
+{if $data_set=="cars"}<div class="listing_make">{$v.make} {$v.model}</div>{/if}
+{if $ads_settings.enable_price && $v.price>=0}<span class="price">{$v.price_curr}&nbsp;</span>{/if}
+{if $v.location_str}<br/><span class="location">{$v.location_str}</span>{/if}
+
+{*
+{if ($v.priority_name && $ads_settings.enable_priorities) || ($v.video && $v.enable_video && $ads_settings.enable_video)}
+	<table class="extra" cellpadding="0" cellspacing="0">
+	<tr>
+	{if $v.priority_name && $ads_settings.enable_priorities}
+	<td><div class="buttonwrapper"><div class="priority-left"><div class="priority-right">{$v.priority_name}</div></div></div></td><td>&nbsp;</td>
+	{/if}
+
+	{if $v.video && $v.enable_video && $ads_settings.enable_video}
+	<td><div class="buttonwrapper"><div class="video-left"><div class="video-right">{$lng.listings.short_video}</div></div></div></td>
+	{/if}
+	</tr>
+	</table>
+{/if}
+*}
+</div>
+</td>

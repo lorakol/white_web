@@ -1,0 +1,106 @@
+
+<section class="location">
+
+<div class="location_top">
+{if isset($crt_location) && $crt_location}
+<h2 class="col-6">{$lng.listings.view_ads_from}&nbsp;{$crt_location|strtoupper}</h2>
+{/if}
+<div {if isset($crt_location) && $crt_location}class="col-6"{else}class="centered"{/if} id="choose_location">
+<a href="javascript:;" onclick="toggleLocation()">
+{if isset($crt_location) && $crt_location}{$lng.location.change_location}{else}{$lng.location.choose_location}{/if}
+</a>
+</div>
+<div class="clearfix"></div>
+</div> {* end location_top *}
+
+<div id="locations_list">
+
+<form name="set_location" id="set_location" method="post" action="">
+
+{* one location field *}
+{if ','|explode:$settings.location_fields|@count==1}
+
+{assign var="type" value="single"}
+<input type="hidden" name="direct" id="direct" value="1" />
+<input type="hidden" name="field" id="field" value="{$settings.location_fields}" />
+<input type="hidden" name="location" id="location" value="" />
+
+{else}{* input fields for each of the location fields *}
+
+{assign var="type" value="double"}
+
+{* the list is used when deleting a location to clear the next depending locations also *}
+<input type="hidden" name="locations_array" id="locations_array" value="{foreach from=$fields item=v name=f}{if $smarty.foreach.f.index!=0}|{/if}{$v.caption}^{$v.name}{/foreach}" />
+
+{foreach from=$fields item=v name=f}
+<input type="hidden" name="{$v.caption}" id="{$v.caption}" value="{$location_array[$v.caption]}" />
+<input type="hidden" name="{$v.caption}_id" id="{$v.caption}_id" value="" />
+{if $v.type=="depending"}
+<input type="hidden" name="{$v.caption}_dep_id" id="{$v.caption}_dep_id" value="{$v.dep_id}" />
+<input type="hidden" name="{$v.caption}_table" id="{$v.caption}_table" value="{$v.table}" />
+{/if}
+{/foreach}
+
+{/if} {* end double *}
+
+
+{foreach from=$fields item=v name=f}
+
+	<div class="mt20">
+	<div class="lfloat heading">{$v.name}</div>
+	<div class="delete_location rfloat mt15"><a href='javascript:;' class="link_delete_location" id="delete{if $type=="double"}_{$v.caption}{/if}"><img src="{$template_path}images/delete.png" id="img_delete{if $type=="double"}_{$v.caption}{/if}" {if !$location_array[$v.caption]}class="low_op"{/if}/></a></div>
+	<div class="clearfix"></div>
+	
+	<div class="loc_selector" id="div_{$v.caption}">
+	{if $v.type=="depending"}
+
+		<ul class="nolist list1">
+		{if $v.elements|@count>0}
+		{assign var="c" value="1"}
+		{foreach from=$v.elements item=e name=el}
+		<li class="mlink {if $type=='double'}dep_selector{/if}{if $location_array[$v.caption]==$e.name} bold underline{/if}" id="{$v.caption}{$e.id}" {if $type!="double"}onclick='changeLocation("{$live_site}", "{$settings.location_fields}|{$e.name}")'{/if}><span>{$e.name}</span>{if $e.no>0} ({$e.no}) {/if}</li>
+		{if $smarty.foreach.el.index==$c*$v.no_per_column-1}
+		</ul>
+		<ul class="nolist list1">
+		{assign var="c" value=$c+1}
+		{/if}
+		{/foreach}
+		{else}
+		{$lng.location.choose} {$v.name}
+		{/if}
+		</ul>
+		<div class="clearfix"></div>
+	{else}
+
+		<ul class="nolist list1">
+		{assign var="c" value="1"}
+		{foreach from=$v.elements item=e name=el}
+		<li class="mlink menu_selector{if $location_array[$v.caption]==$e} bold underline{/if}"><span>{$e}</span></li>
+		{if $smarty.foreach.el.index==$c*$v.no_per_column-1}
+		</ul>
+		<ul class="nolist list1">
+		{assign var="c" value=$c+1}
+		{/if}
+		{/foreach}
+		</ul>
+		<div class="clearfix"></div>
+	{/if}
+	</div> {* end loc_selector *}
+	</div> {* end loc_holder *}
+{/foreach}
+
+	<div class="clearfix"></div>
+	
+	{if $type=="double"}
+	<div class="rfloat mt20">
+	<input type="submit" class="button" name="Save" id="Save" value="{$lng.location.save_location}" />
+	</div>
+	<div class="clearfix"></div>
+	{/if}
+
+</form>
+
+
+</div> {* end locations_list *}
+
+</section>

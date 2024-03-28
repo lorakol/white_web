@@ -1,0 +1,34 @@
+<!-- SAVE SEARCH BOX -->
+<div id="save-search">
+<h2 class="head">{$lng.search.save_your_search}</h2>
+<div id="search_saved" style="display: none;">{$lng.search.search_saved}</div>
+
+<div class="dcenter" >
+<div class="buttons"><strong><input type="submit" name="Save-search" id="Save-search" {if !$logged_in}onclick="alert('{$lng.search.must_login_to_save_search}'); return false;"{/if} value="{$lng.search.save}" /></strong></div>
+
+</div>
+
+
+{if $logged_in}
+{literal}
+<script type="text/javascript">
+$(document).ready(function() {
+
+	$("#search_saved").hide();
+	$("#Save-search").click(function(){
+	var post_json = {/literal}'{if isset($post_json)}{$post_json}{/if}'{literal}
+
+	$.post("{/literal}{$live_site}{literal}/include/save_search.php?post=1", { post_str: post_json }, function(data){ 
+		if(data!=0) alert(data);
+		else $("#search_saved").show();
+	} );
+
+	});
+
+});
+</script>
+{/literal}
+{/if}
+
+</div>
+<!-- END SAVE SEARCH BOX -->

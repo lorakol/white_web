@@ -1,0 +1,26 @@
+{if $sp_settings.ipqs_info_on_users_list &&  $v.spam_prevention_info}
+<tr {if $v.blocked}class="spam"{/if}>
+<td></td>
+<td colspan="9" class="laligned nop">
+	{if $v.spam_prevention_info.proxy}<div class="mid-btn editablebutton lfloat">{$lng_sp.proxy}</div>{/if}
+	{if $v.spam_prevention_info.vpn}<div class="mid-btn publicbutton lfloat">{$lng_sp.vpn}</div>{/if}
+	{if $v.spam_prevention_info.tor}<div class="mid-btn privatebutton lfloat">{$lng_sp.tor}</div>{/if}
+	{if $v.spam_prevention_info.is_crawler}<div class="mid-btn publicbutton lfloat">{$lng_sp.crawler}</div>{/if}
+	{if $v.spam_prevention_info.mobile}<div class="mid-btn editablebutton lfloat">{$lng_sp.mobile}</div>{/if}
+	{if isset($v.spam_prevention_info.bot_status) && $v.spam_prevention_info.bot_status}<div class="mid-btn privatebutton lfloat">{$lng_sp.bot}</div>{/if}
+	
+	
+	<div class="mid-btn graybutton lfloat ml20">{$lng_sp.score}: {if isset($v.spam_prevention_info.fraud_score) && $v.spam_prevention_info.fraud_score}{$v.spam_prevention_info.fraud_score}{else}-{/if}</div>
+	<div class="lfloat ml20">{$lng.search.ip}: {$v.ip}</div>
+
+	<div class="lfloat ml20">{$lng_sp.location}: {if isset($v.spam_prevention_info.country_code) && $v.spam_prevention_info.country_code!='N/A'}
+		<img src="{$live_site}/{$admin_folder}/modules/spam_prevention/flags/{$v.spam_prevention_info.country_code|lower}.png" alt="{$v.spam_prevention_info.country_code}" title="{$v.spam_prevention_info.country_code}"/>
+		{/if}
+		{if isset($v.spam_prevention_info.region) && $v.spam_prevention_info.region!='N/A'}{$v.spam_prevention_info.region},&nbsp;{else}-{/if}{if isset($v.spam_prevention_info.city) && $v.spam_prevention_info.city!='N/A'}{$v.spam_prevention_info.city}{else}-{/if}</div>
+	{if isset($v.spam_prevention_info.isp) && $v.spam_prevention_info.isp}	
+	<div class="lfloat ml20">{$lng_sp.isp}:	{$v.spam_prevention_info.isp}</div>
+	{/if}
+	
+</td>
+</tr>
+{/if}

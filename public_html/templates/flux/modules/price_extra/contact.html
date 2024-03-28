@@ -1,0 +1,95 @@
+<div class="wbg overlay_window">
+
+<script src="{$live_site}/libs/jQuery/jquery.js"></script>
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="wait"></div>
+
+<div class="page_title mb0"><h1>{$lng_pe.answer_to_offer} {$offer_value}</h1></div>
+
+<form name="mailto" id="mailto" method="post" action="{$live_site}/modules/price_extra/contact.php?post=1&id={$id}">
+
+<div class="form2 p30">
+
+<div class="info ma20" style="display: none"></div>
+<div class="error ma20" style="display: none"></div>
+
+<div class="iform">
+<ul>
+
+<li>
+	<label>{$lng.messages.message}<span class="mandatory"> *</span></label>
+	<textarea name="comments" id="comments" rows=6></textarea>
+</li>
+
+</ul>
+
+<input type="submit" class="button wide_button positive" name="Submit" value="{$lng.general.send}" />
+</div>
+
+</div> {* end form2 *}
+
+</form>
+
+{literal}
+<script>
+//<![CDATA[
+
+jQuery(document).ready(function() {
+
+	$(".info").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$(".info").html("<p>"+ret.info+"</p>");
+				$(".info").show();
+				$(".iform").slideUp();
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+
+} 
+
+ $('#mailto').ajaxForm(options);
+
+});
+{/literal}
+//]]>
+</script>
+
+
+</div>

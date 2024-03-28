@@ -1,0 +1,82 @@
+<section id="lur">
+    <div class="tab_content" id="lur_tab_content">
+
+      {section name=loop start=0 loop=$no_user_reviews step=1}
+
+      {capture name=some_content assign=reviewed_url}{if $latest_user_reviews[loop].store>0}{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$latest_user_reviews[loop].user_id p2=$latest_user_reviews[loop].contact_name}{else}{$live_site}/store.php?id={$latest_user_reviews[loop].user_id}{/if}{else}{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=$latest_user_reviews[loop].user_id}{else}{$live_site}/user_listings.php?id={$latest_user_reviews[loop].user_id}{/if}{/if}{/capture}
+
+			<div class="box-container">
+			<div class="fbox rbox clearfix">
+
+        <div class="fvac mb10">
+        {if !empty($latest_user_reviews[loop].logo)}<img src="{$live_site}/uploads/{$latest_user_reviews[loop].logo_folder}/{$latest_user_reviews[loop].logo}" class="rlogo lfloat" />{/if}
+
+        <div class="lfloat {if !empty($latest_user_reviews[loop].logo)}ml10{/if}">
+        {section name=star_loop start=0 loop=5 step=1}
+        <img src="{$template_path}modules/ratings/css/images/star{if $latest_user_reviews[loop].rating|round>=($smarty.section.star_loop.index+1)}_on{else}_off{/if}.gif" />
+        {/section}
+        </div>
+
+        </div>
+
+        <div class="ltitle mb10">
+          {if $latest_user_reviews[loop].poster_id}
+
+          {capture name=some_content assign=reviewer_url}{if $latest_user_reviews[loop].store>0}{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$latest_user_reviews[loop].poster_id p2=$latest_user_reviews[loop].contact_name}{else}{$live_site}/store.php?id={$latest_user_reviews[loop].poster_id}{/if}{else}{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=$latest_user_reviews[loop].poster_id}{else}{$live_site}/user_listings.php?id={$latest_user_reviews[loop].poster_id}{/if}{/if}{/capture}
+
+          <a href="{$reviewer_url}">{$latest_user_reviews[loop].contact_name}</a>
+
+          {else}
+
+          <b>{$latest_user_reviews[loop].name}</b>
+
+          {/if}
+
+          &nbsp;{$lng_ratings.evaluated}&nbsp;<a href="{$reviewed_url}">{$latest_user_reviews[loop].user_contact}</a>
+
+        </div>
+
+        <div class="mb20 cursive light">
+        &bdquo;{if $appearance.charset=="UTF-8"}{$latest_user_reviews[loop].content|strip_tags:true|mb_truncate:120:"...":"UTF-8"}{else}{$latest_user_reviews[loop].content|strip_tags:true|truncate:120:"...":false}{/if}&rdquo;
+        </div>
+
+			</div>
+			</div>
+		{/section}
+
+		<div class="clearfix"></div>
+
+    </div>
+
+    <hr/>
+</section>
+
+
+<script>
+//<![CDATA[
+jQuery(document).ready(function() {
+
+//	$('#tab_video').prop('checked', true);
+
+	if($('#tab_lur').is(':checked')) {
+		$('#lur_tab_content').imagesLoaded( function() {
+			startMasonryLUR();
+		});
+	}
+
+});
+
+$('input:radio[name="tabs"]').change(function() { if ($(this).attr("id") == 'tab_lur') startMasonryLUR(); });
+
+
+function startMasonryLUR() {
+
+$('#lur_tab_content').masonry({
+  // options
+  itemSelector: '.box-container'
+});
+
+}
+
+//]]>
+</script>

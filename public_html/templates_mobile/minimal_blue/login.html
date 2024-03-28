@@ -1,0 +1,130 @@
+{include file="header.html"}
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div id="heading">{$lng.navbar.login}</div>
+<div id="page_content">
+
+{if !isset($step) || !$step}
+
+{if isset($general_info) && $general_info}<div style="margin-bottom: 20px;"><p>{$general_info}</p></div>{/if}
+
+<div class="error" style="display: none;"></div>
+
+<form name="login_form" id="login_form" method="post" action="login.php?post=1{if $loc}&loc={$loc}{/if}">
+
+{if $settings.enable_username}
+<label>{$lng.login.username}:</label>
+<input name="username" id="username" type="text" style="width: 250px;" maxlength="255" /><br/>
+{else}
+<label>{$lng.useraccount.email}</label>
+<input name="email" id="email" type="text" style="width: 250px;" maxlength="255" />
+{/if}
+
+<label>{$lng.login.password}:</label>
+<input name="password" id="password" type="password" style="width: 250px;" maxlength="255"/><br/>
+
+<label><input type="checkbox" name="remember" id="remember" />&nbsp;{$lng.remember_me}</label><br/>
+
+	{if $settings.login_captcha}
+	{if $settings.enable_recaptcha}
+	{include file="data/recaptcha.html"}
+	{else}
+	{include file="data/random_image.html"}
+	{/if}
+	{/if}
+
+<div class="buttons"><strong><input type="submit" name="Login" id="Login" value="{$lng.login.login}" /></strong></div>
+</form>
+
+<hr/>
+
+{* -------- connect ---------- *}
+{if in_array("connect", $modules_array)}
+{include file="modules/connect/connect.html"}
+{/if}
+{* -------- end connect ---------- *}
+
+<p>{$lng.login.forgot_pass}&nbsp;<a href="{$live_site}/password_recovery.php">{$lng.login.click_here}</a></p>
+
+
+{else}
+{* ------------- Two Factor Authentication ------------- *}
+<div class="heading">{$lng.login.2step_verification}</div>
+
+{if isset($tfa_info) && $tfa_info}<div class="mb30"><p>{$tfa_info}</p></div>{/if}
+
+<form name="login_form" id="login_form" method="post" action="login.php?step=2&post=1&auth_name={$auth_name}{if isset($loc) && $loc}&loc={$loc}{/if}">
+
+	<div class="mt30 mb20">
+	<input type="text" name="otp" id="otp" />
+	</div>
+
+	<div class="buttons"><strong><input type="submit" name="Login" id="Login" value="{$lng.login.login}" /></strong></div>
+
+</form>
+
+{/if}
+
+</div> {* end page_content *}
+
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function() {
+
+	$(".error").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+			$("body").removeClass("loading"); 
+
+			if(ret.response==1) {
+
+				var path='';
+				if(location.pathname) {
+					p = location.pathname.replace(/^\/|\/$/g, '');
+					var lastIndex = p.lastIndexOf('/');
+					var path = "/"+p.substr(0, lastIndex);
+				}	
+				window.location.href = location.protocol+'//'+location.hostname+path+"/"+ret.redirect;
+				//alert(ret.redirect);
+				return;
+			}
+
+			// blocked failed attempt
+			if(ret.response==-1) {
+
+				window.location.href = "index.php";
+				return;
+
+			}
+
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+
+			{/literal}{if $settings.login_captcha && $settings.enable_recaptcha}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+ $('#login_form').ajaxForm(options);
+
+});
+{/literal}
+</script>
+
+
+{include file="footer.html"}

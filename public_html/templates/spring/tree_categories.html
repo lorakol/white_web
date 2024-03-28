@@ -1,0 +1,39 @@
+          <!-- CATEGORIES -->
+          <div id="tree_categories"> 
+            <table cellpadding="0" cellspacing="0" width="100%">
+              <tr> 
+                <td width="{$width}%" valign="top">
+			{foreach from=$array_categories item=v name=cat}
+			{if !isset($v.parent_id) || !$v.parent_id}
+			
+			<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/listings.php?category={$v.id}{/if}">
+			<span class="catwrapper">
+			{if $v.icon}<img src="{$live_site}/images/categories/{$v.icon}" alt="{$v.name}" />{/if}
+			<span class="parent" {if $v.icon}style="padding-left: 40px;"{/if}>
+			{$v.name|escape:"html"}
+			{if $v.ads && $appearance.categ_count_ads}<span>({$v.ads})</span>{/if}
+			</span></span>
+			</a>
+
+			{if $smarty.foreach.cat.index!=$categories|@count-1}<ul>{/if}
+			{else}
+			<li {if $v.level}class="level{$v.level}"{/if}><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/listings.php?category={$v.id}{/if}">{$v.name|escape:"html"} {if $v.ads && $appearance.categ_count_ads}({$v.ads}){/if}</a></li>
+			{/if}
+
+			{capture name=some_content assign=next_index}{$smarty.foreach.cat.index+1}{/capture}
+			{if isset($array_categories.$next_index) && !$array_categories.$next_index.parent_id && $smarty.foreach.cat.index!=0 && $smarty.foreach.cat.index!=$categories|@count-1}</ul>{/if}
+
+			{if $smarty.foreach.cat.index==$categories|@count-1 && $v.parent_id}
+			</ul>
+			{/if}
+
+			{if $v.last && $smarty.foreach.cat.index!=$categories|@count-1}
+			</td><td valign="top" width="{$width}%">
+			{/if}
+			{/foreach}
+			</td>
+              </tr>
+            </table>
+
+          </div>
+          <!-- end CATEGORIES -->

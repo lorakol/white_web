@@ -1,0 +1,72 @@
+<!-- LATEST AUCTIONS -->
+<section id="latest_auctions">
+    <div class="tab_content fbr_inv" id="la_tab_content">
+
+			<div>
+
+    		{section name=loop start=0 loop=$no_auctions step=1}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$auctions[loop].id p2=$auctions[loop].title p3='' p4=$auctions[loop].category_id p5=$auctions[loop].slug}{else}{$live_site}/details.php?id={$auctions[loop].id}{/if}{/capture}
+
+			<a href="{$details_url}">
+			<div class="box-container">
+			<div class="fbox box clearfix{*{if $v.highlited && $ads_settings.enable_highlited} highlited{/if}*}">
+
+				<img id="fpic{$auctions[loop].id}" src="{$live_site}/{$auctions[loop].medImage}" alt="{if $auctions[loop].image_id}{$auctions[loop].title|strip_tags:false|substr:0:100}{/if}" />
+
+				{if $auctions[loop].sold}<div class="ribbon ribbon_sold"><span>{$lng.listings.sold}</span></div>{/if}
+				{if $auctions[loop].rented}<div class="ribbon ribbon_rented"><span>{$lng.listings.rented}</span></div>{/if}
+
+				{if in_array("acategories", $modules_array) && in_array($auctions[loop].category_id, $ac_settings.array_categories_list)}
+				<div id="ac{$auctions[loop].id}" class="ac_over">{$lng.general.click_to_view}</div>
+				{/if}
+
+				<div class="ltitle">{if $data_set=="cars" && ((isset($auctions[loop].make) && $auctions[loop].make) || (isset($auctions[loop].model) && $auctions[loop].model))}{$auctions[loop].make} {$auctions[loop].model}{else}{if $appearance.charset=="UTF-8"}{$auctions[loop].title|mb_truncate:30:"...":"UTF-8"}{else}{$auctions[loop].title|truncate:30:"...":false}{/if}{/if}</div>
+
+				<div class="lloc">{$auctions[loop].location_str}</div>
+
+				<div class="lfloat mt5">{$lng.useraccount.starts_at}:&nbsp;&nbsp;</div><div class="lprice">{$auctions[loop].auction.starting_price}</div>
+				
+				<div class="starfav addtofav tooltip make-fav" id="fav{$auctions[loop].id}" title="{$lng.listings.add_to_favourites}"></div>
+			</div>
+			</div>
+			</a>
+		{/section}
+		<div class="clearfix"></div>
+		</div>
+
+    </div>
+	{if $no_auctions}
+		<div><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.auctions}{else}auctions.php{/if}"><h2 class="view_more">{$lng.listings.view_all_auctions}</h2></a></div>
+		<div class="clearfix"></div>
+	{/if}
+    <hr/>
+</section>
+
+
+<script>
+//<![CDATA[
+jQuery(document).ready(function() {
+
+	if($('#tab_latest_auctions').is(':checked')) {
+		$('#la_tab_content').imagesLoaded( function() {
+			startMasonryLAuctions();
+			});
+	}
+	
+});
+
+$('input:radio[name="tabs"]').change(function() { if ($(this).attr("id") == 'tab_latest_auctions') startMasonryLAuctions(); });
+
+
+function startMasonryLAuctions() {
+
+$('#la_tab_content').masonry({
+  // options
+  itemSelector: '.box-container'
+});
+
+}
+
+//]]>
+</script>

@@ -1,0 +1,45 @@
+{if $listing.pedigree_ss || $listing.pedigree_s || $listing.pedigree_sd || $listing.pedigree_ds || $listing.pedigree_d || $listing.pedigree_dd}
+{literal}
+<style type="text/css">
+.pedigree1 {padding: 10px 0 10px 0; width: 200px;}
+.pedigree21 {padding: 20px 10px 10px 70px; width: 200px;}
+.pedigree22 {padding: 10px 10px 20px 70px; width: 200px;}
+.pedigree {border: 1px dotted #999999; padding: 5px; width: 200px; height: 14px;}
+</style>
+{/literal}
+
+<div class="box_heading">{$v.name}</div>
+<table cellpadding="2" cellspacing="2">
+	<tr>
+		<td valign="top">
+			<div class="pedigree21">
+			<div class="pedigree">{$listing.pedigree_ss}</div>
+			</div>
+
+			<div class="pedigree1">
+			<div class="pedigree">{$listing.pedigree_s}</div>
+			</div>
+
+			<div class="pedigree22">
+			<div class="pedigree">{$listing.pedigree_sd}</div>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td valign="top">
+			<div class="pedigree21">
+			<div class="pedigree">{$listing.pedigree_ds}</div>
+			</div>
+
+			<div class="pedigree1">
+			<div class="pedigree">{$listing.pedigree_d}</div>
+			</div>
+
+			<div class="pedigree22">
+			<div class="pedigree">{$listing.pedigree_dd}</div>
+			</div>
+		</td>
+	</tr>
+
+</table>
+{/if}

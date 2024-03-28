@@ -1,0 +1,15 @@
+{if $sn_settings.enable_fb_page_plugin}
+
+{if in_array("timeline", $sn_settings.fb_pp_tabs_array)}
+<div class="fb-page mt20" data-width="{$sn_settings.fb_pp_width}" data-height="{$sn_settings.fb_pp_height}" data-href="{$sn_settings.facebook_page_link}" data-tabs="timeline" data-small-header="{if $sn_settings.fb_pp_small_header}true{else}false{/if}" data-adapt-container-width="true" data-hide-cover="{if $sn_settings.fb_pp_hide_cover}true{else}false{/if}" data-show-facepile="{if $sn_settings.fb_pp_show_facepile}true{else}false{/if}" data-hide-cta="{if $sn_settings.fb_pp_hide_cta}true{else}false{/if}"></div>
+{/if}
+
+{if in_array("events", $sn_settings.fb_pp_tabs_array)}
+<div class="fb-page mt20" data-width="{$sn_settings.fb_pp_width}" data-height="{$sn_settings.fb_pp_height}" data-href="{$sn_settings.facebook_page_link}" data-tabs="events" data-small-header="{if $sn_settings.fb_pp_small_header}true{else}false{/if}" data-adapt-container-width="true" data-hide-cover="{if $sn_settings.fb_pp_hide_cover}true{else}false{/if}" data-show-facepile="{if $sn_settings.fb_pp_show_facepile}true{else}false{/if}" data-hide-cta="{if $sn_settings.fb_pp_hide_cta}true{else}false{/if}"></div>
+{/if}
+
+{if in_array("messages", $sn_settings.fb_pp_tabs_array)}
+<div class="fb-page mt20" data-width="{$sn_settings.fb_pp_width}" data-height="{$sn_settings.fb_pp_height}" data-href="{$sn_settings.facebook_page_link}" data-tabs="messages" data-small-header="{if $sn_settings.fb_pp_small_header}true{else}false{/if}" data-adapt-container-width="true" data-hide-cover="{if $sn_settings.fb_pp_hide_cover}true{else}false{/if}" data-show-facepile="{if $sn_settings.fb_pp_show_facepile}true{else}false{/if}" data-hide-cta="{if $sn_settings.fb_pp_hide_cta}true{else}false{/if}"></div>
+{/if}
+
+{/if}

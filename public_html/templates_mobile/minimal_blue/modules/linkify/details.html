@@ -1,0 +1,15 @@
+<script src="{$live_site}/libs/jQuery/plugins/linkify/linkify.min.js"></script>
+<script src="{$live_site}/libs/jQuery/plugins/linkify/linkify-jquery.min.js"></script>
+
+{literal}
+<script>
+
+$('#pdescription').linkify({
+    target: "_blank",
+    attributes: {
+		rel: 'nofollow'
+	}
+});
+
+</script>
+{/literal}

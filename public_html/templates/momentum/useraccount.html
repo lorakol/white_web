@@ -1,0 +1,415 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+
+<div class="main1 box">
+<div class="page_title heading"><h1>{$lng.useraccount.statistics}</h1></div>
+
+<div class="pdiv6">
+<div class="col-6">
+
+<div class="pb30">
+<div class="heading heading_large heading5">{$lng.stats.general}</div>
+<div class="heading_large_under heading5-under"></div>
+
+{assign var="row" value="odd"}
+{if $no_groups>1}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.useraccount.account_type}</div>
+<div class="rfloat gray-bold">{$group.name}</div>
+<div class="clearfix"></div>
+</div>
+{assign var="row" value="even"}
+{/if}
+
+{if $crt_usr_sett.post_ads}
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.useraccount.total_views}</div>
+<div class="rfloat gray-bold">{$total_views}</div>
+<div class="clearfix"></div>
+</div>
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+{/if}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.useraccount.last_login}</div>
+<div class="rfloat gray-bold">{if $last_login.date_login_nice}{$last_login.date_login_nice}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.useraccount.last_login_ip}</div>
+<div class="rfloat gray-bold">{if $last_login.ip}{$last_login.ip}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row-bottom"></div>
+
+</div>
+
+
+{if $crt_usr_sett.affiliate}
+<div class="pb30">
+<div class="heading heading_large heading5">{$lng.users.affiliate}</div>
+<div class="heading_large_under heading5-under"></div>
+
+<div class="row row-even">
+<div class="lfloat">{$lng.users.affiliate_link}</div>
+<div class="rfloat gray-bold"><a href="{$user.affiliate_link}" target="_blank">{$user.affiliate_link}</a></div>
+<div class="clearfix"></div>
+</div>
+<div class="row row-odd">
+<div class="lfloat">{$lng.affiliates.last_payment}</div>
+<div class="rfloat gray-bold">{if isset($last_payment.amount) && $last_payment.amount}{$last_payment.amount}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-even">
+<div class="lfloat">{$lng.affiliates.last_payment_date}</div>
+<div class="rfloat gray-bold">{if isset($last_payment.date) && $last_payment.date}{$last_payment.date}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.affiliates.next_payment_date}</div>
+<div class="rfloat gray-bold">{if isset($next_payment_date) && $next_payment_date}{$next_payment_date}{else}-{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-even">
+<div class="lfloat">{$lng.affiliates.total_due}</div>
+<div class="rfloat gray-bold"><div class="lfloat">{$total_due}</div><div class="mt4 lfloat btn7 space5"><a href="affiliate_revenue.php">{$lng.affiliates.revenue_history}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.affiliates.total_payments}</div>
+<div class="rfloat gray-bold"><div class="lfloat">{$total_payments}</div><div class="mt4 lfloat btn7 space5">
+	<a href="affiliate_payments_history.php">{$lng.affiliates.payments_history}</a></div></div>
+<div class="clearfix"></div>
+</div>
+
+{if isset($pending_payment) && $pending_payment}
+<div class="row row-even">
+<div class="lfloat">{$lng.affiliates.pending_payment}</div>
+<div class="rfloat gray-bold">{$pending_payment}</div>
+<div class="clearfix"></div>
+</div>
+{/if}
+
+<div class="row-bottom"></div>
+
+</div>
+{/if}
+
+{if $crt_usr_sett.post_ads}
+
+<div class="pb30">
+<div class="heading heading_large heading5">{$lng.stats.listings}</div>
+<div class="heading_large_under heading5-under"></div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.useraccount.total_listings}</div>
+<div class="rfloat gray-bold">
+	<div class="lfloat">{$no_listings}</div><div class="mt4 lfloat btn7 space5">
+	<a href="my_listings.php">{$lng.general.view}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-even">
+<div class="lfloat">{$lng.useraccount.active_listings}</div>
+<div class="rfloat gray-bold">
+	<div class="lfloat">{$no_active_listings}</div><div class="mt4 lfloat btn7 space5">
+	<a href="my_listings.php?show=active">{$lng.general.view}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-odd">
+<div class="lfloat">{$lng.useraccount.pending_listings}</div>
+<div class="rfloat gray-bold">
+	<div class="lfloat">{$no_pending_listings}</div><div class="mt4 lfloat btn7 space5">
+	<a href="my_listings.php?show=pending">{$lng.general.view}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row row-even">
+<div class="lfloat">{$lng.useraccount.expired_listings}</div>
+<div class="rfloat gray-bold">
+	<div class="lfloat">{$no_expired_listings}</div><div class="mt4 lfloat btn7 space5">
+	<a href="my_listings.php?show=expired">{$lng.general.view}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row-bottom"></div>
+
+</div>
+
+{/if} {* end if post ads *}
+
+</div>{* end col-6 *}
+
+<div class="col-6">
+
+{if $crt_usr_sett.post_ads}
+
+{if $subscription_exists}
+<div class="pb30">
+<div class="heading heading_large heading5">{$lng.useraccount.subscriptions}</div>
+<div class="heading_large_under heading5-under"></div>
+
+{assign var="row" value="odd"}
+
+{if $subscriptions|@count>1}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.general.active}</div>
+
+<div class="rfloat gray-bold">
+	<div class="lfloat">{$active_subscriptions}</div><div class="mt4 lfloat btn7 space5">
+	<a href="subscriptions.php">{$lng.general.view}</a></div>
+</div>
+
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+{if $pending_subscriptions}
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.general.pending}</div>
+<div class="rfloat gray-bold">
+	<div class="lfloat">{$pending_subscriptions}</div><div class="mt4 lfloat btn7 space5">
+	<a href="subscriptions.php">{$lng.general.view}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+{/if}
+
+{if $expired_subscriptions}
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.listings.expired}</div>
+<div class="rfloat gray-bold">
+	<div class="lfloat">{$expired_subscriptions}</div><div class="mt4 lfloat btn7 space5">
+	<a href="subscriptions.php">{$lng.general.view}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+{/if}
+
+{if $inactive_subscriptions}
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.general.inactive}</div>
+<div class="rfloat gray-bold">
+	<div class="lfloat">{$inactive_subscriptions}</div><div class="mt4 lfloat btn7 space5">
+	<a href="subscriptions.php">{$lng.general.view}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+{/if}
+
+{elseif $subscriptions|@count==1} {* if subscriptions>1 *}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$subscription.package_name}</div>
+<div class="rfloat gray-bold">{$subscription.state}{if $subscription.recurring}, {$lng.useraccount.recurring}{/if}
+		{if !$subscription.active && !$subscription.pending && !$subscription.fixed}&nbsp;<a href="useraccount.php?removesub={$subscription.id}" onclick="return myConfirm('{$lng.useraccount.confirm_delete_subscription|addslashes}')">[ {$lng.general.remove} ]</a>
+		{if $subscription.expired && !$subscription.recurring && !$subscription.fixed}&nbsp;<a href="subscribe.php?id={$subscription.id}&renew=1">[ {$lng.listings.renew} ]</a>{/if}{/if}</div>
+<div class="clearfix"></div>
+</div>
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+{if $subscription.user_approved}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.useraccount.date_start}</div>
+<div class="rfloat gray-bold">{$subscription.date_start_nice}</div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+{if $subscription.date_renew!='' && $subscription.date_renew_nice}
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.useraccount.date_renew}</div>
+<div class="rfloat gray-bold">{$subscription.date_renew_nice}</div>
+<div class="clearfix"></div>
+</div>
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+{/if}
+
+{if $subscription.date_renew!='' && $subscription.date_end_nice}
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.useraccount.date_end}</div>
+<div class="rfloat gray-bold">{$subscription.date_end_nice}</div>
+<div class="clearfix"></div>
+</div>
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+{/if}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.useraccount.remaining_ads}</div>
+<div class="rfloat gray-bold">{if $subscription.ads_left==-1}{$lng.general.unlimited}{else}{$subscription.ads_left}{/if}</div>
+<div class="clearfix"></div>
+</div>
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+{/if} {* end if $subscription.user_approved *}
+
+{/if}{* end if subscriptions>1 *}
+
+
+<div class="row row-{$row}">
+<div class="lfloat"></div>
+<div class="rfloat gray-bold"><div class="btn5"><a href="subscribe.php">{$lng.useraccount.buy_package}</a></div></div>
+<div class="clearfix"></div>
+</div>
+
+<div class="row-bottom"></div>
+</div>
+{/if}
+{/if} {* end if post ads *}
+
+
+{if $crt_usr_sett.post_ads && $credits_allowed}
+<div class="pb30">
+<div class="heading heading_large heading5">{$lng.credits.credits}</div>
+<div class="heading_large_under heading5-under"></div>
+
+
+{assign var="row" value="odd"}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.credits.current_credits}</div>
+<div class="rfloat gray-bold">{$no_credits} {if $no_credits==1}{$lng.credits.credit}{else}{$lng.credits.credits}{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+{assign var="row" value="even"}
+
+{if $pending_credits}
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.credits.pending_credits}</div>
+<div class="rfloat gray-bold">{$pending_credits} {if $no_credits==1}{$lng.credits.credit}{else}{$lng.credits.credits}{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+{/if}
+
+{if $credits_settings.unit!=1}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.credits.one_credit_equals}</div>
+<div class="rfloat gray-bold">{$credits_settings.unit_curr}</div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+{/if}
+
+{if $no_credits}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.credits.credits_amount}</div>
+<div class="rfloat gray-bold">{$credits_amount}</div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+{/if}
+
+{if $no_processors}
+
+<div class="row row-{$row}">
+<div class="lfloat"></div>
+<div class="rfloat gray-bold"><div class="btn5"><a href="buy_credits.php">{$lng.credits.buy_extra_credits}</a></div></div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+{/if}
+
+<div class="row-bottom"></div>
+</div>
+{/if}
+
+{if $crt_usr_sett.post_ads && $group.store>0}
+<div class="pb30">
+<div class="heading heading_large heading5">{$lng.users.store}</div>
+<div class="heading_large_under heading5-under"></div>
+
+{assign var="row" value="odd"}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.general.status}</div>
+<div class="rfloat gray-bold">
+	{if $user.store}
+		<div class="small-btn activebutton icon mt10">{$lng.listings.active}</div>
+	{elseif isset($user.store_pending) && $user.store_pending}
+		<div class="small-btn pendingbutton icon mt10">{$lng.listings.pending}</div>
+	{else}
+		<div class="small-btn inactivebutton icon mt10">{$lng.listings.inactive}</div>
+</div>
+<div class="clearfix"></div>
+</div>
+
+{assign var="row" value="even"}
+
+<div class="row row-{$row}">
+<div class="lfloat"></div>
+<div class="rfloat gray-bold"><div class="btn5"><a href="buy_store.php">{$lng.useraccount.buy_store}</a></div>
+	{/if}
+</div>
+<div class="clearfix"></div>
+</div>
+
+{assign var="row" value="even"}
+
+{if $user.store}
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.general.expires}</div>
+<div class="rfloat gray-bold">{if $user.store_expires_nice}{$user.store_expires_nice}{else}{$lng.general.never}{/if}</div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.general.link}</div>
+<div class="rfloat gray-bold"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$user.id p2=$user[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$user.id}{/if}" target='_blank'>{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$user.id p2=$user[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$user.id}{/if}</a></div>
+<div class="clearfix"></div>
+</div>
+
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+{/if} {* end if user store *}
+<div class="row-bottom"></div>
+</div>{* end pb30 *}
+
+{/if}{* end if group store *}
+
+{if in_array("showcase",$modules_array)}
+	{include file="modules/showcase/useraccount.html"}
+{/if}
+
+</div>
+</div> {* end pdiv6 *}
+<div class="clearfix"></div>
+</div> {* end main1 *}
+
+{include file="footer.html"}

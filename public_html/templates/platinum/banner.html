@@ -1,0 +1,11 @@
+{if $v.filename}
+	{if $v.extension=='swf'}
+		{include file="data/flash.html" img_name=$v.filename img_width=$v.size[0] img_height=$v.size[1]}
+	{else}
+	<a href="{$v.link}" onclick="clickBanner({$v.id},'{$live_site}');"{if isset($v.open_new) && $v.open_new} target="_blank"{/if}>
+		<img src="{$live_site}/images/baners/{$v.filename}" alt="" />
+	</a>
+	{/if}
+{else}
+	{$v.code}
+{/if}

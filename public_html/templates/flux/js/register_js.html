@@ -1,0 +1,286 @@
+
+{literal}
+<script>
+//<![CDATA[
+
+function usernameChecker() {
+
+	//var username_enc = base64_encode($("#username").val());
+//var username_enc = $("#username").val();
+	$.post("{/literal}{$live_site}{literal}/include/username_checker.php", $( "#users_form" ).serialize() , function(data){ 
+
+		data_split = data.split("|");
+		var error = data_split[0];
+		var info = data_split[1];
+		if(info) {
+			$("#username_available").html(info);
+			$("#username_available").show();
+			$("#username_error").hide();
+		}
+		else if(error) {
+			$("#username_error").html(error);
+			$("#username_error").show();
+			$("#username_available").hide();
+		}
+
+	});
+
+}
+
+
+
+$(document).ready(function() {
+
+$('.tooltip').powerTip({
+	placement: 'n'
+});
+
+var options = { 
+       // target:        '#output1',   // target element(s) to be updated with server response 
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  beforeSubmit,  // pre-submit callback 
+        success:       successResponse  // post-submit callback 
+ 
+        // other available options: 
+        //url:       url         // override for form's 'action' attribute 
+        //type:      type        // 'get' or 'post', override for form's 'method' attribute 
+        //dataType:  null        // 'xml', 'script', or 'json' (expected server response type) 
+        //clearForm: true        // clear all form fields after successful submit 
+        //resetForm: true        // reset the form after successful submit 
+ 
+        // $.ajax options can be used here too, for example: 
+        //timeout:   3000 
+    }; 
+
+function beforeSerialize(jqForm, options) {
+
+$("body").addClass("loading"); 
+
+	{/literal}{if $htmlarea_exists}{literal}
+	// capturing nicEditor content
+	for(var i=0;i<data_htmlarea.nicInstances.length;i++){data_htmlarea.nicInstances[i].saveContent();}
+	{/literal}{/if}{literal}
+
+	// international phones errors
+	var extra_phone_error = recheckIntlPhone();
+	if(extra_phone_error.length>0) {
+
+		// clean all fields possible err class
+		$(".err").removeClass("err");
+		// remove all err_labels
+		$(".err_label").remove();
+			
+		for (var i = 0, len = extra_phone_error.length; i < len; i++) {
+
+			$("#"+extra_phone_error[i]).addClass("err");
+			// add as child before form element
+			$("#"+extra_phone_error[i]).first().before('<label class="err_label">{/literal}{$lng.listings.errors.invalid_phone}{literal}</label>');
+			
+		}
+
+		$("body").removeClass("loading"); 
+
+		// move the page to the first err_label element
+		$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+		return false;
+			
+	} // end international phone error
+
+	// return false to cancel submit
+
+}
+
+// pre-submit callback 
+function beforeSubmit(formData, jqForm, options) { 
+
+    // formData is an array; here we use $.param to convert it to a string to display it 
+    // but the form plugin does this for you automatically when it submits the data 
+    var queryString = $.param(formData); 
+ 
+    // jqForm is a jQuery object encapsulating the form element.  To access the 
+    // DOM element for the form do this: 
+    // var formElement = jqForm[0]; 
+ 
+    //alert('About to submit: \n\n' + queryString); 
+ 
+    // here we could return false to prevent the form from being submitted; 
+    // returning anything other than false will allow the form submit to continue 
+    
+    return true; 
+} 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+    // for normal html responses, the first argument to the success callback 
+    // is the XMLHttpRequest object's responseText property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'xml' then the first argument to the success callback 
+    // is the XMLHttpRequest object's responseXML property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'json' then the first argument to the success callback 
+    // is the json data object returned by the server 
+ 
+    //alert('status: ' + statusText + '\n\nresponseText: \n' + responseText + 
+    //    '\n\nThe output div should have already been updated with the responseText.'); 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+    
+			// ad saved correctly
+			if(ret.response==1) {
+
+				// clean all fields possible err class
+				$(".err").removeClass("err");
+				// remove all err_labels
+				$(".err_label").remove();
+
+				// show info message and hide form
+				$("#register_form").slideUp();
+				$("#group_selected").slideUp();
+				$(".info").html("<p>"+ret.info+"</p>");
+				$("#registered").slideDown();
+
+				// move the page to the info label
+				$('html,body').animate({scrollTop:$("#register_form").offset().top}, 'slow');
+
+				$("body").removeClass("loading"); 
+
+				return;
+			}
+
+			if(ret.response==2) { // REDIRECT
+			
+				location.href=ret.redirect;
+				return;
+			
+			}
+
+			// response = 0 -> there are errors in submit ad process 
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+
+				if(err_field=="alert_window") { alert(err_string); $("body").removeClass("loading"); $('input[type="submit"]').prop('disabled', true); break; }
+				
+				$("#"+err_field).addClass("err");
+				// add as child before form element
+				//$("#"+err_field).first().before('<label class="err_label">'+err_string+'</label>');
+				$('label[for='+err_field+']').after('<label class="err_label">'+err_string+'</label>');
+
+			}
+
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+			$("body").removeClass("loading"); 
+
+			{/literal}{if $settings.register_captcha && $settings.enable_recaptcha}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+//initialize the AJAX form
+$('#users_form').ajaxForm(options);
+$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+
+{/literal}
+{if $only_group}
+
+	loadRegistrationForm({$only_group});
+
+
+{/if}
+{literal}
+/*
+{/literal}
+var gmaps_on = {if $gmaps}1{else}0{/if};
+// initialize google maps
+if (gmaps_on && !places && !dsearch) load_gmaps();
+{literal}
+*/
+// ----------- SELECT GROUP ----------
+$(document).on("click", ".select_group", function(){ 
+
+	// get current selected group
+	var group_no = parseInt(jQuery(this).attr("id").substr(12));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var group_id = split_res[0];
+	var group_name = split_res[1];
+
+	// set value for selected plan
+	$("#group").val(group_id);
+
+	$("#select_group").slideUp();
+
+	$("#group_selected span.tag").html(group_name);
+	$("#group_selected").slideDown();
+
+	loadRegistrationForm(group_id);
+
+}); // end select_plan click	
+	
+$(document).on("click", "#change_group", function(){ 
+
+	// empty plan value
+	$("#group").val(0);
+
+	// show plans box
+	$("#group_selected").slideUp();
+	$("#select_group").slideDown();
+
+	// hide registration form
+	$("#register_form").html("");
+	$("#register_form").show();
+
+}); // end change plan
+	
+});
+
+function loadRegistrationForm(group_id) {
+
+	var str = "";
+	if(group_id>0) str+="&group="+group_id;
+	// get custom fields
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/register.php?step=2"+str,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#register_form").html(data);
+			{/literal}
+			{if $settings.map_type=="gmaps"}
+			load_gmaps();
+			{else}
+			init_osm();
+			{/if}
+			{literal}
+		}// end data
+	}); // end ajax
+
+}
+
+
+//]]>
+</script>
+{/literal}

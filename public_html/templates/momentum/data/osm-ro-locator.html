@@ -1,0 +1,48 @@
+	function autoLocator_{$v.caption}() {
+
+		var address = '';
+		var address_html = '';
+		var osm_marker;
+
+		{assign var=extensions_array value=","|explode:$v.extensions} 
+		{foreach from=$extensions_array item=e}
+
+			var l = "{$listing[$e]}";
+
+			if(l) {
+				if(address!='') { 
+					address = address + ', ';
+					address_html = address_html + '<br/>';
+				}
+				address = address + l;
+				address_html = address_html + "<b>" + l + "</b>";
+			}
+			
+		{/foreach}
+
+		if(!address) { 
+			$("#gm_{$v.caption}").hide();
+			return;
+		}
+		
+		 $.getJSON('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + address, function(data) {
+			
+			var lat = data[0].lat;
+			var lng = data[0].lon;
+			var location = new L.LatLng(lat, lng);
+			map_{$v.caption}.panTo(location);
+			
+			if (typeof osm_marker !== 'undefined') map_{$v.caption}.removeLayer(osm_marker); 
+			osm_marker = L.marker([lat, lng]).addTo(map_{$v.caption});
+
+			if(address_html) {
+				osm_marker.bindPopup(address_html).openPopup();
+			}
+			
+			var h = map_{$v.caption}.getZoom();
+			if(IsNumeric(lat) && IsNumeric(lng) && IsNumeric(h)) document.getElementById("{$v.caption}").value=lat+","+lng+","+h;
+			
+			
+		 });
+	}
+

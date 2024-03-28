@@ -1,0 +1,5 @@
+<option value="location.href='{$order_by_link|replace:'##order##':'banned'}'" {if $order=='`suspended` desc, `date_unsuspend` asc'}selected="selected"{/if}>
+		{$lng_su.order_by_banned}</option>
+		
+<option value="location.href='{$order_by_link|replace:'##order##':'suspended'}'" {if $order=='`suspended` desc, `date_unsuspend` desc'}selected="selected"{/if}>
+		{$lng_su.order_by_suspended}</option>

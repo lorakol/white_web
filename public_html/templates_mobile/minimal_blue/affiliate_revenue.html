@@ -1,0 +1,26 @@
+{include file="header.html"}
+<div id="heading">{$lng.affiliates.revenue_history}</div>
+
+{if $no_pages>1}<div id="pages">{include file="paginator.html"}</div>{/if}
+<div class="clearfix"></div>
+{foreach from=$revenue_array item=v}
+
+<div class="classified_nl">
+
+<div class="classifieds_content">
+<h3>{$v.amount_nice}</h3>
+<b>{$v.date_nice}</b>&nbsp;|&nbsp;{if $v.released==1}<span class="green">{$lng.affiliates.released}</span>{else}<span class="red">{$lng.affiliates.not_released}</span>{/if}&nbsp;&nbsp;{if $v.paid}<span class="green">{$lng.affiliates.paid}</span>{else}<span class="red">{$lng.affiliates.not_paid}</span>{/if}
+</div>
+<div class="clearfix"></div>
+</div>
+{/foreach}
+
+{if $no_rev==0}
+	<div class="p10">	
+	{$lng.general.no_items}
+	</div>
+{/if}
+
+<div class="clearfix"></div>
+
+{include file="footer.html"}

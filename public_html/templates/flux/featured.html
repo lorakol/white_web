@@ -1,0 +1,83 @@
+<section id="featured_ads" class="fbr_inv">
+
+	<div class="tab_content fbr_inv" id="featured_tab_content">
+
+			<div>
+    		{section name=loop start=0 loop=$no_featured step=1}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$featured_ads[loop].id p2=$featured_ads[loop].title p3='' p4=$featured_ads[loop].category_id p5=$featured_ads[loop].slug}{else}{$live_site}/details.php?id={$featured_ads[loop].id}{/if}{/capture}
+
+			<a href="{$details_url}">
+			<div class="box-container">
+			<div class="fbox box clearfix{*{if $v.highlited && $ads_settings.enable_highlited} highlited{/if}*}">
+
+				<img id="fpic{$featured_ads[loop].id}" src="{$live_site}/{$featured_ads[loop].medImage}" alt="{if $featured_ads[loop].image_id}{$featured_ads[loop].title|strip_tags:false|substr:0:100}{/if}" />
+
+				{if $featured_ads[loop].sold}<div class="ribbon ribbon_sold"><span>{$lng.listings.sold}</span></div>{/if}
+				{if $featured_ads[loop].rented}<div class="ribbon ribbon_rented"><span>{$lng.listings.rented}</span></div>{/if}
+
+				{if in_array("acategories", $modules_array) && in_array($featured_ads[loop].category_id, $ac_settings.array_categories_list)}
+				<div id="ac{$featured_ads[loop].id}" class="ac_over">{$lng.general.click_to_view}</div>
+				{/if}
+
+				<h3 class="ltitle">{if $data_set=="cars" && ((isset($featured_ads[loop].make) && $featured_ads[loop].make) || (isset($featured_ads[loop].model) && $featured_ads[loop].model))}{$featured_ads[loop].make} {$featured_ads[loop].model}{else}{if $appearance.charset=="UTF-8"}{$featured_ads[loop].title|mb_truncate:30:"...":"UTF-8"}{else}{$featured_ads[loop].title|truncate:30:"...":false}{/if}{/if}</h3>
+
+				<div class="lloc">{$featured_ads[loop].location_str}</div>
+
+				{if $ads_settings.enable_price}
+
+					{if in_array("price_extra",$modules_array) && ( isset($pe_settings[$featured_ads[loop].fieldset]) || isset($pe_settings[0]) )}
+
+						{include file="modules/price_extra/gallery_listing.html" pe_listing=$featured_ads[loop]}
+
+					{else}
+
+						{if !empty($featured_ads[loop].price) && $featured_ads[loop].price>=0}<div class="lprice">{$featured_ads[loop].price_curr}</div>{/if}
+
+					{/if}
+
+				{/if} {* end if enable price *}
+
+				{if !in_array($featured_ads[loop].id, $fav_array)}
+				<div class="starfav addtofav tooltip make-fav" id="fav{$featured_ads[loop].id}" title="{$lng.listings.add_to_favourites}"></div>
+				{else}
+				<div class="starfav remfav tooltip rem-fav" id="fav{$featured_ads[loop].id}" title="{$lng.listings.remove_favourite}"></div>
+				{/if}
+{*				
+				{if $v.urgent && $ads_settings.enable_urgent}<div class="clearfix"></div><div class="mt5"><span class="urgent sq-btn sq-btn1">{$lng.listings.urgent}</span></div>{/if}
+*}				
+			</div>
+			</div>
+			</a>
+		{/section}
+		<div class="clearfix"></div>
+		</div>
+    </div>
+
+	{if $no_featured}
+		<div><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.featured_ads}{else}featured_ads.php{/if}"><h2 	class="view_more">{$lng.listings.view_all_featured}</h2></a></div>
+		<div class="clearfix"></div>
+	{/if}
+	<hr/>
+
+</section>
+
+
+<script>
+//<![CDATA[
+jQuery(document).ready(function() {
+
+if($('#tab_featured').is(':checked')) {
+
+$('#featured_tab_content').imagesLoaded( function() {
+	$('#featured_tab_content').masonry({
+		// options
+		itemSelector: '.box-container'
+	});
+}); // end if images are loaded
+
+} // end if checked
+});
+
+//]]>
+</script>

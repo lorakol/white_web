@@ -1,0 +1,207 @@
+{include file="header.html"}
+
+{if $invalid_user}
+<div class="main box">
+<div class="pdiv1 pb30">
+<div class="info"><p>{$lng.users.no_such_id}</p></div>
+</div>
+</div>
+{else}
+
+{include file="js/user_listings_js.html"}
+{include file="js/listings_js.html"}
+
+<style type="text/css">
+@media all and (min-width: 800px) {
+	.smallimg { width: {$ads_settings.thmb_width+2}px; height: {$ads_settings.thmb_height+2}px; }
+	.rclass { {if $text_direction=="rtl"}margin-right: {$ads_settings.thmb_width+10}px;{else}margin-left: {$ads_settings.thmb_width+10}px;{/if} min-height: {$ads_settings.thmb_height+2}px;}
+}
+.rclass { min-height: {$ads_settings.thmb_height+2}px;}
+.highlited { background: {$ads_settings.highlited_color}; }
+</style>
+
+<div class="wbg">
+	<div class="page_bounds">
+	
+	{if in_array("showcase",$modules_array)}
+	{include file="modules/showcase/showcase.html"}
+	{/if}
+		
+	<div class="mt20 mb20">	
+		<div class="col-8">
+			<h1 class="heading">{$user[$settings.contact_name_field]}</h1>
+			{if in_array("ratings",$modules_array) && $ratings_settings.rate_users}
+			{include file="modules/ratings/user_rating.html"}
+			{/if}
+		</div> 
+		{* logo *}
+		<div class="col-4 raligned">
+
+		{if $special_user_fields.logo && $special_user_fields.logo && isset($user[$special_user_fields.logo]) && $user[$special_user_fields.logo]}
+		<img src="{$live_site}/uploads/{$special_user_fields.logo}/{$user[$special_user_fields.logo]}" />
+		{/if}
+		
+		</div>
+	<div class="clearfix"></div>	
+	</div>
+	</div> {* end page_bounds *}
+</div> {* end wdiv *}
+
+
+{if  in_array("ratings", $modules_array) && $ratings_settings.rate_users && $ratings_settings.enable_reviews && (in_array($user.group, $ratings_settings.groups_array) || !$ratings_settings.groups)}
+	{include file="modules/ratings/user_reviews.html"}
+{/if}
+
+
+{* contact information *}
+<div class="page_bounds">
+	<div class="mt20 mb20">
+	<div class="col-7">
+	
+	{foreach from=$user_fields_array item=v}
+
+	{capture name=some_content assign=pub_field}pb_{$v.caption}{/capture}
+	
+	{if isset($user[$v.caption]) && $user[$v.caption] && $v.caption != $settings.contact_name_field && $v.caption!=$special_user_fields.logo && ($v.public==1 || ($v.public==2 && $user[$pub_field]==1 ))}
+
+	<div class="fdesc">
+	<span>{$v.name}:</span>
+
+	{if $v.type=='url'}<a href="{$user[$v.caption]}" target="_blank" rel="nofollow">{/if}
+	{if isset($v.prefix) && $v.prefix}{$v.prefix}{/if}
+
+	{if $v.type=="date"}
+	{$user.vis[$v.caption]}
+
+	{elseif $v.type=="multiselect"}
+	{", "|implode:$user[$v.caption]}
+
+	{elseif $v.type=="checkbox"}
+	{if $user[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+	{elseif $v.type=="checkbox_group"}
+
+	{', '|implode:$user[$v.caption]} 
+
+	{elseif $v.type=="user_email"}
+
+	<div class="email_icon lfloat mb5"></div><span class="span_email" id="span_{$v.caption}">{$user[$v.caption]|substr:0:2}********</span>&nbsp;
+	<a class="med-btn btn2 show_email" href="javascript:;" id="show_{$v.caption}">{$lng.listings.show_email}</a>
+
+	{elseif $v.type=="phone"}
+
+	{if !$is_phone}
+	<div class="phone_icon lfloat mb5"></div><span class="span_phone" id="span_{$v.caption}">{$user[$v.caption]|substr:0:2}********</span>&nbsp;
+	<a class="med-btn btn2 show_phone" href="javascript:;" id="show_{$v.caption}">{$lng.listings.show_phone}</a>
+	{else} {* is phone, show call and SMS links *}
+	<div class="cdbtns mb10">
+	<a class="med-btn btn-green center mr10 cdbtn" href="tel:{$user[$v.caption]}"><div class="sphone_icon"></div>{$lng.listings.call}</a>
+	<a class="med-btn btn-green center cdbtn asms" href="sms:{$user[$v.caption]}">{$lng.listings.sms}</a>
+	<a class="med-btn btn-green center cdbtn iossms" style="display: none" href="sms://{$user[$v.caption]}">{$lng.listings.sms}</a>
+	</div>
+
+	{/if}
+
+	{elseif $v.type=="whatsapp"}
+
+	{if !$is_phone}
+	<div class="whatsapp_icon lfloat mb5"></div><span class="span_phone" id="span_{$v.caption}">{$user[$v.caption]|substr:0:2}********</span>&nbsp;
+	<a class="med-btn btn2 show_phone" href="javascript:;" id="show_{$v.caption}">{$lng.listings.show_whatsapp}</a>
+	{else}
+	
+	<div class="cdbtns mb10">
+	<a class="med-btn btn-green center cdbtn" href="https://wa.me/{$user[$v.caption]|replace:'+':''}"><div class="swhatsapp_icon"></div>{$lng.listings.click_to_chat}</a>
+	</div>
+	
+	{/if}
+
+	{elseif $v.type!="file" && $v.type!="image" && $v.type!="youtube" && $v.type!="google_maps"}
+
+	{if $v.type=="menu" && $user[$v.caption]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$user[$v.caption]}
+	{/if}
+	
+	{else}
+
+		{if $v.type=="file"}
+		<a href="{$live_site}/uploads/{$v.caption}/{$user[$v.caption]}"><img src="{$template_path}images/download.png" class="tooltip mbm7" alt="" name="{$lng.general.download}"/></a>
+		{/if}
+
+		{if $v.type=="image"}
+		<a href="{$live_site}/uploads/{$v.caption}/{$user[$v.caption]}" class="imgfield view_image">&nbsp;</a>
+		{/if}
+		
+		{if $v.type=="youtube"}
+		<a class="open-popup-link popup-youtube youtube" href="#{$v.caption}">&nbsp;</a>
+		<div id="{$v.caption}" class="white-popup mfp-hide">{$user[$v.caption]}</div>
+		{/if}
+
+	{/if}
+
+	{if isset($v.postfix) && $v.postfix}{$v.postfix}{/if}
+
+	{if $v.type=='url'}</a>{/if}
+
+	</div>
+
+	{/if}
+	{/foreach}
+
+	</div> {* end col-7 *}
+	<div class="col-5">
+		{if isset($special_user_fields.google_maps) && $special_user_fields.google_maps && $user[$special_user_fields.google_maps]}
+		<div id="gm_{$special_user_fields.google_maps}" class="map user_map"></div>		
+		{/if}
+	</div>
+	<div class="clearfix"></div>
+	
+</div>
+</div> {* end page_bounds *}
+
+
+{* ------------- listings ------------- *}
+
+<section>
+<div class="wbg">
+	<div class="page_bounds pt20">
+	
+	<h2 class="hidden">{$lng.listings.all_listings_for}&nbsp;{$user[$settings.contact_name_field]}</h2>
+	
+	{if $no_listings>0}
+
+		{include file="order_listings.html"}
+	
+		{foreach name="listings" from=$listings_array item=v}
+			{include file="short_listing.html"}
+
+			{if ($smarty.foreach.listings.index+1)==$appearance.ads_per_page/2|ceil && $smarty.foreach.listings.index!=$listings_array|@count-1}
+			{* ------ listings4 banners ------- *}
+			{if in_array('listings4',$banners_positions)}
+			{banner->getTemplateBanners p1='listings4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+			{if $array_banners|@count}<div class="clearfix mt10 mb10"></div><div class="dcenter">{/if}
+			{foreach from=$array_banners item=v}
+			<div class="vert_banners">{include file="banner.html"}</div><div class="clearfix"></div>
+			{/foreach}
+			{if $array_banners|@count}</div>{/if}{/if}
+			{* ------- end listings4 banners ------- *}
+			{/if}
+
+		{/foreach}
+
+		<div class="center mt30 mb40">
+		{include file="paginator.html"}
+		</div>
+
+	{else}
+		<div class="xsize mt20 mb40">{$lng.listings.no_listings}</div>
+	{/if}
+	<div class="clearfix"></div>
+	</div> {* end page_bounds *}
+</div> {* end wbg *}	
+</section>
+
+
+{/if}
+{include file="footer.html"}

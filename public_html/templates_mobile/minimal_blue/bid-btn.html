@@ -1,0 +1,9 @@
+	{if isset($crt_usr) && $crt_usr>0}
+	<div class="p10">
+	{if $crt_usr!=$listing.user_id}
+	<a href="javascript:;" id="place_bid" class="med-btn btn1">{$lng.useraccount.place_bid|replace:" ":"&nbsp;"}</a>
+	{else}
+	<a href="javascript:;" id="show_bids" class="med-btn btn3">{$lng.useraccount.show_bids|replace:" ":"&nbsp;"}</a>
+	{/if}
+	</div>
+	{/if}

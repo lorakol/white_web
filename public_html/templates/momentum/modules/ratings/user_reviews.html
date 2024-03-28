@@ -1,0 +1,38 @@
+{if !isset($jqform_included) || !$jqform_included}
+<div class="wait"></div>
+{assign var="jqform_included" value="1"}
+{/if}
+
+<script type="text/javascript" src="{$live_site}/modules/ratings/js/jquery.rating.min.js"></script>
+<link href="{$template_path}modules/ratings/css/rating{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+
+{* left col - reviews *}
+<div class="col-7">
+<div class="heading6 p10"><span id="no_reviews">{$no_reviews}</span> {if $no_reviews!=1}{$lng_ratings.sreviews}{else}{$lng_ratings.sreview}{/if} {$lng.general.on} {$user[$settings.contact_name_field]}</div>
+<div class="heading_large_under heading6-under"></div>
+
+
+<div id="reviews_container">
+
+	{foreach from=$reviews_array item=v name=rloop}
+	{include file="modules/ratings/review.html" prefix=""}
+	{/foreach}	
+
+	{if $ur_no_pages>1}
+	{include file="modules/ratings/ur_paginator.html"}
+	{/if}
+
+</div> {* end reviews_container *}
+
+</div> {* end col-7 *}
+
+{* right col - add reviews *}
+<div class="col-5">
+
+<div class="lgbox p20">
+{include file="modules/ratings/add_user_review.html"}
+</div>
+
+</div>{* end rcomm *}
+<div class="clearfix"></div>
+

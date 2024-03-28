@@ -1,0 +1,62 @@
+{include file="header.html"}
+
+<div class="main1 box">
+<div class="page_title heading"><h1>{$lng.general.favourites}</h1></div>
+
+	{if $no_listings>0}
+
+
+	{literal}
+	<style type="text/css">
+
+	.smallimg { width: {/literal}{$ads_settings.thmb_width}{literal}px; height: {/literal}{$ads_settings.thmb_height}{literal}px; }
+	.highlited { background: {/literal}{$ads_settings.highlited_color}{literal}; }
+	.rclass { {/literal}{if $text_direction=="rtl"}margin-right: {$ads_settings.thmb_width}px;{else}margin-left: {$ads_settings.thmb_width}px;{/if}{literal} }
+	.gimg { min-height: {/literal}{$fheight}{literal}px; padding-top: 20px; }
+
+	@media all and (min-width: 801px)
+	{
+	.rclass { height: 80px; }
+
+	}
+
+
+	</style>
+	{/literal}
+
+	<div class="pdiv5" >
+
+	<div class="mb10 clearfix">
+	{include file="paginator.html"}
+	</div>
+	
+	{include file="order_listings.html"}
+
+	{foreach name="listings" from=$listings_array item=v}
+		{include file="short_listing.html"}
+	{/foreach}
+
+	{include file="js/listings_js.html"}
+
+	{* if listings_compare *}
+	{if in_array("listings_compare", $modules_array)}
+	{include file="modules/listings_compare/cmp_js.html"}
+	{/if}
+
+	<div class="clearfix">
+	{include file="paginator.html"}
+	</div>
+
+	</div> {* end pdiv5 *}
+
+	{else}
+
+	<div class="mb300 pdiv2">
+	<div class="info"><p>{$lng.listings.no_favourites}</p></div>
+	</div>
+
+	{/if}
+
+</div>{* end main1 *}
+
+{include file="footer.html"}

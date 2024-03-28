@@ -1,0 +1,64 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+{include file="data/magnific-popup.html"}
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng.messages.message_history}</h1></div>
+</div>
+
+<div class="wbg">
+<div class="page_bounds mb40">
+
+{foreach from=$messages_array item=v}
+
+	<div class="dialogbox {if $v.from==$crt_usr}in_dialogbox{/if} mt30">
+		<div class="body">
+			<span class="tip {if $v.from!=$crt_usr}tip-left{else}tip-right{/if}"></span>
+			<div class="message">
+				{if $v.from!=$crt_usr}
+				<div class="bold">{$lng.messages.from}: {if $v.from}{$v.contact_name}, {$v.email}{else}{$v.from_email}{/if}{if $v.from_phone}, {$v.from_phone}{/if}</div>
+				{else}
+				<div class="bold">(#{$v.msg_id}) {$lng.messages.to}: {if $v.to}{$v.to_contact_name}, {$v.to_email}{else}{$v.to_email}{/if}</div>
+				{/if}
+
+				<div class="small">{$v.date_nice}</div>
+				
+				<p>{$v.message|wordwrap:50:" ":true}</p>
+				
+				{if $v.to == $crt_usr}
+				<a href="{$live_site}/reply.php?id={$v.msg_id}" class="freply ubtn mt10" id="msg{$v.msg_id}">{$lng.general.reply}</a>
+				{/if}
+
+			</div>
+		</div>
+	</div>	
+
+
+{/foreach}
+<div class="clearfix"></div>
+
+	<div class="mb40 mt20 rfloat">
+		<a class="button" href="messages.php">{$lng.general.back}</a>
+	<div class="clearfix"></div>
+	</div>
+
+
+</div>{* end page_bounds *}
+</div> {* end wbg *}
+
+<script type="text/javascript">
+{literal}
+
+$(document).ready(function() {
+
+	$('a.freply').magnificPopup({
+		type: 'ajax',
+		showCloseBtn: true,
+		closeBtnInside:true
+	});
+
+});
+{/literal}
+</script>
+
+{include file="footer.html"}

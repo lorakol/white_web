@@ -1,0 +1,31 @@
+{capture name=some_content assign=awidth}{math equation="100/y" x=$appearance.outer_table y=$news|@count}{/capture}
+{capture name=news_url assign=news_url}{if $seo_settings.enable_mod_rewrite}/news{else}/modules/news/news.php{/if}{/capture}
+
+{literal}
+<style type="text/css">
+ 	.article { width: {/literal}{$awidth}{literal}%;}
+ 	@media all and (max-width: 600px) {
+ 	.article { width: 90%;}
+ 	}
+</style>
+{/literal}
+
+	<div class="news_bg">
+
+		{foreach from=$news item=v name=newsloop}
+		<div class="lfloat article">
+		<a href="{$live_site}{$news_url}">{$v.title}</a><br/>
+
+		<p>{if $v.image}<a href="{$live_site}{$news_url}"><img src="{$live_site}/modules/news/images/{$v.image}" class="lfloat mr10 mb10" /></a>{/if}
+		{$v.summary}</p>
+	
+		<div class="clearfix"></div>
+	
+		<div class="date lfloat">{$lng.listings.added_on} {$v.date_nice}</div>
+		<div class="more rfloat"><a href="{$live_site}{$news_url}">{$lng_news.read_more}</a></div>
+		</div>{* end article *}
+		{/foreach}
+
+		<div class="clearfix"></div>
+
+	</div> {* end news_bg *}

@@ -1,0 +1,23 @@
+	{capture name=news_url assign=news_url}{if $seo_settings.enable_mod_rewrite}/news{else}/modules/news/news.php{/if}{/capture}
+	<div class="left_tabs">
+	{capture name=some_content assign=field_name}title_{$crt_lang}{/capture}
+	<h2><span>{$news_settings[$field_name]}</span></h2>
+		<div class="tab_content clearfix" id="news">
+		
+			{foreach from=$news item=v name=newsloop}
+			<div class="article">
+			
+			<h3><a href="{$live_site}{$news_url}" class="news_title">{$v.title}</a></h3>
+
+			<p>{if $v.image}<a href="{$live_site}{$news_url}"><img src="{$live_site}/modules/news/images/{$v.image}" class="lfloat mr10 mb10" /></a>{/if}
+			{$v.summary}</p>
+	
+			<div class="small lfloat">{$lng.listings.added_on} {$v.date_nice}</div>
+			<div class="more rfloat"><a href="{$live_site}{$news_url}">{$lng_news.read_more}</a></div>
+			
+			</div>{* end article *}
+			{/foreach}
+
+		</div> {* end tab_content *}
+
+	</div> {* end news *}

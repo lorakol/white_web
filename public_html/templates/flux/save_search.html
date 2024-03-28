@@ -1,0 +1,62 @@
+<div class="hidden dark-bg save_search_details">
+
+<div class="page_bounds mt30">
+
+{if isset($crt_usr) && $crt_usr}
+
+<div class="info search_info" style="display: none"><p>{$lng.search.search_saved}</p></div>
+<div class="error search_error" style="display: none"></div>
+<div class="center mb20"><a href="javascript:;" class="button" id="save-search">{$lng.search.save_your_search}</a></div>
+
+{if $ads_settings.alerts_enabled}<hr/>{/if}
+
+{/if}
+
+{if $ads_settings.alerts_enabled}
+
+<div {if isset($crt_usr) && $crt_usr}class="mt20"{/if}>
+<form name="alert" id="alert" method="post" action="{$live_site}/include/add_alert.php?post=1">
+
+<input type="hidden" name="post_str" id="post_str" value='{if isset($post_json)}{$post_json}{/if}' />
+<div class="info alert_info" style="display: none"></div>
+<div class="error alert_error" style="display: none;"></div>
+
+<div class="alert_content">
+
+<div class="heading">{$lng.alerts.email_alert_info}</div>
+{if $str_search}<div class="small-light">{$str_search}</div>{else}<div class="small-light">{$lng.alerts.no_terms_searched}</div>{/if}
+
+<div class="mt20">
+{$lng.alerts.send_email_alerts}&nbsp;
+<select name="alert_frequency" id="alert_frequency">
+<option value="0">{$lng.alerts.immediately}</option>
+<option value="1" selected="selected">{$lng.alerts.daily}</option>
+<option value="7">{$lng.alerts.weekly}</option>
+</select>
+&nbsp;
+{$lng.general.to}
+&nbsp;<input type="text" size="30" name="alert_email" id="alert_email" class="defaultText" title="{$lng.alerts.your_email}" value="{if isset($crt_usr_sett.email)}{$crt_usr_sett.email}{/if}"/>
+</div>
+
+{if $settings.alerts_captcha}
+{if $settings.enable_recaptcha}
+<div class="mt10">
+{include file="data/recaptcha.html"}
+</div>
+{else}
+{include file="data/random_image.html"}
+{/if}
+{/if}
+
+<input type="submit" class="button mt20 mt20" name="CreateAlert" id="CreateAlert" value="{$lng.alerts.create_alert}" />
+
+</div>{* end alert_content *}
+
+</form>
+</div>
+
+{/if}
+
+</div> {* end page_bounds *}
+
+</div> {* end save_search_details *}

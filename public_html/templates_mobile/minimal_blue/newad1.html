@@ -1,0 +1,752 @@
+{include file="header.html"}
+
+<div id="heading">{$lng.navbar.submit_ad}</div>
+
+{if $step==1}
+<div id="form_container">
+<div class="form_content">
+<form name="newad" method="post" action="newad1.php?step=1">
+	<label>{$lng.listings.category}<span class="mandatory"> *</span></label>
+	<div>
+        <select id="category1" name="category1" class="levels" onChange="chooseCateg(this.form, 1)">
+        <option value="">{$lng.listings.category}</option>
+        {foreach from=$short_categories item=v name=cat}
+                {if $v.parent_id==0}
+                <option value="{$v.id}">{$v.name|escape:"html"}</option>
+                {/if}
+        {/foreach}
+        </select>
+        </div>
+
+        <div style="display: none;" id="level2">
+        <select id="category2" name="category2" class="levels" onChange="chooseCateg(this.form, 2)">
+        </select>
+        </div>
+
+        <div style="display: none;" id="level3">
+        <select id="category3" name="category3" class="levels" onChange="chooseCateg(this.form, 3)">
+        </select>
+        </div>
+
+        <div style="display: none;" id="level4">
+        <select id="category4" name="category4" class="levels" onChange="chooseCateg(this.form, 4)">
+        </select>
+        </div>
+
+        <div style="display: none;" id="level5">
+        <select id="category5" name="category5" class="levels" onChange="chooseCateg(this.form, 5)">
+        </select>
+        </div>
+ 	<input type="hidden" name="category" id="category" />
+
+	<br/><br/>
+
+	<div class="buttons"><strong><input type="submit" name="Choose_categ" id="Choose_categ" value="{$lng.listings.next_step}" /></strong></div>
+	<div class="clearfix"></div>
+
+</form>
+</div>
+</div>
+{/if} {* end step1 *}
+
+{if $step==2}
+<form name="choose_package" action="newad1.php?step=2{if $id}&id={$id}{/if}{if $back_to}&back_to={$back_to}{/if}" method="post">
+{if $subscriptions|@count}
+
+	{foreach from=$subscriptions item=v name=plan}
+		<div class="plan">
+		<h2>{$v.package_name}</h2>
+
+		<ul>
+
+		<li>{$lng.subscriptions.remaining_ads}: <b>{if $v.ads_left==-1}{$lng.general.unlimited}{else}{$v.ads_left}{/if}</b></li>
+		<li>{$lng.subscriptions.date_start}: <b>{$v.date_start_nice}</b></li>
+		{if $v.date_renew_nice}<li>{$lng.subscriptions.date_renew}: <b>{$v.date_renew_nice}</b></li>{/if}
+		<li>{$lng.subscriptions.date_end}: <b>{if $v.date_end_nice}{$v.date_end_nice}{else}{$lng.general.never}{/if}</b></li>
+
+
+		<li class="feature">{$v.no_pictures}&nbsp;{if $v.no_pictures==1}{$lng.packages.picture}{else}{$lng.packages.pictures}{/if}</li>
+
+		{if $ads_settings.enable_featured && $v.featured}<li class="feature">{$lng.packages.featured}</li>{/if}
+		{if $ads_settings.enable_highlited && $v.highlited}<li class="feature">{$lng.listings.highlited}</span></li>{/if}
+		{if $ads_settings.enable_priorities && $v.priority}<li class="feature">{$lng.listings.priority}&nbsp;{$v.priority_name}</li>{/if}
+		{if $ads_settings.enable_video && $v.video}<li class="feature">{$lng.listings.video}</li>{/if}
+
+		</ul>
+		<br/>
+		<div class="choose"><input type="radio" class="noborder" name="subscription" value="{$v.usr_pkg}" {if $smarty.foreach.plan.index==0}checked="checked"{/if}/>&nbsp;&nbsp;<span>{$lng.listings.select_subscription}</span></div>
+		</div>
+	{/foreach}
+{else}
+
+	{foreach from=$plans_array item=v name=plan}
+		<div class="plan list">
+		<h2>{$v.name}</h2>
+		<div class="price">{$v.price_curr}</div>
+
+		<ul>
+
+		{if $v.type=="sub"}
+		<li>{if $v.subscription_time}{$v.subscription_time}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.days}&nbsp;{$lng.packages.subscription}</li>
+
+		<li>{if $v.no_ads}{$v.no_ads}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.ads}</li>
+
+	
+		{/if}
+
+		<li>{if $v.no_words}{$v.no_words}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.words}</li>
+
+		<li>{$lng.packages.available}&nbsp;{if $v.no_days}{$v.no_days}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.days}</li>
+
+		<li>{$v.no_pictures}&nbsp;{if $v.no_pictures==1}{$lng.packages.picture}{else}{$lng.packages.pictures}{/if}</li>
+
+		{if $ads_settings.enable_featured && $v.featured}<li class="feature">{$lng.packages.featured}</li>{/if}
+		{if $ads_settings.enable_highlited && $v.highlited}<li class="feature">{$lng.listings.highlited}</li>{/if}
+		{if $ads_settings.enable_priorities && $v.priority}<li class="feature">{$lng.listings.priority}&nbsp;{$v.priority_name}</li>{/if}
+		{if $ads_settings.enable_video && $v.video}<li class="feature">{$lng.listings.video}</li>{/if}
+
+		</ul>
+		<p>{$v.description}</p>
+		<br/><br/>
+		<div class="choose"><input type="radio" class="noborder" name="plan" value="{$v.id}" {if $smarty.foreach.plan.index==0}checked="checked"{/if}/>&nbsp;&nbsp;<span>{$lng.listings.select_plan}</span></div>
+		</div>
+
+	{/foreach}
+{/if}
+	<br/>
+
+	<div class="dcenter">
+	<div class="buttons">
+	<span class="negative"><input type="submit" name="Back" value="{$lng.general.back}" /></span>
+	{if $subscriptions|@count}
+	<span class="positive"><input type="submit" name="Choose_subscription" value="{$lng.listings.choose_subscription}" /></span>
+	{else}
+	<span class="positive"><input type="submit" name="Choose_plan" value="{$lng.listings.choose_plan}" /></span>
+	{/if}
+	</div>
+	</div>
+	<div class="clearfix"></div>
+</form>
+{/if} {* end step2 *}
+
+{if $step==3}
+<div id="form_container">
+{include file="fancybox.html"}
+
+{if $htmlarea}
+<script type="text/javascript" src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+{/if}
+
+{if $gmaps}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3.4&sensor=false"></script>
+{/if}
+
+<div class="form_content">
+<form name="newad" method="post" enctype="multipart/form-data" action="newad1.php?step=3{if $id}&id={$id}{/if}{if $back_to}&back_to={$back_to}{/if}">
+<input type="hidden" name="category" value="{$category}"/>
+<input type="hidden" name="package" value="{$package}"/>
+<input type="hidden" name="usr_pkg" value="{$usr_pkg}"/>
+{if $no_words}<input name="no_words" type="hidden" value="{$no_words}"/>{/if}
+
+<h2>{$lng.listings.ad_description}</h2>
+
+{if $error}<div class="error"><p>{$error}</p></div>{/if}
+
+{if $languages|@count>1 && $ads_settings.translate_title_description==1}
+
+{foreach from=$languages item=v}
+
+	<label>{$lng.listings.title}<span class="mandatory"> *</span></label>
+	{capture name=some_content assign=title_field}title_{$v.id}{/capture}
+	{capture name=some_content assign=desc_field}description_{$v.id}{/capture}
+
+	<input type="text" id="title_{$v.id}" name="title_{$v.id}" style="width: 100%;" value="{$tmp.$title_field}"
+	 onkeydown="CountTitleLeft(document.newad.title_{$v.id},150);" onkeyup="CountTitleLeft(document.newad.title_{$v.id},150);" 
+	onpaste="CountTitleLeft(document.newad.title_{$v.id}, 150);"/>
+	&nbsp;{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />{else}{$v.name}{/if}
+
+<!-- DESCRIPTION -->
+
+	<label>{$lng.listings.description}<span class="mandatory"> *</span></label>
+	<textarea name="description_{$v.id}" style="width: 100%;" rows="12" id="description_{$v.id}" {if $no_words}
+	onkeydown="CountTextLeft(newad, document.newad.description_{$v.id}, document.newad.count_{$v.id});" 
+	onkeyup="CountTextLeft(newad, document.newad.description_{$v.id}, document.newad.count_{$v.id});" 
+	onpaste="CountTextLeft(newad, document.newad.description_{$v.id}, document.newad.count_{$v.id});"{/if}>{$tmp.$desc_field}</textarea>
+	&nbsp;{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />{else}{$v.name}{/if}
+
+{if $no_words}
+<!-- COUNT WORDS -->
+	<br/><input readonly name="count_{$v.id}" id="count_{$v.id}" type="text" size="5" value="{$no_words}" />
+	{$lng.listings.words_left}
+{/if}
+
+
+{/foreach}
+
+{else}
+<!-- TITLE -->
+
+	<label>{$lng.listings.title}<span class="mandatory"> *</span></label>
+	<input type="text" name="title" id="title" value="{$tmp.title}" style="width: 100%;"
+	 onkeydown="CountTitleLeft(document.newad.title,150);" onkeyup="CountTitleLeft(document.newad.title,150);" 
+	onpaste="CountTitleLeft(document.newad.title, 150);"/>
+
+<!-- DESCRIPTION -->
+
+	<label>{$lng.listings.description}<span class="mandatory"> *</span></label>
+	<textarea name="description" style="width: 100%;" rows="10" id="description" {if $no_words}
+	onkeydown="CountTextLeft(newad, document.newad.description, document.newad.count);" 
+	onkeyup="CountTextLeft(newad, document.newad.description, document.newad.count);" 
+	onpaste="CountTextLeft(newad, document.newad.description, document.newad.count);"{/if}>{$tmp.description}</textarea>
+
+{if $no_words}
+<!-- COUNT WORDS -->
+	<br/><input readonly name="count" id="count" type="text" size="5" value="{$no_words}"/>
+	{$lng.listings.words_left}
+{/if}
+
+{/if}
+
+<h2>{$lng.listings.ad_information}</h2>
+
+{include file="custom_fields_form.html"}
+<br/><br/>
+
+{if $ads_settings.enable_video && $tmp.enable_video}
+<h2>{$lng.listings.video}</h2>
+	<label>{$lng.listings.video_code}</label>
+	<textarea name="video" style="width: 100%;" rows="10" id="video">{$tmp.video}</textarea>
+{/if}
+
+{if $ads_settings.add_meta_with_listings}
+	<h2>{$lng.listings.meta_info}</h2>
+{* -------------------- META_KEYWORDS --------------------- *}
+	<label>{$lng.listings.meta_keywords}</label>
+	<textarea name="meta_keywords" style="width: 100%;" rows="3">{$tmp.meta_keywords}</textarea>
+
+{* -------------------- META_DESCRIPTION --------------------- *}
+	<label>{$lng.listings.meta_description}</label>
+	<textarea name="meta_description" style="width: 100%;" rows="3">{$tmp.meta_description}</textarea>
+{/if}
+
+{if $settings.nologin_enabled && !$user_id}
+	<h2>{$lng.listings.your_info}</h2>
+
+	{include file="custom_fields_form_usr.html"}
+
+	{if $settings.nologin_image_verification}
+	<h2></h2>
+	<p>{$lng.users.image_verification_info}</p><br/>
+	<input name="number" type="text" /><br/><br/><img src="{$live_site}/include/random_image.php" alt="" /><br/>
+	{/if}
+{/if}
+
+<br/><br/>
+
+	<div class="dcenter">
+	<div class="buttons">
+	<span class="negative"><input type="submit" name="Back" value="{$lng.general.back}" /></span>
+	<span class="positive"><input type="submit" name="Submit" value="{$lng.listings.next_step}" /></span>
+	</div>
+	</div>
+	<div class="clearfix"></div>
+</form>
+</div>
+
+{literal}
+<script type="text/javascript">
+$(document).ready(function() {
+	$("a.imgfield").fancybox();
+});
+</script>
+{/literal}
+
+{/if}{* end step3 *}
+
+{if $step==4}
+<!-- IMAGES -->
+<link href="{$template_path}style-uploader{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+
+<div class="form_content">
+<form name="newad" method="post" action="newad1.php?step=4{if $id}&id={$id}{/if}{if $back_to}&back_to={$back_to}{/if}">
+<h2>{$lng.listings.enter_photos}</h2>
+
+	<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/fileuploader.js"></script>
+	<script type="text/javascript" src="{$live_site}/libs/jQuery/jquery.livequery.min.js"></script>
+
+	<div id="file-uploader">
+
+		<noscript>			
+
+		<p>Please enable JavaScript to use file uploader.</p>
+
+		</noscript>
+
+	</div>
+
+	
+
+	{literal}
+
+	<script>
+
+	function createUploader(){
+		var uploader = new qq.FileUploader({
+
+			element: document.getElementById('file-uploader'),
+			action: 'include/upload.php',{/literal}
+			max_photos: '{$no_photos}',
+			crt_photos: '{$crt_photos}',
+			order_up: '{$lng.listings.order_up|addslashes}',
+			order_down: '{$lng.listings.order_down|addslashes}',
+			delete_file: '{$lng.general.delete|addslashes}',
+			template_path: '{$template_path}',
+			files_uploaded: "{$lng.listings.files_uploaded|addslashes}",
+			allowed: "{$lng.listings.allowed|addslashes}",
+			limit_reached: "{$lng.listings.limit_reached|addslashes}",
+			click_to_upload: "{$lng.listings.click_to_upload|addslashes}",
+			{literal}
+			messages: { 
+			failed_message: "{/literal}{$lng.failed|addslashes}{literal}",
+			typeError: "{/literal}{$lng.images.errors.file_type_not_accepted|addslashes}{literal}" 
+			},
+			params: {
+        			max_photos: '{/literal}{$no_photos}{literal}'
+    			},
+			allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
+			debug: false
+ 	});
+        }
+        window.onload = createUploader;
+	</script>
+	{/literal}
+
+	<div id="maincol"></div>
+
+
+	<div class="clearfix"></div>
+	<div class="dcenter">
+	<div class="buttons">
+		<span class="negative"><input type="submit" name="Back" value="{$lng.general.back}" /></span>
+		<span class="positive"><input type="submit" name="Add_photos" value="{$lng.listings.next_step}" /></span>
+	</div>
+	</div>
+	<div class="clearfix"></div>
+
+</form>
+</div>
+
+
+{/if}{* end step4 *}
+
+{if $step==5}
+<div class="form_content">
+<form name="newad" method="post" action="newad1.php?step=5{if $id}&id={$id}{/if}{if $back_to}&back_to={$back_to}{/if}">
+<!-- EXTRA OPTIONS -->
+<h2>{$lng.listings.extra_options}</h2>
+<br/>
+{if $error}<div class="error"><p>{$error}</p></div><br/>{/if}
+
+<table cellpadding="2" cellspacing="2" width="70%" id="table_options">
+
+{if $plan_name}
+	<tr>
+		<td width="50%">{$lng.listings.package} {$plan_name}</td>
+		<td width="50%">{$plan_amount}</td>
+	</tr>
+{else}
+	<tr>
+		<td width="50%">{$lng.listings.free_category}</td>
+		<td>{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}0{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</td>
+	</tr>
+{/if}
+
+{if $ads_settings.enable_featured && ($ads_settings.featured_categories==0 || in_array($category, $ads_settings.featured_categories_array))}
+	<tr>
+		<td>{$lng.listings.featured}</td>
+		<td><input type="checkbox" class="noborder" name="featured" onclick="adjustTotal(this.form, {$ads_settings.featured_price}, document.newad.featured, {$appearance.price_format_decimals} )" {if $featured || $options.featured.value}checked="checked"{/if} {if $featured} disabled="disabled"{/if}/>&nbsp;{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.featured_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}&nbsp;{if $featured}({$lng.listings.included}){/if}</td>
+	</tr>
+{/if}
+{if $ads_settings.enable_highlited}
+	<tr>
+		<td>{$lng.listings.highlited}</td>
+		<td><input type="checkbox" class="noborder" onclick="adjustTotal(this.form, {$ads_settings.highlited_price}, document.newad.highlited, {$appearance.price_format_decimals} )" name="highlited" {if $highlited || $options.highlited.value}checked="checked"{/if} {if $highlited}disabled="disabled"{/if}/>&nbsp;{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.highlited_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}&nbsp; {if $highlited}included{/if}</td>
+	</tr>
+{/if}
+{if $ads_settings.enable_priorities}
+	<tr>
+		<td>{$lng.listings.priority}</td>
+		<td>
+			<input type="hidden" name="pri" id="pri" value="{if $options.priority.price}{$options.priority.price}{/if}"/>
+			<input type="radio" class="noborder" name="priority" value="" onclick="changePriority(this.form, 0, {$appearance.price_format_decimals})" checked="checked" {if $priority}disabled="disabled"{/if}/>&nbsp;&nbsp;{$lng.general.none} <br/>
+		{foreach from=$priorities item=v}
+			<input type="radio" class="noborder" name="priority" onclick="changePriority(this.form, {$v.price}, {$appearance.price_format_decimals})" value="{$v.order_no}" {if $priority==$v.order_no || $options.priority.value==$v.order_no}checked="checked"{/if} {if $priority}disabled="disabled"{/if}/>&nbsp;&nbsp;{$v.name} - {if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$v.price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if} <br/>
+		{/foreach}
+		</td>
+	</tr>
+{/if}
+{if $ads_settings.enable_video}
+	<tr>
+		<td>{$lng.listings.video}</td>
+		<td><input type="checkbox" class="noborder" name="video" id="video" onclick="adjustTotal(this.form, {$ads_settings.video_price}, document.newad.video, {$appearance.price_format_decimals} ); onVideo();" {if $video || $options.video.value}checked="checked"{/if} {if $video}disabled="disabled"{/if}/>&nbsp;{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.video_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}&nbsp;{if $video}({$lng.listings.included}){/if}
+		<div id="video_code" {if !$video && !$options.video.value}style="display: none;"{/if}>
+		<label>{$lng.listings.video_code}</label>
+		<textarea name="video_code" cols="30" rows="6" id="video_code">{$video_code}</textarea></div>
+		</td>
+	</tr>
+{/if}
+
+	{if $enable_coupons}
+	<tr>
+		<td>{$lng.listings.enter_coupon} :</td>
+		<td><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',0, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',0, {$appearance.price_format_decimals})" value="{$discount_code}"/></td>
+	</tr>
+	{/if}
+
+	<tr><td colspan="2" align="right" class="price">
+	<input type="hidden" name="full_total" id="full_total" value="{$full_total}"/>
+	{$lng.listings.total}: <b>
+	{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b></td></tr>
+
+	<tr><td colspan=2 align="center">
+
+	<div class="dcenter">
+	<div class="buttons">
+		<span class="negative"><input type="submit" name="Back" value="{$lng.general.back}" /></span>
+		<span class="positive"><input type="submit" name="Add_options" value="{$lng.listings.next_step}" /></span>
+	</div>
+	</div>
+
+	</td></tr>
+
+</table>
+</form>
+
+<script type="text/javascript">
+{literal}
+function onVideo() {
+	if(document.getElementById("video").checked) document.getElementById("video_code").style.display = "block";
+	else document.getElementById("video_code").style.display = "none";
+}
+{/literal}
+</script>
+
+</div>
+
+{/if}{* end step5 *}
+
+{if $step==6}
+{include file="fancybox.html"}
+
+{literal}
+<script type="text/javascript">
+$(document).ready(function() {
+	$("a.imgfield").fancybox();
+});
+</script>
+{/literal}
+
+<div class="form_content">
+<form name="payment" action="newad1.php?step=7" method="post">
+<table cellpadding="2" cellspacing="2" width="70%" id="table_options">
+
+{if $discount}
+<tr>
+	<td width="25%">{$lng.listings.discount}:</td>
+	<td>{$discount} {$lng.general.of} {if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$full_total}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</td>
+</tr>
+{/if}{* end discount *}
+
+<tr>
+	<td width="25%"><b>{$lng.general.total}:</b></td>
+	<td class="price"><b>{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$total}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b> {if $total>0 && !$nologin && $credits_allowed}( {$needed_credits} {if $needed_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if} ){/if}</td>
+</tr>
+
+{if $total>0 && !$nologin && $credits_allowed}
+<tr>
+	<td width="25%"><b>{$lng.credits.credits}</b></td>
+	<td align="left">
+	<b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+	<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}{if $current_credits<$needed_credits} ( {$lng.credits.not_enough_credits} ) {/if}</td>
+</tr>
+{/if}
+
+{if $total>0}
+{if $no_processors>1 || ($no_processors==1 && $credits_allowed)}
+<tr>
+	<td width="25%">{$lng.listings.choose_payment_method} :</td>
+	<td align="left">
+	
+	{foreach from=$payment_processors name=pp item=v}
+	<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (!$credits_allowed || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+
+	{* if subscription choose if recurring *}
+
+	{if $is_subscription && $v.recurring==2}&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="recurring{$v.processor_code}" checked="checked" />&nbsp;&nbsp;{$lng.subscribe.recurring}{/if}
+
+	<br/>
+	{/foreach}
+
+	</td>
+</tr>
+
+{else}
+<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+<tr>
+	<td width="50%">{$lng.subscribe.payment_method}:</td>
+	<td>{$payment_processors[0].processor_title}</td>
+</tr>
+
+{/if}
+{/if}{* end total *}
+
+</table>
+<br/>
+	<div class="dcenter">
+	<div class="buttons">
+	<span class="negative">{if $nologin}<input type="submit" name="Cancel" value="{$lng.general.cancel}" />{else}<input type="submit" name="Finalize_later" value="{$lng.listings.finalize_later}" />{/if}</span>
+	<span class="positive"><input type="submit" name="Approve" value="{$lng.listings.approve_ad}" /></span>
+	</div>
+	</div>
+	<div class="clearfix"></div>
+</form>
+</div>
+
+<div class="newad-details">
+<h2>{$lng.listings.ad_details}</h2>
+<br/>
+<table cellpadding="0" cellspacing="0" width="100%">
+<tr><td class="left_form">{$lng.listings.category}:</td> <td class="right_form">&nbsp;{$tmp.category}</td></tr>
+
+<tr><td class="left_form">{$lng.listings.title}:</td> <td class="right_form">&nbsp;{$tmp.title|wordwrap:70:" ":true}</td></tr>
+<tr><td class="left_form">{$lng.listings.description}:</td> <td class="right_form">&nbsp;{$tmp.description_formatted|wordwrap:70:" ":true}</td></tr>
+
+<tr><td>
+<script type="text/javascript">
+//<![CDATA[
+{literal}
+$(document).ready(function() {
+{/literal}
+
+{foreach from=$fields_array item=v}
+	{if $v.type=='google_maps' && $tmp[$v.caption]}
+		{include file="data/gmap-ro.html"}
+	{/if}
+{/foreach}
+{literal}
+});
+{/literal}
+//]]>
+</script>
+</td></tr>
+
+{foreach from=$fields_array item=v}
+{if $v.type=="price" && $ads_settings.enable_price}
+<tr><td class="left_form">{$lng.listings.price}:</td> <td class="right_form">&nbsp;{if $tmp.price>=0}{$tmp.price_curr}{/if}</td></tr>
+{elseif $v.type=="image"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if $tmp[$v.caption]}
+<a href="{$live_site}/uploads/{$v.caption}/{$tmp[$v.caption]}" class="imgfield"><img src="{$template_path}images/camera.gif"></a>{/if}
+</td></tr>
+{elseif $v.type=="file"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if $tmp[$v.caption]}
+<a href="{$live_site}/uploads/{$v.caption}/{$tmp[$v.caption]}"><img src="{$template_path}/images/download.png" class="tooltip" alt="" title="{$lng.general.download}"/></a>{/if}
+</td></tr>
+{elseif $v.type=="multiselect"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;
+{$tmp[$v.caption]|@implode:', '}
+</td></tr>
+{elseif $v.type=="google_maps"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form"> {if $tmp[$v.caption]}
+<input type="hidden" name="{$v.caption}" id="{$v.caption}" value="{$tmp[$v.caption]}">
+<div id="gm_{$v.caption}" style="width: 100%; height: 300px"></div>
+{/if}</td></tr>
+
+{elseif $v.type=='checkbox_group'}
+<tr>
+<td class="left_form">{$v.name}</td>
+<td class="right_form">
+<table cellpaccing=0 cellspacing=0 width=100%>
+	<tr>
+	{foreach from=$v.extra_elements_array item=t name=check}
+		<td width="50%" height=25>
+		{if in_array($t.name, $tmp[$v.caption])}<img src="{$template_path}images/checkbox_on.png">{else}<img src="{$template_path}images/checkbox_off.png">{/if}&nbsp;
+		{if $v.prefix!=""} {$v.prefix} {/if}
+		{$t.name}
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		</td>
+		{if $smarty.foreach.check.index!=0 && $smarty.foreach.check.index%2==1}</tr><tr>{/if}
+	{/foreach}
+</tr>
+</table>
+</td></tr>
+{elseif $v.type=="depending"}
+<tr><td class="left_form">{$v.depending.name1}:</td> <td class="right_form">&nbsp;{$tmp[$v.depending.caption1]}</td></tr>
+<tr><td class="left_form">{$v.depending.name2}:</td> <td class="right_form">&nbsp;{$tmp[$v.depending.caption2]}</td></tr>
+{if $v.depending.no>=3}
+<tr><td class="left_form">{$v.depending.name3}:</td> <td class="right_form">&nbsp;{$tmp[$v.depending.caption3]}</td></tr>
+{/if}
+{if $v.depending.no==4}
+<tr><td class="left_form">{$v.depending.name4}:</td> <td class="right_form">&nbsp;{$tmp[$v.depending.caption4]}</td></tr>
+{/if}
+{elseif $v.type=="checkbox"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if $tmp[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}</td></tr>
+{elseif $v.type=="youtube"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{$tmp[$v.caption]|regex_replace:'/ width="[0-9]+"/':' width="500"'|regex_replace:'/ height="[0-9]+"/':' height="388"'}</td></tr>
+{else}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{$tmp[$v.caption]}</td></tr>
+{/if}
+{/foreach}
+</table>
+<br/>
+
+{if $ads_settings.add_meta_with_listings}
+	<h2>{$lng.listings.meta_info}</h2>
+	<br/>
+	<table cellpadding="0" cellspacing="0" width="100%">
+	<tr><td class="left_form">{$lng.listings.meta_keywords}:</td> <td class="right_form">&nbsp;{$tmp.meta_keywords}</td></tr>
+	<tr><td class="left_form">{$lng.listings.meta_description}:</td> <td class="right_form">&nbsp;{$tmp.meta_description}</td></tr>
+	</table>
+	<br/>
+{/if}
+
+{if !$tmp.user_id}
+<h2>{$lng.listings.your_info}</h2>
+<br/>
+<table cellpadding="0" cellspacing="0" width="100%">
+
+{* nologin fields *}
+
+{foreach from=$user_fields item=v}
+{if $v.type=="image"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if $tmp_nologin[$v.caption]}
+<a href="{$live_site}/uploads/{$v.caption}/{$tmp_nologin[$v.caption]}" class="imgfield"><img src="{$template_path}images/camera.gif"></a>{/if}
+</td></tr>
+{elseif $v.type=="file"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if $tmp_nologin[$v.caption]}
+<a href="{$live_site}/uploads/{$v.caption}/{$tmp_nologin[$v.caption]}"><img src="{$template_path}/images/download.png" class="tooltip" alt="" title="{$lng.general.download}"/></a>{/if}
+</td></tr>
+{elseif $v.type=="multiselect"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;
+{$tmp_nologin[$v.caption]|@implode:', '}
+</td></tr>
+{elseif $v.type=="google_maps"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form"> {if $tmp_nologin[$v.caption]}
+<input type="hidden" name="{$v.caption}" id="{$v.caption}" value="{$tmp_nologin[$v.caption]}">
+<div id="gm_{$v.caption}" style="width: 450px; height: 400px"></div>
+{/if}</td></tr>
+
+{elseif $v.type=='checkbox_group'}
+<tr>
+<td class="left_form">{$v.name}</td>
+<td class="right_form">
+<table cellpaccing=0 cellspacing=0 width=100%>
+	<tr>
+	{foreach from=$v.extra_elements_array item=t name=check}
+		<td width="50%" height=25>
+		{if in_array($t.name, $tmp_nologin[$v.caption])}<img src="{$template_path}images/checkbox_on.png">{else}<img src="{$template_path}images/checkbox_off.png">{/if}&nbsp;
+		{if $v.prefix!=""} {$v.prefix} {/if}
+		{$t.name}
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		</td>
+		{if $smarty.foreach.check.index!=0 && $smarty.foreach.check.index%2==1}</tr><tr>{/if}
+	{/foreach}
+</tr>
+</table>
+</td></tr>
+{elseif $v.type=="depending"}
+<tr><td class="left_form">{$v.depending.name1}:</td> <td class="right_form">&nbsp;{$tmp_nologin[$v.depending.caption1]}</td></tr>
+<tr><td class="left_form">{$v.depending.name2}:</td> <td class="right_form">&nbsp;{$tmp_nologin[$v.depending.caption2]}</td></tr>
+{if $v.depending.no>=3}
+<tr><td class="left_form">{$v.depending.name3}:</td> <td class="right_form">&nbsp;{$tmp_nologin[$v.depending.caption3]}</td></tr>
+{/if}
+{if $v.depending.no==4}
+<tr><td class="left_form">{$v.depending.name4}:</td> <td class="right_form">&nbsp;{$tmp_nologin[$v.depending.caption4]}</td></tr>
+{/if}
+{elseif $v.type=="checkbox"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if $tmp_nologin[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}</td></tr>
+{elseif $v.type=="youtube"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{$tmp_nologin[$v.caption]|regex_replace:'/ width="[0-9]+"/':' width="500"'|regex_replace:'/ height="[0-9]+"/':' height="388"'}</td></tr>
+{elseif $v.type!="terms"}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{$tmp_nologin[$v.caption]}</td></tr>
+{/if}
+{/foreach}
+
+</table>
+<br/>
+{/if}{* end if $user_id *}
+
+<center><div class="form_button"><strong><a href="{$live_site}/newad1.php?id={$id}&step=3">{$lng.navbar.editad}</a></strong></div></center>
+
+<br/>
+
+{if $tmp.enable_video && $tmp.video}
+<h2>{$lng.listings.video}</h2>
+<br/>
+<center>{$tmp.video|regex_replace:'/ width="[0-9]+"/':' width="500"'|regex_replace:'/ height="[0-9]+"/':' height="388"'}</center>
+{/if}{* end video *}
+<br/>
+
+{if $ads_settings.enable_featured || $ads_settings.enable_highlited || $ads_settings.enable_priorities || $ads_settings.enable_video}
+
+<h2>{$lng.listings.extra_options}</h2>
+<br/>
+<table cellpadding="0" cellspacing="0" width="100%">
+{if $ads_settings.enable_featured}
+<tr><td class="left_form">{$lng.listings.featured}:</td><td class="right_form">{if $tmp.featured || $options.featured.value}{$lng.general.Yes}{else}{$lng.general.No}{/if}</td></tr>
+{/if}
+{if $ads_settings.enable_highlited}
+<tr><td class="left_form">{$lng.listings.highlited}:</td><td class="right_form">{if $tmp.highlited || $options.highlited.value}{$lng.general.Yes}{else}{$lng.general.No}{/if}</td></tr>
+{/if}
+{if $ads_settings.enable_priorities}
+<tr><td class="left_form">{$lng.listings.priority}:</td><td class="right_form">{if $tmp.priority>0}{$tmp.priority_name}{elseif  $options.priority.value}{foreach from=$priorities item=p}{if $p.order_no==$options.priority.value}{$p.name}{/if}{/foreach}{else}{$lng.general.none}{/if}</td></tr>
+{/if}
+
+{if $ads_settings.enable_video}
+<tr><td class="left_form">{$lng.listings.video}:</td><td class="right_form">{if $tmp.enable_video || $options.video.value}{$lng.general.Yes}{else}{$lng.general.No}{/if}</td></tr>
+{/if}
+</table>
+
+<br/>
+{if $tmp.user_id || $settings.nologin_extra_options}
+<center><div class="form_button"><strong><a href="{$live_site}/newad1.php?id={$id}&step=5">{$lng.listings.edit_options}</a></strong></div></center>
+{/if}
+<br/>
+
+{/if}{* end options *}
+{if $no_pictures}
+<h2>{$lng.listings.ad_photos}</h2>
+<br/>
+<ul id="ul_files">
+{foreach from=$tmp.images item=v}
+<li><img class="pic" src="{$live_site}/images/listings{if $v.folder}/{$v.folder}{/if}/thmb/{$v.picture}"></li>
+{/foreach}
+</ul>
+<br/>
+
+<center><div class="form_button"><strong><a href="{$live_site}/newad1.php?id={$id}&step=4">{$lng.listings.edit_photos}</a></strong></div></center>
+<br/>
+{/if}
+
+</div>
+{/if}
+
+
+{if $step==7}  {* ---- redirect to payment ---- *}
+<script type="text/javascript" src="{$live_site}/libs/jQuery/jquery.js"></script>
+<br/><br/><br/><br/>
+<p style="text-indent: 20px;">{$lng.listings.wait_while_redirected}</p>
+<br/><br/><br/>
+<div style="display: none;">{$payment_form}</div>
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function () {
+document.payment_form.submit();
+});
+{/literal}
+</script>
+{/if}
+
+</div> {* end form_container *}
+{include file="footer.html"}

@@ -1,0 +1,111 @@
+{* ------ footer banners ------- *}
+{if in_array('footer-mobile',$banners_positions)}
+{banner->getTemplateBanners p1='footer-mobile' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{foreach from=$array_banners item=v}
+<div class="hor_banners">{include file="banner.html"}</div>
+{/foreach}
+{/if}
+{* ------- end footer banners ------- *}
+</div> {* end main *}
+<div id="footer">
+<a href="{$live_site}/">{$lng.navbar.home}</a>&nbsp;&nbsp;
+
+{if $logged_in || $is_admin}|&nbsp;&nbsp;<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.logout}{else}logout.php{/if}">{$lng.navbar.logout}</a>&nbsp;&nbsp;{else}|&nbsp;&nbsp;<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.login}{else}login.php{/if}">{$lng.navbar.login}</a>&nbsp;&nbsp;{if $no_groups}|&nbsp;&nbsp;<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.register}{else}register.php{/if}">{$lng.navbar.register}</a>&nbsp;&nbsp;{/if}{/if}|&nbsp;&nbsp;<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.contact}{else}contact.php{/if}">{$lng.navbar.contact}</a><br/>
+
+	{assign var="separator" value=""}
+	{assign var="line_separator" value=""}
+	
+	{foreach from=$main_navbar item=cp name=mainnav}
+	{if $cp.type==1}
+	{$separator}&nbsp;&nbsp;<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeCustomPageLink p1=$cp.id p2=$cp.title p3=$cp.slug}{else}{$live_site}/content.php?id={$cp.id}{/if}" {if $cp.blank==1}target="_blank"{/if}>
+	{else}<a href="{$cp.hreflink}" {if $cp.blank==1}target="_blank"{/if}>
+	{/if}
+	{$cp.title}</a>&nbsp;&nbsp;
+	{assign var="separator" value="|"}
+	{assign var="line_separator" value="<br/>"}
+	{/foreach}
+
+	{foreach from=$sec_navbar item=cp name=secnav}
+	{if $cp.type==1}
+	{$separator}<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeCustomPageLink p1=$cp.id p2=$cp.title p3=$cp.slug}{else}{$live_site}/content.php?id={$cp.id}{/if}" {if $cp.blank==1}target="_blank"{/if}>
+	{else}<a href="{$cp.hreflink}" {if $cp.blank==1}target="_blank"{/if}>
+	{/if}
+	{$cp.title}</a>&nbsp;&nbsp;
+	{assign var="separator" value="|"}
+	{assign var="line_separator" value="<br/>"}
+	{/foreach}
+
+	{$line_separator}
+
+	<div class="form_button back">
+		<strong><a href="{if $mobile_settings.enable_mobile_subdomain}http://{$main_domain}{else}javascript:;{/if}" onclick="document.cookie='mobile=0; path=/; expires='+exdate.toUTCString()+'; {if ($settings.enable_locations && $settings.enable_subdomains) || $mobile_settings.enable_mobile_subdomain}domain={$main_domain};{/if}';window.location.reload( false );">{$lng.general.full_version}</a></strong>
+	</div>
+
+{if $logged_in}
+	<div class="form_button back">
+		<strong><a href="{$live_site}/useraccountmenu.php">{$lng.navbar.my_account}</a></strong>
+	</div>
+{elseif $is_admin || $is_mod}
+	<div class="form_button back">
+		<strong><a href="{$live_site}/{$admin_folder}/">{$lng.navbar.administrator_panel}</a></strong>
+	</div>
+{/if}
+
+	{if $languages|@count>1}
+		<div class="languages"><div id="languages">
+		{$crt_lang_name}{if $crt_lang_flag}&nbsp;<img src="{$live_site}/images/languages/{$crt_lang_flag}" alt="" />{/if}&nbsp;&nbsp;
+		<span id="down_arrow"><a href="javascript:;" id="show_language"><img src="{$template_path}images/lang-arrow.png" alt="" /></a></span>
+		<span id="up_arrow" style="display: none;"><a href="javascript:;" id="hide_language"><img src="{$template_path}images/up-lang-arrow.png" alt="" /></a></span>
+		<ul id="languages-menu" style="display: none;">
+		{foreach from=$languages item=v}
+		{if $v.id!=$crt_lang}
+		<li>
+		<a href="javascript:;" onclick="document.cookie='default_lang={$v.id}; path=/; expires = '+exdate.toUTCString()+'; {if $settings.enable_locations && $settings.enable_subdomains}domain={$main_domain};{/if}'; window.location.reload( false );">{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />&nbsp;{/if}{$v.name}</a>
+		</li>
+		{/if}
+		{/foreach}
+		</ul>
+		</div></div>
+	{/if}
+
+{if $languages|@count>1}
+{literal}
+<script type="text/javascript">
+
+$(document).ready(function() {
+	$("#languages-menu").hide();
+	$("#down_arrow").show();
+	$("#up_arrow").hide();
+	$("#show_language").click(function(event){
+		event.stopPropagation();
+		$("#languages-menu").slideDown('fast');
+		$("#down_arrow").hide();
+		$("#up_arrow").show();
+	});
+	$("#hide_language").click(function(event){
+		event.stopPropagation();
+		$("#languages-menu").slideUp('fast');
+		$("#down_arrow").show();
+		$("#up_arrow").hide();
+	});
+	$("#languages-menu").hover(function() {
+		}, function(){
+			$("#languages-menu").slideUp('fast');
+			$("#down_arrow").show();
+			$("#up_arrow").hide();
+		});
+
+});
+
+</script>
+{/literal}
+{/if}
+
+	<div class="clearfix"></div>
+
+{$appearance.footer_text}
+</div>
+
+</div> {* end page *}
+</body>
+</html>

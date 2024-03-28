@@ -1,0 +1,97 @@
+{capture name=some_content assign=details_url}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title p3=$post_array.search_id p4=$v.category_id p5=$v.slug}{else}{$live_site}/details.php?id={$v.id}{if isset($post_array.search_id)}&search_id={$post_array.search_id}{/if}{/if}
+{/capture}
+
+<div class="classified">
+
+	<a href="{$details_url}" name="listing{$v.id}">
+	<div class="lfloat gallery-img-bg smallimg sl-image">
+	
+	<img class="cpic" src="{$live_site}/{$v.image}" alt="{if $v.image_id}{$v.title|strip_tags:false|substr:0:100}{/if}" />
+	
+	{if $v.sold}<div class="ribbon ribbon_sold"><span>{$lng.listings.sold}</span></div>{/if}
+	{if $v.rented}<div class="ribbon ribbon_rented"><span>{$lng.listings.rented}</span></div>{/if}
+	{if $v.featured && $ads_settings.enable_featured && $self_noext!="featured_ads" && !$v.sold && !$v.rented}<div class="ribbon ribbon_featured"><span>{$lng.listings.featured}</span></div>{/if}
+
+	{if $v.no_pictures}<div class="images-no">{$v.no_pictures}</div>{/if}
+
+	</div> {* end picture *}
+
+	<div class="rclass fba{if $v.highlited && $ads_settings.enable_highlited} highlited{/if}">
+		
+		<div class="fbac">
+
+		<div class="title">
+
+		<h3 {if $v.priority}class="priority tooltip prioritized"{/if} alt="priority{$v.priority}" title="{$v.priority_name}">{if $appearance.charset=="UTF-8"}{$v.title|mb_truncate:100:"...":"UTF-8"}{else}{$v.title|truncate:100:"...":false}{/if}</h3>
+		
+		</div>
+
+		{* ratings *}
+
+		{if in_array("ratings",$modules_array) && $ratings_settings.rate_listings}
+		<div class="ratings">
+		{include file="modules/ratings/stars.html"}
+		</div>
+		{/if}
+
+		{* end ratings *}
+
+		{if $v.location_str}<div class="sl-loc">{$v.location_str}</div>{/if}
+
+		<p>{if $appearance.charset=="UTF-8"}{$v.description|mb_truncate:150:"...":"UTF-8"}{else}{$v.title|truncate:150:"...":false}{/if}</p>
+
+		<div class="small-light">
+		{if $ads_settings.show_ad_date_for_everybody==1}
+			{if $v.date_added!=$v.date_updated}{$lng.listings.updated}&nbsp;{$v.date_updated_nice}{else}{$lng.listings.added_on}&nbsp;{$v.date_nice}{/if}
+		{else}
+			{$lng.listings.posted}
+		{/if}
+		&nbsp;{$lng.general.to}&nbsp;<u>{$v.category}</u>
+		
+		{if $v.video && $v.enable_video && $ads_settings.enable_video}<div class="inline video sq-btn sq-btn1"><img src="{$template_path}images/video.png" />&nbsp;{$lng.listings.short_video}</div>{/if}
+
+		{if $v.urgent && $ads_settings.enable_urgent}&nbsp;<span class="urgent sq-btn sq-btn1">{$lng.listings.urgent}</span>{/if}
+		
+
+		</div>
+
+		</div> {* end lfloat *}
+		
+		<div class="fbav sl-right"> {* rfloat *}
+
+			{if $ads_settings.enable_price && !$v.auction}
+		
+		{if in_array("price_extra",$modules_array) && (isset($pe_settings[$v.fieldset]) || isset($pe_settings[0])) }
+	
+		{include file="modules/price_extra/short_listing.html"}
+
+		{else}
+
+		{if $v.price>=0}<div class="fbavr price sl-price">{$v.price_curr}
+
+				{$vat = $config_vat_rates[$v.country].standard_rate}
+				<br>
+				<small style="font-weight:500;white-space:nowrap;">{$vat},00% {$lng.general.tax}</small>
+
+			</div>{/if}
+ 
+		{/if}
+			
+		{/if} {* end if enable price *}
+		{if $v.auction}
+		<div class="fbavr sl-price sq-btn sq-btn2">{$lng.useraccount.auction}</div>
+		{/if}
+
+		{if $self_noext!="favorites" && !in_array({$v.id}, $fav_array)}
+		<div><div class="starfav addtofav fbavr tooltip sl-make-fav" id="fav{$v.id}" title="{$lng.listings.add_to_favourites}"></div></div>
+		{else}
+		<div><div class="starfav remfav fbavr tooltip sl-rem-fav" id="fav{$v.id}" title="{$lng.listings.remove_favourite}"></div></div>
+		{/if}
+
+		</div> {* end rfloat *}
+
+	</div> {* end lfloat lpdiv1 rclass *}
+	<div class="clearfix"></div>
+</a> 
+</div> {* end classified *}

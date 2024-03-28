@@ -1,0 +1,71 @@
+<!-- LATEST ADS -->
+<div id="latest">
+	<div class="box-heading top-box-text"><div class="box-heading-left"><div class="box-heading-right">{$lng.general.latest_ads}</div></div></div>
+	<div class="box2-bottom-gray"><div class="box-left"><div class="box-right"><div class="box-bottom-left"><div class="box2-bottom-right">
+                    <div class="vert-box"> 
+			{if $no_latest}
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                      {section name=loop start=0 loop=$no_latest step=1}
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$latest[loop].id p2=$latest[loop].title p3='' p4=$latest[loop].category_id p5=$latest[loop].slug}{else}{$live_site}/details.php?id={$latest[loop].id}{/if}{/capture}
+                        <tr> 
+                          <td valign="middle" class="last-image"><div class="box-image">
+				<a href="{$details_url}"><img class="pic" id="lpic{$latest[loop].id}" src="{$live_site}/{$latest[loop].image}" alt="{if $latest[loop].image_id}{$latest[loop].title|strip_tags:false|substr:0:100}{/if}" /></a>
+				{if $latest[loop].rented && $ads_settings.enable_rented}<div class="rented" id="lrented{$latest[loop].id}" style="display: none;"></div>{elseif $latest[loop].sold && $ads_settings.enable_sold}<div class="sold" id="lsold{$latest[loop].id}" style="display: none;"></div>{/if}
+				</div></td>
+			<td valign="middle">
+			{if $data_set=="cars" && ($latest[loop].make || $latest[loop].model)}
+			<h3><a href="{$details_url}">{$latest[loop].make} {$latest[loop].model}</a></h3>
+			{else}
+			<h3><a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$latest[loop].title|mb_truncate:40:"...":"UTF-8"}{else}{$latest[loop].title|truncate:40:"...":false}{/if}</a></h3>
+			{/if}
+			{$latest[loop].location_str}
+			{if $ads_settings.enable_price}
+		
+			{if in_array("price_extra",$modules_array) && isset($pe_settings[$latest[loop].fieldset])}
+	
+			{include file="modules/price_extra/latest.html"}
+	
+			{else}
+
+			{if $latest[loop].price>=0}<div class="price">{$latest[loop].price_curr}</div>{/if}
+ 
+			{/if}
+			
+			{/if} {* end if enable price *}
+
+			<div class="date">{$latest[loop].date_nice}</div>
+			</td></tr>
+                        {if $smarty.section.loop.index<$no_latest-1}
+                        <tr>
+                          <td colspan="2"><div class="vert-separator"></div></td>
+                        </tr>
+                        {/if}
+                      {/section}
+                      </table>
+			{/if}
+                    </div>
+	</div></div></div></div></div>
+</div>
+<!-- END LATEST ADS -->
+
+<script type="text/javascript">
+{literal}
+$(window).load(function(){
+{/literal}
+{foreach from = $latest item=v}
+	{if $v.rented}
+	{literal}
+		$("#lrented{/literal}{$v.id}{literal}").show();
+		$("#lrented{/literal}{$v.id}{literal}").css({ top: $("#lpic{/literal}{$v.id}{literal}").position().top-11, left: $("#lpic{/literal}{$v.id}{literal}").position().left+ $("#lpic{/literal}{$v.id}{literal}").width()-54});
+	{/literal}
+	{elseif $v.sold}
+	{literal}
+		$("#lsold{/literal}{$v.id}{literal}").show();
+		$("#lsold{/literal}{$v.id}{literal}").css({ top: $("#lpic{/literal}{$v.id}{literal}").position().top-11, left: $("#lpic{/literal}{$v.id}{literal}").position().left+ $("#lpic{/literal}{$v.id}{literal}").width()-54});
+	{/literal}
+	{/if}
+{/foreach}
+{literal}
+});
+{/literal}
+</script>

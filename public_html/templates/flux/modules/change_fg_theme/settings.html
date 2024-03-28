@@ -1,0 +1,58 @@
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="page_bounds mb40">
+
+<form name="change_fg_theme_form" id="change_fg_theme_form" method="post" action="settings.php">
+
+<div class="heading form_heading">{$lng.general.settings}</div>
+<div class="wbg p30">
+<div class="form_container">
+
+<div class="fel clearfix">
+	<label>{$lng_cfgth.template}</label>
+	<select name="template" id="template">
+	{foreach from=$cfgth_templates item=v}
+	<option value="{$v.template_code}" {if $th_settings.template==$v.template_code}selected{/if}>{$v.template_name}</option>
+	{/foreach}
+	</select>
+	<span id="div_dark_mode" style="display: none">
+		&nbsp;<input type="checkbox" name="dark_mode" id="dark_mode" {if isset($th_settings.dark_mode) && $th_settings.dark_mode}checked{/if} />&nbsp;{$lng_cfgth.dark_mode}
+	</span>
+</div>
+
+<div class="fel" id="div_colorscheme" style="display: none">
+	<label>{$lng_cfgth.colorscheme}</label>
+	<select name="template_colorscheme" id="template_colorscheme">
+	</select>
+</div>
+
+<div class="fel" id="div_fp_type" style="display: none">
+	<label>{$lng_cfgth.first_page_type}</label>
+	<input type="radio" name="first_page_type" value="1" {if $th_settings.first_page_type==1} checked="checked" {/if} />&nbsp;{$lng_cfgth.browse_categories}&nbsp;&nbsp;
+	<input type="radio" name="first_page_type" value="2" {if $th_settings.first_page_type==2 || !$th_settings.first_page_type} checked="checked" {/if} />&nbsp;{$lng_cfgth.tree_categories}
+</div>
+
+<div class="fel">
+	<label>{$lng_cfgth.ads_per_page}</label>
+	<input type="textbox" size="6" name="ads_per_page" id="ads_per_page" value="{if $th_settings.ads_per_page}{$th_settings.ads_per_page}{else}{$appearance.ads_per_page}{/if}" />
+</div>
+
+</div> {* end form_container *}
+
+</div>{* end wbg *}
+
+<div class="form_footer">
+<input type="submit" class="button wide_button positive" name="Submit" value="{$lng.general.save}" />
+</div>
+
+</form>
+
+</div>{* end page_bounds *}
+
+{include file="modules/change_fg_theme/js/settings_js.html"}
+
+{include file="footer.html"}

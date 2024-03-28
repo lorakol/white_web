@@ -1,0 +1,88 @@
+<section id="browse_location">
+    <div class="tab_content">
+
+    <div class="browse-tabs">
+    
+	{if $browse_location_settings.type!="single" && $bl_locations.values|@count > 1}
+
+		{foreach name="master_loc" from=$bl_locations.values item=v}
+
+		<input id="lt{$v.id}" type="radio" name="bl_tabs" class="tradio" {if $smarty.foreach.master_loc.index==0}checked{/if}>
+		<label for="lt{$v.id}" id="bl_label{$v.id}">{$v.name|replace:" ":"&nbsp;"}</label>
+	
+		{/foreach}
+		
+
+	{/if}
+
+	
+	{if $browse_location_settings.type=="single"}
+
+	<div class="browse-tab-content bltc" style="display: block">
+	
+		{capture name=some_content assign=no_elements}{$bl_locations.elements|@count}{/capture}
+		{if $no_elements}
+		{capture name=some_content assign=no_on_col}{($no_elements/4)|ceil}{/capture}
+	
+		<ul>
+			{foreach name=list from=$bl_locations.elements item=t}
+				{capture name=sfield assign=field2}{$t.el}{/capture}
+				<li><a href="{if $settings.enable_locations}{if $settings.enable_subdomains && $settings.subdomain_field == $bl_locations.caption}http://{$t.encoded_el}.{$main_domain}{elseif in_array($bl_locations.caption, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$bl_locations.caption}|{$field2|rawurlencode}'){/if}{else}{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$bl_locations.caption p2=$field2}{else}{$live_site}/listings.php?{$bl_locations.caption}={$field2}{/if}{/if}">{$t.el}</a></li>
+				{if ($smarty.foreach.list.index+1)%$no_on_col==0 && $smarty.foreach.list.index && $smarty.foreach.list.index!=$bl_locations.no_elements-1}
+			</ul>
+			<ul>
+				{/if}
+			{/foreach}
+		</ul>
+		{/if} {* end if no_elements *}
+	</div>	
+	{else}
+
+		{foreach name="loc1" from=$bl_locations.values item=v}
+
+		<div class="browse-tab-content bltc clearfix {if $smarty.foreach.loc1.index==0} first-tab-content{/if}" id="btc{$v.id}">
+		
+			{capture name=some_content assign=no_elements}{$v.elements|@count}{/capture}
+			{if $no_elements}
+			{capture name=some_content assign=no_on_col}{($no_elements/4)|ceil}{/capture}
+
+			<ul>
+			{capture name=sfield assign=field1}{$v.name}{/capture}
+			{foreach name=list from=$v.elements item=t}
+				{capture name=sfield assign=field2}{$t.el}{/capture}
+				<li><a href="{if $settings.enable_locations}{if $settings.enable_subdomains && $settings.subdomain_field == $bl_locations.caption}http://{$t.encoded_el}.{$main_domain}{elseif in_array($bl_locations.caption, $location_fields)}javascript:;" onclick="changeDoubleLocation('{$live_site}', '{$seo_settings.enable_mod_rewrite}', '{$bl_locations.master_caption}|{$field1|rawurlencode},{$bl_locations.caption}|{$field2|rawurlencode}'){else}{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$bl_locations.master_caption p2=$field1 p3=$bl_locations.caption p4=$field2}{else}{$live_site}/listings.php?{$bl_locations.master_caption}={$field1|lower}&amp;{$bl_locations.caption}={$field2|lower}{/if}{/if}{else}{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$bl_locations.master_caption p2=$field1 p3=$bl_locations.caption p4=$field2}{else}{$live_site}/listings.php?{$bl_locations.master_caption}={$field1|lower}&amp;{$bl_locations.caption}={$field2|lower}{/if}{/if}">{$t.el}</a></li>
+				{if ($smarty.foreach.list.index+1)%$no_on_col==0 && $smarty.foreach.list.index && $smarty.foreach.list.index!=$v.no_elements-1}
+			</ul>
+			<ul>
+				{/if}
+			{/foreach}
+			</ul>
+			{/if}
+		</div> {* end browse-tab-content *}
+		
+		{/foreach}
+
+		{literal}
+	<script>
+
+	$(document).ready(function() {
+	$(".tradio").click(function(event){
+
+		var loc_id = jQuery(this).attr("id").substr(2);
+		$('.bltc').hide();
+		$("#btc"+loc_id).show();
+
+		});
+	});
+
+	</script>
+	{/literal}
+
+		
+	{/if} {* end if double *}                                                                                                                                                                                                                                                           
+	
+	<div class="clearfix"></div>
+	</div> {* end browse-tabs *}	
+		
+</div>
+</section>

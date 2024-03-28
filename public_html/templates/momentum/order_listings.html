@@ -1,0 +1,43 @@
+<div class="graytab">
+
+<div class="lfloat">
+
+{if $self_noext=="listings"}
+
+{if $ads_settings.enable_map_search}
+<div class="lfloat pdiv4" id="showMap" {if $ads_settings.map_visible}style="display: none;"{/if}><img src="{$template_path}images/map.png" alt="{$lng.listings.show_map}" title="{$lng.listings.show_map}" class="tooltip" /></div><!--
+--><div class="lfloat pdiv4" id="hideMap" {if !$ads_settings.map_visible}style="display: none;"{/if}><img src="{$template_path}images/map_off.png" alt="{$lng.listings.hide_map}" title="{$lng.listings.hide_map}" class="tooltip" /></div><!--
+-->{/if}<!--
+
+-->{if $post_array.show=="list"}<!--
+--><div class="lfloat pdiv4"><a href="{$show_link|replace:'##show##':'gallery'}"><img src="{$template_path}images/gallery.png" alt="{$lng.listings.gallery}" title="{$lng.listings.gallery}" class="tooltip" /></a></div><!--
+-->{else}<!--
+--><div class="lfloat pdiv4"><a href="{$show_link|replace:'##show##':'list'}"><img src="{$template_path}images/list.png" alt="{$lng.listings.list}" title="{$lng.listings.list}" class="tooltip" /></a></div>
+{/if}
+
+{/if} {* end if listings *}
+
+
+</div>
+
+<div class="rfloat" style="padding-top: 6px;">
+
+	{* -------- multicurrency ---------- *}
+	{if in_array("multicurrency", $modules_array) && $self_noext=="listings"}
+	{include file="modules/multicurrency/search_currencies.html"}
+	{/if}
+	{* -------- end multicurrency ---------- *}
+
+<select id="order" name="order" onchange="doSel(this)">
+	<option value="location.href='{$order_link|replace:'##order##':'date_updated'|replace:'##order_way##':'desc'}'" {if $order=='' && $order_way==""}selected="selected"{/if}>{$lng.advanced_search.sort_by}</option>
+	<option value="location.href='{$order_link|replace:'##order##':'date_updated'|replace:'##order_way##':'desc'}'" {if $order=='date_updated' && $order_way=="desc"}selected="selected"{/if}>{$lng.listings.date} {$lng.general.desc}</option>
+	<option value="location.href='{$order_link|replace:'##order##':'date_updated'|replace:'##order_way##':'asc'}'" {if $order=='date_updated' && $order_way=="asc"}selected="selected"{/if}>{$lng.listings.date} {$lng.general.asc}</option>
+	<option value="location.href='{$order_link|replace:'##order##':'price'|replace:'##order_way##':'desc'}'" {if $order=='price' && $order_way=="desc"}selected="selected"{/if}>{$lng.listings.price} {$lng.general.desc}</option>
+	<option value="location.href='{$order_link|replace:'##order##':'price'|replace:'##order_way##':'asc'}'" {if $order=='price' && $order_way=="asc"}selected="selected"{/if}>{$lng.listings.price} {$lng.general.asc}</option>
+
+</select>
+</div>
+
+<div class="clearfix"></div>
+
+</div>

@@ -1,0 +1,65 @@
+{include file="header.html"}
+
+<link href="{$template_path}css/style-uploader{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+
+<div id="form_container">
+<h1>{$lng.listings.edit_photos} {$lng.listings.for_listing} <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id}{else}{$live_site}/details.php?id={$id}{/if}"> #{$id}</a></h1>
+
+<div class="form_content">
+
+{if $pending_edited}
+<div class="info"><p>{$lng.listings.info.listing_pending_edited}</p></div>
+{/if}
+
+	<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/fileuploader.js"></script>
+	<script type="text/javascript" src="{$live_site}/libs/jQuery/jquery.livequery.min.js"></script>
+	<div id="file-uploader">
+		<noscript>
+		<p>Please enable JavaScript to use file uploader.</p>
+		</noscript>
+	</div>
+
+	{literal}
+	<script>
+	function createUploader(){            
+		var uploader = new qq.FileUploader({
+			element: document.getElementById('file-uploader'),{/literal}
+			action: 'include/upload.php?id={$id}{if $pending_edited}&pending_edited=1{/if}',
+			max_photos: '{$no_photos}',
+			crt_photos: '{if isset($crt_photos)}{$crt_photos}{/if}',
+			order_up: '{$lng.listings.order_up|addslashes}',
+			order_down: '{$lng.listings.order_down|addslashes}',
+			delete_file: '{$lng.general.delete|addslashes}',
+			template_path: '{$template_path}',
+			files_uploaded: "{$lng.listings.files_uploaded|addslashes}",
+			allowed: "{$lng.listings.allowed|addslashes}",
+			limit_reached: "{$lng.listings.limit_reached|addslashes}",
+			click_to_upload: "{$lng.listings.click_to_upload|addslashes}",
+	{literal}
+			messages: { 
+			failed_message: "{/literal}{$lng.failed|addslashes}{literal}",
+			typeError: "{/literal}{$lng.images.errors.file_type_not_accepted|addslashes}{literal}" 
+			},
+			params: {
+        			max_photos: '{/literal}{$no_photos}{literal}'
+    			},
+			allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
+			debug: false
+	});	
+        }
+        window.onload = createUploader;
+</script>
+{/literal}
+	<div id="maincol"></div>
+	<div class="clearfix"></div>
+
+
+<br />
+
+<center>{if isset($crt_usr) && $crt_usr}
+<div class="form_button"><strong><a href="my_listings.php">{$lng.useraccount.browse_your_listings}</a></strong></div>
+&nbsp;&nbsp;{/if}
+<div class="form_button"><strong><a href="{if $seo_settings.enable_mod_rewrite && $crt_usr}{seo->makeDetailsLink p1=$id}{else}{$live_site}/details.php?id={$id}{if isset($key) && $key}&key={$key}{/if}{/if}">{$lng.listings.details}</a></strong></div></center>
+</div>
+</div>
+{include file="footer.html"}

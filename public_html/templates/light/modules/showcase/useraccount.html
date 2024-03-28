@@ -1,0 +1,15 @@
+{if $showcase_allowed==1}
+
+<h2>{$lng_sw.showcase}</h2>
+
+	<table class="stat" width="100%">
+		<tr><td>{$lng.general.status}</td>
+		<td class="tright">{if isset($user.showcase) && $user.showcase}{$lng.listings.active}{elseif isset($user.showcase_pending) && $user.showcase_pending}{$lng.listings.pending}{else}{$lng.listings.inactive}{/if}
+		
+		{if !isset($user.showcase) || !$user.showcase}&nbsp;&nbsp;<a href="modules/showcase/buy_showcase.php">[ {$lng_sw.buy_showcase} ]</a>{/if}
+		
+		</td>
+	</tr>
+	</table>
+
+{/if}

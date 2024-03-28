@@ -1,0 +1,16 @@
+{if !$has_alert}
+<a href="javascript:;" id="add_price_drop_alert" class="med-btn btn1 {if $has_alert}hidden{/if}">{$lng_price_drop_alert.add_alert}</a>
+
+<script type="text/javascript">
+
+$("#add_price_drop_alert").click(function () { 
+
+	if($(".add-alert-form").is(":visible"))
+		$(".add-alert-form").slideUp();
+	else $(".add-alert-form").slideDown();
+
+});
+
+</script>
+
+{/if}

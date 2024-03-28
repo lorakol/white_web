@@ -1,0 +1,72 @@
+{include file="header.html"}
+
+<form id="contact" name="contact" method="post" action="{$live_site}/contact.php?post=1" class="main">
+
+<script src="{$live_site}/libs/jQuery/jquery.js"></script>
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="wait"></div>
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng.navbar.contact}</h1></div>
+
+<div class="wbg">
+
+<div class="form_container p30">
+
+<div id="contact_info" class="info" style="display: none;">
+	<span class="closebtn" onclick='$("#contact_info").hide();'>&times;</span>
+	<span class="content"></span>
+</div>
+
+<div class="contact_form">
+
+<div class="fel">
+	<label for="name">{$lng.contact.name}<span class="mandatory"> *</span></label>
+	<input name="name" id="name" type="text" size="40" maxlength="255" value="{if isset($crt_usr_sett[$settings.contact_name_field])}{$crt_usr_sett[$settings.contact_name_field]}{/if}" />
+</div>
+
+<div class="fel">
+	<label for="email">{$lng.contact.email}<span class="mandatory"> *</span></label>
+	<input name="email" id="email" type="text" size="40" maxlength="255" value="{if isset($crt_usr_sett.email)}{$crt_usr_sett.email}{/if}" />
+</div>
+
+<div class="fel">
+	<label for="webpage">{$lng.contact.webpage}</label>
+	<input name="webpage" id="webpage" type="text" size="40" maxlength="255" />
+</div>
+
+<div class="fel">
+	<label for="subject">{$lng.contact.subject}<span class="mandatory"> *</span></label>
+	<input name="subject" id="subject" type="text" size="40" maxlength="255"/>
+</div>
+
+<div class="fel">
+	<label for="comments">{$lng.contact.comments}<span class="mandatory"> *</span></label>
+	<textarea name="comments" id="comments" rows="5" cols="60"></textarea>
+</div>
+
+{if $settings.contact_captcha}
+{if $settings.enable_recaptcha}
+{include file="data/recaptcha.html"}
+{else}
+{include file="data/random_image.html"}
+{/if}
+{/if}
+
+</div> {* end contact_form *}
+
+</div> {* end form_container *}
+<div class="clearfix"></div>
+</div>{* end wbg *}
+
+<div class="form_footer mb40">
+<input type="submit" class="button wide_button positive" name="Submit" id="Submit" value="{$lng.general.send}" />
+</div>
+
+</div> {* end page_bounds *}
+
+</form>
+
+{include file="js/contact_js.html"}
+{include file="footer.html"}

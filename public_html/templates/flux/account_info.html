@@ -1,0 +1,186 @@
+{if !isset($post) || !$post}
+{include file="header.html"}
+{include file="data/magnific-popup.html"}
+{include file="data/form_includes.html" fields_array=$user_fields user_fields=[]}
+
+<div class="wait"></div>
+
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<script src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+<script src="{$live_site}/libs/jQuery/plugins/jquery.number.min.js"></script>
+
+<link rel="stylesheet" href="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.css">
+<script src="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.min.js"></script>
+
+<div class="page_bounds mb40">
+
+<form name="account_form" id="account_form" method="post" action="account_info.php?action=account_info" enctype="multipart/form-data">
+
+<div class="heading form_heading">{$lng.useraccount.modify_account_info}</div>
+<div class="wbg p30">
+<div class="form_container">
+
+<div id="account_info" class="info" style="display: none;">
+	<span class="closebtn" onclick='$("#account_info").hide();'>&times;</span>
+	<span class="content"></span>
+</div>
+
+{if $tmp.admin_verification}
+<div id="av_info" class="warning">
+	<span class="closebtn" onclick='$("#av_info").hide();'>&times;</span>
+	<span class="content">{$lng.users.info.your_account_has_admin_verification_fields}</span>
+</div>
+{/if}
+
+{if isset($tmp.affiliate) && $tmp.affiliate}
+<div class="fel">
+	<label>{$lng.users.affiliate_link}</label>
+	<input name="affiliate_link" size="50" type="text" readonly="readonly" value="{$tmp.affiliate_link}" onClick="javascript:this.form.affiliate_link.focus();this.form.affiliate_link.select();" />
+</div>
+
+
+<div class="fel">
+	<label for="affiliate_paypal_email">{$lng.users.affiliate_paypal_email}<span class="mandatory"> *</span>&nbsp;<a href="javascript:;" class="info_icon tooltip" title="{$lng.users.info.affiliate_paypal_email}">i</a></label>
+	<input type="text" size="30" name="affiliate_paypal_email" id="affiliate_paypal_email"  value="{$tmp.affiliate_paypal_email}" />
+</div>
+
+
+{/if}
+
+{include file="custom_fields_form.html" fields_array=$user_fields user_fields=[] edit=1 type="user"}
+
+{if $tmp.store>0}
+<div class="fel">
+	<label for="store_banner">{$lng.users.store_banner}<span class="mandatory"> *</span><a href="javascript:;" class="info_icon tooltip" title="{$lng.users.info.store_banner}" />i</a></label>
+	<input type="file" name="store_banner" id="store_banner" />
+
+	{if $tmp.store_banner}<a href="{$live_site}/images/store/{$tmp.store_banner}" class="imgfield view_image mbm7">&nbsp;</a>
+	<a href="{$live_site}/account_info.php?delete=store_banner"><img src="{$template_path}images/delete_file.png" class="mbm7 tooltip" title="{$lng.general.delete}"  /></a>
+	{/if}
+
+</div>
+
+{/if}
+
+
+</div> {* end form_container *}
+
+</div>{* end wbg *}
+
+<div class="form_footer">
+<input type="submit" class="button wide_button positive" name="Submit" value="{$lng.general.save}" />
+</div>
+
+</form>
+
+<form name="pass_form" id="pass_form" method="post" action="account_info.php?action=save_pass">
+
+<div class="heading form_heading"><a name="user_pass"></a>{$lng.useraccount.change_password|replace:" ":"&nbsp;"}</div>
+<div class="wbg p30">
+<div class="form_container">
+
+<div id="pass_info" class="info" style="display: none;">
+	<span class="closebtn" onclick='$("#pass_info").hide();'>&times;</span>
+	<span class="content"></span>
+</div>
+
+<div class="fel">
+	<label for="password">{$lng.useraccount.password}<span class="mandatory"> *</span></label>
+	<input type="password" name="password" id="password" size="35" />
+</div>
+
+<div class="fel">
+	<label>{$lng.useraccount.repeat_password}<span class="mandatory"> *</span></label>
+	<input type="password" name="password1" id="password1" size="35" />
+</div>
+
+</div> {* end form_container *}
+
+</div>{* end wbg *}
+
+<div class="form_footer">
+<input type="submit" class="button wide_button positive" name="Submit_password" value="{$lng.general.save}" />
+</div>
+
+</form>
+
+
+
+{if $security_settings.enable_2fa}
+<a id="2fa"></a>
+<form name="2fa_form" id="2fa_form" method="post" action="account_info.php?action=2fa">
+
+<div class="heading form_heading">{$lng.useraccount.2fa|replace:" ":"&nbsp;"}</div>
+<div class="wbg p30">
+<div class="form_container">
+
+{if isset($tfa_info) && $tfa_info}<p class="mb30">{$tfa_info}</p>{/if}
+
+<div id="2fa_info" class="info" style="display: none;">
+	<span class="closebtn" onclick='$("#2fa_info").hide();'>&times;</span>
+	<span class="content"></span>
+</div>
+
+<div class="fel">
+<label for="enable_2fa"><input type="checkbox" name="enable_2fa" id="enable_2fa" {if isset($tmp.enable_2fa) && $tmp.enable_2fa}checked{/if} />&nbsp;{$lng.useraccount.enable_2fa}</label>
+	
+</div>
+
+<div class="fel">
+	<label>{$lng.useraccount.2fa_secret}</label>
+	<input type="text" name="2fa_secret" id="2fa_secret" size="50" readonly {if isset($tmp.2fa_secret) && $tmp.2fa_secret}value="{$tmp.2fa_secret}"{/if} />
+	
+	<a class="med-btn btn-green" href="account_info.php?regenerate_2fa=1">{$lng.general.regenerate}</a>
+		
+	{if isset($tmp.2fa_secret) && $tmp.2fa_secret}
+		<div class="mt10"><img src="{$qr_code_url}" style="border: 1px solid #777;"></div>
+		<div class="information">{$lng.useraccount.info.qr_code}</div>
+	{/if}
+
+	
+</div>
+
+</div> {* end form_container *}
+
+</div>{* end wbg *}
+
+<div class="form_footer">
+<input type="submit" class="button wide_button positive" name="Submit_password" value="{$lng.general.save}" />
+</div>
+
+</form>
+{/if}
+
+{if $settings.users_can_ask_account_removal}
+
+<form name="acc_removal_form" id="acc_removal_form" method="post" action="account_info.php?action=request_removal">
+
+<div class="heading form_heading"><a name="acc_removal"></a>{$lng.useraccount.request_removal|replace:" ":"&nbsp;"}</div>
+<div class="wbg p30">
+<div class="form_container">
+
+{if isset($info_acc_removal)}<p>{$info_acc_removal}</p>{/if}
+
+<div id="removal_info" class="info" style="display: none;">
+	<span class="closebtn" onclick='$("#removal_info").hide();'>&times;</span>
+	<span class="content"></span>
+</div>
+
+</div> {* end form_container *}
+
+</div>{* end wbg *}
+
+<div class="form_footer mb40">
+<input type="submit" class="button wide_button positive" name="Request_removal" value="{$lng.useraccount.request_removal_now}" />
+</div>
+
+</form>
+{/if}
+
+</div>{* end page_bounds *}
+
+
+{include file="js/account_info_js.html"}
+
+{include file="footer.html"}
+{/if}

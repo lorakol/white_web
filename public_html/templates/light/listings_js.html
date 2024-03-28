@@ -1,0 +1,115 @@
+<script type="text/javascript">
+{literal}
+
+$(document).ready(function() {
+
+$("a.fshare").click(function(event){
+	var listing_id = jQuery(this).attr("id").substr(6);
+	$.fancybox({
+		'width'         		: 630,
+		'height'        		: 600,
+		'transitionIn'		: 'none',
+		'transitionOut'		: 'none',
+		'margin'		: '0',
+		'padding'		: '0',
+		'titleShow'		: false,
+	//	'type'			: 'iframe',
+		'href'			: '{/literal}{$live_site}/recommend.php?id={literal}'+listing_id
+	});
+});
+
+$("a.fmailto").click(function(event){
+	var nr = jQuery(this).attr("id").substr(6);
+
+	var arr = nr.split("_");
+	var user_id = arr[0];
+	var listing_id = arr[1];
+
+	$.fancybox({
+		'width'         		: 630,
+		'height'        		: 600,
+		'transitionIn'		: 'none',
+		'transitionOut'		: 'none',
+		'margin'		: '0',
+		'padding'		: '0',
+		'titleShow'		: false,
+		'type'			: 'iframe',
+		'href'			: '{/literal}{$live_site}{literal}/mailto.php?id='+user_id+'&amp;aid='+listing_id
+	});
+});
+
+$("a.addtofav").click(function (event) { 
+	var listing_id = event.target.id.substr(3);
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/include/add_favorite.php?id="+listing_id+"&logged_in={/literal}{$logged_in}{literal}",
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$.fancybox(data, { 'autoDimensions'	: false,
+					'width'         		: 630,
+					'height'        		: 'auto',
+					'transitionIn'		: 'none',
+					'transitionOut'		: 'none',
+					'margin'		: '0',
+					'padding'		: '0'
+				});// end fancybox
+
+				$("#fav"+listing_id).hide();
+				$("#remfav"+listing_id).show();
+
+			} // end data
+		});// end ajax
+
+ })
+
+$("a.remfav").click(function (event) { 
+	var listing_id = event.target.id.substr(6);
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/remove_favorite.php?id="+listing_id+"{literal}",
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$.fancybox(data, { 'autoDimensions'	: false,
+					'width'         		: 630,
+					'height'        		: 'auto',
+					'transitionIn'		: 'none',
+					'transitionOut'		: 'none',
+					'margin'		: '0',
+					'padding'		: '0'
+				});// end fancybox
+
+				$("#fav"+listing_id).show();
+				$("#remfav"+listing_id).hide();
+
+			} // end data
+		});// end ajax
+ })
+
+});
+
+$(window).load(function(){ // fix for safari and chrome setting width and height after the image is loaded
+{/literal}
+{foreach from = $listings_array item=v}
+	{if $v.rented}
+	{literal}
+		$("#rented{/literal}{$v.id}{literal}").show();
+		$("#rented{/literal}{$v.id}{literal}").css({ top: $("#pic{/literal}{$v.id}{literal}").position().top-11, left: $("#pic{/literal}{$v.id}{literal}").position().left+ $("#pic{/literal}{$v.id}{literal}").width()-54});
+	{/literal}
+	{elseif $v.sold}
+	{literal}
+		$("#sold{/literal}{$v.id}{literal}").show();
+		$("#sold{/literal}{$v.id}{literal}").css({ top: $("#pic{/literal}{$v.id}{literal}").position().top-11, left: $("#pic{/literal}{$v.id}{literal}").position().left+ $("#pic{/literal}{$v.id}{literal}").width()-54});
+	{/literal}
+	{/if}
+{/foreach}
+{literal}
+
+});
+
+{/literal}
+
+</script>

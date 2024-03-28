@@ -1,0 +1,38 @@
+{if $comments_settings.categories==0 || in_array($listing.category_id, $comments_settings.categories_array)}
+{if !isset($jqform_included) || !$jqform_included}
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<div class="wait"></div>
+{assign var="jqform_included" value="1"}
+{/if}
+
+{* left col - comments *}
+<div class="col-7">
+<div class="heading6 p10"><span id="no_comments">{$no_comments}</span> {if $no_comments!=1}{$lng_comments.scomments}{else}{$lng_comments.scomment}{/if} {$lng.general.on} {$listing.title}</div>
+<div class="heading_large_under heading6-under"></div>
+
+
+<div id="comments_container">
+
+
+	{foreach from=$comments_array item=v name=cloop}
+	{include file="modules/comments/comment.html"}
+	{/foreach}	
+
+	{if $cm_no_pages>1}
+	{include file="modules/comments/paginator.html"}
+	{/if}
+
+</div> {* end comments_container *}
+
+</div> {* end col-7 *}
+
+{* right col - add comments *}
+<div class="col-5">
+
+<div class="lgbox p20">
+{include file="modules/comments/add_comment.html"}
+</div>
+
+</div>{* end rcomm *}
+<div class="clearfix"></div>
+{/if}

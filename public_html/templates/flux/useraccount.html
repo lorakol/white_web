@@ -1,0 +1,310 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng.useraccount.statistics}</h1></div>
+
+<div class="col-6">
+
+<div class="dark-container2 mb30 stats-box">
+
+<div class="heading">{$lng.stats.general}</div>
+
+{if $no_groups>1}
+
+<div class="adesc">
+	<span>{$lng.useraccount.account_type}</span>
+	{$group.name}
+</div>
+
+{/if}
+
+{if $crt_usr_sett.post_ads}
+<div class="adesc">
+	<span>{$lng.useraccount.total_views}</span>
+	{$total_views}
+</div>
+{/if}
+
+<div class="adesc">
+	<span>{$lng.useraccount.last_login}</span>
+	{if $last_login.date_login_nice}{$last_login.date_login_nice}{else}-{/if}
+</div>
+
+<div class="adesc">
+	<span>{$lng.useraccount.last_login_ip}</span>
+	{if $last_login.ip}{$last_login.ip}{else}-{/if}
+</div>
+
+</div> {* end dark-container2 *}
+
+
+{if $crt_usr_sett.affiliate}
+<div class="dark-container2 mb30 stats-box">
+
+<div class="heading">{$lng.users.affiliate}</div>
+
+<div class="adesc">
+	<span>{$lng.users.affiliate_link}</span>
+	<a href="{$user.affiliate_link}" target="_blank">{$user.affiliate_link}</a>
+</div>
+
+<div class="adesc">
+	<span>{$lng.affiliates.last_payment}</span>
+	{if isset($last_payment.amount) && $last_payment.amount}{$last_payment.amount}{else}-{/if}
+</div>
+
+<div class="adesc">
+	<span>{$lng.affiliates.last_payment_date}</span>
+	{if isset($last_payment.date) && $last_payment.date}{$last_payment.date}{else}-{/if}
+</div>
+
+<div class="adesc">
+	<span>{$lng.affiliates.next_payment_date}</span>
+	{if isset($next_payment_date) && $next_payment_date}{$next_payment_date}{else}-{/if}
+</div>
+
+<div class="adesc">
+	<span>{$lng.affiliates.total_due}</span>
+	{$total_due}&nbsp;&nbsp;<a href="affiliate_revenue.php" class="med-btn btn-green">{$lng.affiliates.revenue_history}</a>
+</div>
+
+<div class="adesc">
+	<span>{$lng.affiliates.total_payments}</span>
+	{$total_payments}&nbsp;&nbsp;<a href="affiliate_payments_history.php" class="med-btn btn-green">{$lng.affiliates.payments_history}</a>
+</div>
+
+{if isset($pending_payment) && $pending_payment}
+<div class="adesc">
+	<span>{$lng.affiliates.pending_payment}</span>
+	{$pending_payment}
+</div>
+{/if}
+
+</div> {* end dark-container2 *}
+{/if}
+
+
+{if $crt_usr_sett.post_ads}
+<div class="dark-container2 mb30 stats-box">
+<div class="heading">{$lng.stats.listings}</div>
+
+
+<div class="adesc">
+	<span>{$lng.useraccount.total_listings}</span>
+	{$no_listings}<a href="my_listings.php" class="lfloat med-btn btn2">{$lng.general.view}</a>
+</div>
+
+<div class="adesc">
+	<span>{$lng.useraccount.active_listings}</span>
+	{$no_active_listings}<a href="my_listings.php?show=active" class="lfloat med-btn btn2">{$lng.general.view}</a>
+</div>
+
+<div class="adesc">
+	<span>{$lng.useraccount.pending_listings}</span>
+	{$no_pending_listings}<a href="my_listings.php?show=pending" class="lfloat med-btn btn2">{$lng.general.view}</a>
+</div>
+
+<div class="adesc">
+	<span>{$lng.useraccount.expired_listings}</span>
+	{$no_expired_listings}<a href="my_listings.php?show=expired" class="lfloat med-btn btn2">{$lng.general.view}</a>
+</div>
+
+</div> {* end dark-container2 *}
+{/if} {* end if post ads *}
+
+</div>{* end col-6 *}
+
+<div class="col-6">
+
+
+{if $crt_usr_sett.post_ads}
+
+{if $subscription_exists}
+<div class="dark-container2 mb30 rstats-box">
+<div class="heading">{$lng.useraccount.subscriptions}</div>
+
+{if !empty($subscriptions) && $subscriptions|@count>1}
+
+<div class="adesc">
+	<span>{$lng.general.active}</span>
+	{$active_subscriptions}<a href="subscriptions.php" class="lfloat med-btn btn2">{$lng.general.view}</a>
+</div>
+
+{if $pending_subscriptions}
+<div class="adesc">
+	<span>{$lng.general.pending}</span>
+	{$pending_subscriptions}<a href="subscriptions.php" class="lfloat med-btn btn2">{$lng.general.view}</a>
+</div>
+{/if}
+
+{if $expired_subscriptions}
+<div class="adesc">
+	<span>{$lng.listings.expired}</span>
+	{$expired_subscriptions}<a href="subscriptions.php" class="lfloat med-btn btn2">{$lng.general.view}</a>
+</div>
+{/if}
+
+{if $inactive_subscriptions}
+<div class="adesc">
+	<span>{$lng.general.inactive}</span>
+	{$inactive_subscriptions}<a href="subscriptions.php" class="lfloat med-btn btn2">{$lng.general.view}</a>
+</div>
+{/if}
+
+{elseif !empty($subscriptions) && $subscriptions|@count==1} {* if subscriptions>1 *}
+
+<div class="adesc">
+	<span>{$subscription.package_name}</span>
+	{$subscription.state}{if $subscription.recurring}, {$lng.useraccount.recurring}{/if}
+
+	{if !$subscription.active && !$subscription.pending && !$subscription.fixed}
+	<div class="lfloat">
+		<a href="useraccount.php?removesub={$subscription.id}" onclick="return myConfirm('{$lng.useraccount.confirm_delete_subscription|addslashes}')" class="med-btn btn2">{$lng.general.remove}</a>
+
+		{if $subscription.expired && !$subscription.recurring && !$subscription.fixed}
+			<a href="subscribe.php?id={$subscription.id}&renew=1" class="med-btn btn-green ml10">{$lng.listings.renew}</a>
+		{/if}
+	</div> {* end lfloat *}
+	{/if}
+</div>
+
+{if $subscription.user_approved}
+
+<div class="adesc">
+	<span>{$lng.useraccount.date_start}</span>
+	{$subscription.date_start_nice}
+</div>
+
+
+{if $subscription.date_renew!='' && $subscription.date_renew_nice}
+<div class="adesc">
+	<span>{$lng.useraccount.date_renew}</span>
+	{$subscription.date_renew_nice}
+</div>
+{/if}
+
+{if $subscription.date_renew!='' && $subscription.date_end_nice}
+<div class="adesc">
+	<span>{$lng.useraccount.date_end}</span>
+	{$subscription.date_end_nice}
+</div>
+{/if}
+
+<div class="adesc">
+	<span>{$lng.useraccount.remaining_ads}</span>
+	{if $subscription.ads_left==-1}{$lng.general.unlimited}{else}{$subscription.ads_left}{/if}
+</div>
+
+{/if} {* end if $subscription.user_approved *}
+
+{/if}{* end if subscriptions>1 *}
+
+<div class="adesc">
+	<span></span>
+	<a href="subscribe.php" class="rfloat med-btn btn-green">{$lng.useraccount.buy_package}</a>
+</div>
+
+</div> {* end dark-container2 *}
+{/if} {* end if post ads *}
+
+{/if}
+
+{if $crt_usr_sett.post_ads && $credits_allowed}
+
+<div class="dark-container2 mb30 rstats-box">
+
+<div class="heading">{$lng.credits.credits}</div>
+
+<div class="adesc">
+	<span>{$lng.credits.current_credits}</span>
+	{$no_credits} {if $no_credits==1}{$lng.credits.credit}{else}{$lng.credits.credits}{/if}
+</div>
+
+{if $pending_credits}
+<div class="adesc">
+	<span>{$lng.credits.pending_credits}</span>
+	{$pending_credits} {if $no_credits==1}{$lng.credits.credit}{else}{$lng.credits.credits}{/if}
+</div>
+{/if}
+
+{if $credits_settings.unit!=1}
+<div class="adesc">
+	<span>{$lng.credits.one_credit_equals}</span>
+	{$credits_settings.unit_curr}
+</div>
+{/if}
+
+{if $no_credits}
+
+<div class="adesc">
+	<span>{$lng.credits.credits_amount}</span>
+	{$credits_amount}
+</div>
+
+{/if}
+
+{if $no_processors}
+
+<div class="adesc">
+	<span>{$lng.credits.credits_amount}</span>
+	<a href="buy_credits.php" class="rfloat med-btn btn-green">{$lng.credits.buy_extra_credits}</a>
+</div>
+
+{/if}
+
+</div> {* end dark-container2 *}
+{/if}
+
+{if $crt_usr_sett.post_ads && $group.store>0}
+
+<div class="dark-container2 mb30 rstats-box">
+
+<div class="heading">{$lng.users.store}</div>
+
+<div class="adesc">
+	<span>{$lng.general.status}</span>
+	{if $user.store}
+		<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+	{elseif isset($user.store_pending) && $user.store_pending}
+		<div class="small-btn pendingbutton icon">{$lng.listings.pending}</div>
+	{else}
+		<div class="small-btn inactivebutton icon">{$lng.listings.inactive}</div>
+	{/if}
+</div>
+
+{if !$user.store}
+<div class="adesc">
+	<span></span>
+	<a href="buy_store.php" class="rfloat med-btn btn-green">{$lng.useraccount.buy_store}</a>
+</div>
+
+{else}
+
+<div class="adesc">
+	<span>{$lng.general.expires}</span>
+	{if $user.store_expires_nice}{$user.store_expires_nice}{else}{$lng.general.never}{/if}
+</div>
+
+<div class="adesc">
+	<span>{$lng.general.link}</span>
+	<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$user.id p2=$user[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$user.id}{/if}" target='_blank'>{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$user.id p2=$user[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$user.id}{/if}</a>
+</div>
+
+{/if} {* end if user store *}
+
+</div>{* end dark-container2 *}
+
+{/if}{* end if group store *}
+
+{if in_array("showcase",$modules_array)}
+	{include file="modules/showcase/useraccount.html"}
+{/if}
+
+
+</div>
+
+<div class="clearfix"></div>
+</div> {* end page_bounds *}
+
+{include file="footer.html"}

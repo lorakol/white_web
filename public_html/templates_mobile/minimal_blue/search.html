@@ -1,0 +1,6 @@
+<div id="search">
+<form name="qsearch" id="qsearch" method="post" action="{$live_site}/listings.php">
+<div><input type="text" id="qsearch_input" name="qs_{$keyword_name}" />{if isset($cat) && $cat}<input type="hidden" name="qs_category" value="{$cat}" />{/if}<input type="image" id="search_button" value="" name="" src="{$template_path}images/search-button.png" /></div><div class="refine"><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.refine}{else}refine.php{/if}"><span class="rbwrapper"><span class="rbleft"><span class="rbright">{$lng.listings.refine}</span></span></span></a></div>
+</form>
+</div>
+<div class="clearfix"></div>

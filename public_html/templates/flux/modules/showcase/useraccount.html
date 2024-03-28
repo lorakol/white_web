@@ -1,0 +1,28 @@
+{if $showcase_allowed==1}
+
+<div class="dark-container2 mb30 rstats-box">
+
+<div class="heading">{$lng_sw.showcase}</div>
+
+<div class="adesc">
+	<span>{$lng.general.status}</span>
+	{if isset($user.showcase) && $user.showcase}
+		<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+	{elseif isset($user.showcase_pending) && $user.showcase_pending}
+		<div class="small-btn pendingbutton icon">{$lng.listings.pending}</div>
+	{else}
+		<div class="small-btn inactivebutton icon">{$lng.listings.inactive}</div>
+	{/if}
+</div>
+
+{if !isset($user.showcase) || !$user.showcase}
+<div class="adesc">
+	<span></span>
+	<a href="modules/showcase/buy_showcase.php" class="rfloat med-btn btn-green">{$lng_sw.buy_showcase}</a>
+</div>
+{/if} {* end if showcase *}
+
+</div>{* end dark-container2 *}
+
+{/if}
+

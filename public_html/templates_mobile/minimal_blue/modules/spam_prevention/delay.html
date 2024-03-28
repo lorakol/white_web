@@ -1,0 +1,127 @@
+<style>
+.white-popup-block {
+	background: #fff;
+	width: 100%;
+	min-height: 300px;
+	padding: 50px 10px;
+	text-align: center;
+	font-size: 1.5em;
+	line-height: 40px;
+	color: #222;
+}
+#delay_minutes, #delay_seconds {
+	color: #3394DE;
+	font-size: 2em;
+}
+
+@media all and (min-width: 800px) {
+	.white-popup-block {
+		width: 75%;
+		min-height: 300px;
+		padding: 100px 30px;
+		margin: 0 auto;
+
+	}
+}
+
+@media all and (min-width: 1200px) {
+	.white-popup-block {
+		width: 50%;
+		min-height: 300px;
+		padding: 100px 50px;
+
+	}
+}
+
+</style>
+<a class="popup-modal" href="#delay-modal" style="display: none">#</a>
+<div id="delay-modal" class="white-popup-block mfp-hide relative">
+	<div style="margin-bottom: 40px;">
+	{$lng.general.you_must_wait}&nbsp;<span id="span_minutes" style="display: none;"><span id="delay_minutes">{$sp_waiting_minutes}</span><span id="minutes">&nbsp;{$lng.minutes}</span><span id="minute">&nbsp;{$lng.minute}</span>,&nbsp;</span><span id="span_seconds" style="display: none;"><span id="delay_seconds">{$sp_waiting_seconds}</span>&nbsp;<span id="seconds">{$lng.seconds}</span><span id="second" style="display: none;">{$lng.second}</span></span>{$lng.general.before_posting}
+	</div>
+	<br/>
+	<br/>
+	<a href="javascript:;" onClick="closePopup();" >{$lng.general.back_to_site}</a>
+</div>
+
+<script>
+
+var red_url = "{$live_site}/";
+
+$(document).ready(function() {
+		
+	$( ".popup-modal" ).trigger( "click" );
+	
+}); // end document ready
+
+	$('.popup-modal').magnificPopup({
+		type: 'inline',
+		preloader: false,
+		focus: '#username',
+		modal: true
+	});
+
+	function closePopup() {
+    window.location.href = red_url;
+ }
+	
+var delay = "{$sp_waiting_time}";
+var delay_minutes = "{$sp_waiting_minutes}";
+var delay_seconds = "{$sp_waiting_seconds}";
+
+displayTime(delay_minutes, delay_seconds);
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+	delay = delay-1;
+	delay_minutes = Math.floor(delay/60)
+	delay_seconds = delay%60;
+  
+	displayTime(delay_minutes, delay_seconds);
+  
+  // If the count down is finished, write some text
+  if (delay <= 0) {
+    clearInterval(x);
+    $.magnificPopup.close();
+    location.reload(true);
+  }
+}, 1000);
+	
+function displayTime(delay_minutes, delay_seconds) {
+
+	if(delay_minutes>0) { 
+		$("#delay_minutes").html(delay_minutes);
+		if(delay_minutes>1) {
+			$("#minutes").show();
+			$("#minute").hide();
+		}
+		else {
+			$("#minutes").hide();
+			$("#minute").show();
+		}
+		$("#span_minutes").show();
+	} // end if delay_minutes
+	else 
+		$("#span_minutes").hide();
+
+	if(delay_seconds>0) { 
+		$("#delay_seconds").html(delay_seconds);
+		if(delay_seconds>1) {
+			$("#seconds").show();
+			$("#second").hide();
+		}
+		else {
+			$("#seconds").hide();
+			$("#second").show();
+		}
+		$("#span_seconds").show();
+	}
+	else 
+		$("#span_seconds").hide();
+
+}
+
+</script>
+
+

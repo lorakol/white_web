@@ -1,0 +1,63 @@
+<script>
+{literal}
+$(document).ready(function() {
+
+	$(".error").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+			$("body").removeClass("loading"); 
+
+			if(ret.response==1) {
+
+				if(parent.$.magnificPopup) {
+
+					// close window and redirect parent to the proper page
+					parent.location.href = ret.redirect;
+					parent.$.magnificPopup.instance.close();
+
+				} 
+				else window.location.href = ret.redirect;
+				return;
+			}
+
+			// blocked failed attempt
+			if(ret.response==-1) {
+
+				if(parent.$.magnificPopup) {
+
+					// close window and redirect parent to the proper page
+					parent.location.href = "index.php";
+					parent.$.magnificPopup.instance.close();
+
+				} 
+				else window.location.href = "index.php";
+				return;
+
+			}
+			
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+
+			{/literal}{if $settings.login_captcha && $settings.enable_recaptcha}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+ $('#login_form').ajaxForm(options);
+
+});
+{/literal}
+</script>

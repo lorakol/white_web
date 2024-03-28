@@ -1,0 +1,24 @@
+{include file="header.html"}
+
+<div id="stats">
+
+<h2>{$lng.stats.general}</h2>
+	<div><span>{$lng.useraccount.account_type}</span>{$group.name}</div>
+	<div><span>{$lng.users.affiliate_link}</span><a href="{$user.affiliate_link}" target="_blank">{$user.affiliate_link}</a></div>
+	<div><span>{$lng.useraccount.last_login}</span>{if isset($last_login.date_login_nice) && $last_login.date_login_nice}{$last_login.date_login_nice}{else}-{/if}</div>
+
+
+	<div><span>{$lng.useraccount.last_login_ip}</span>{if isset($last_login.ip) && $last_login.ip}{$last_login.ip}{else}-{/if}</div>
+	<div><span>{$lng.affiliates.last_payment}</span>{if isset($last_payment.amount) && $last_payment.amount}{$last_payment.amount}{else}-{/if}</div>
+	<div><span>{$lng.affiliates.last_payment_date}</span>{if isset($last_payment.date) && $last_payment.date}{$last_payment.date}{else}-{/if}</div>
+	<div><span>{$lng.affiliates.next_payment_date}</span>{if isset($next_payment_date) && $next_payment_date}{$next_payment_date}{else}-{/if}</div>
+
+	<div><span>{$lng.affiliates.total_due}</span>{$total_due}&nbsp;<a href="affiliate_revenue.php">[ {$lng.affiliates.revenue_history} ]</a></div>
+	<div><span>{$lng.affiliates.total_payments}</span>{$total_payments}&nbsp;<a href="affiliate_payments_history.php">[ {$lng.affiliates.payments_history} ]</a></div>
+	{if isset($pending_payment) && $pending_payment}
+	<div><span>{$lng.affiliates.pending_payment}</span>{$pending_payment}</div>
+	{/if}
+
+</div>
+
+{include file="footer.html"}

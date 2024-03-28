@@ -1,0 +1,23 @@
+	{include file="data/ui.html"}
+	<script type="text/javascript">
+
+	{literal}
+	setTimeout(function() {
+
+		$('#qs_{/literal}{$v.caption}_low_vis{literal}').datepicker({
+			dateFormat: "{/literal}{$v.date_format}{literal}",
+			changeMonth: true,
+			changeYear: true,
+			altField: '#qs_{/literal}{$v.caption}_low{literal}', altFormat: 'yy-mm-dd'
+		});
+
+		$('#qs_{/literal}{$v.caption}_high_vis{literal}').datepicker({
+			dateFormat: "{/literal}{$v.date_format}{literal}",
+			changeMonth: true,
+			changeYear: true,
+			altField: '#qs_{/literal}{$v.caption}_high{literal}', altFormat: 'yy-mm-dd'
+		});
+	}, 1000);
+
+	{/literal}
+	</script>

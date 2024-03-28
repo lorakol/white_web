@@ -1,0 +1,92 @@
+{include file="header.html"}
+
+<div class="heading"><h1>{$lng.useraccount.order_history}</h1></div>
+
+<div id="browse">
+
+<form name="search" method="post" action="{$self}?no_per_page={$no_per_page}">
+	<input type="hidden" name="page_hidden" value="{$page}" />
+	<input type="hidden" name="search_hidden" value="{if isset($search)}{$search}{/if}" />
+	<input type="hidden" name="order_hidden" value="{$order}" />
+	<input type="hidden" name="order_way_hidden" value="{$order_way}" />
+	<input type="hidden" name="no_per_page" value = "{$no_per_page}" />
+
+{include file="paginator.html"}
+
+<div style="float: left">
+	<select name="order_Sel" onchange="doSel(this);">
+		<option value="location.href='{$order_by_link|replace:'##order##':'date'}'" {if $order=='date'}selected="selected"{/if}>
+		{$lng.order_history.order_by_date}</option>
+		<option value="location.href='{$order_by_link|replace:'##order##':'amount'}'" {if $order=='amount'}selected="selected"{/if}>
+		{$lng.order_history.order_by_amount}</option>
+		<option value="location.href='{$order_by_link|replace:'##order##':'processor'}'" {if $order=='processor'}selected="selected"{/if}>
+		{$lng.order_history.order_by_processor}</option>
+
+	</select>
+
+	<select name="order_way_sel" onchange="doSel(this);">
+
+		<option value="location.href='{$order_way_link|replace:'##order_way##':'desc'}'" {if $order_way=='desc'}selected="selected"{/if}>{$lng.general.desc}</option>
+		<option value="location.href='{$order_way_link|replace:'##order_way##':'asc'}'" {if $order_way=='asc'}selected="selected"{/if}>{$lng.general.asc}</option>
+
+	</select>
+</div>
+<div style="float: right">
+	<input type="text" name="id" size="6" value="{$lng.listings.id}" onfocus="if(this.value=='{$lng.listings.id}') this.value=''" onblur="if(this.value=='') this.value='{$lng.listings.id}'">&nbsp;
+
+<div class="buttons" >
+	<strong><input type="submit" name="Search" value="{$lng.general.search}" /></strong>
+</div>
+<div class="clearfix"></div>
+
+</div>
+
+<table cellpadding="0" cellspacing="0" align="center" width="100%" id="nicetable"> 
+<tr id="tab_header">
+	<td width="30">{$lng.listings.id}</td>
+	<td>{$lng.order_history.processor}</td>
+	<td>{$lng.order_history.amount}</td>
+	<td>{$lng.order_history.completed}</td>
+	{if $invoice_settings.enable_invoices}
+	<th width="40">{$lng.invoice.invoice}</th>
+	{/if}
+	<td>{$lng.order_history.details}</td>
+	<td>{$lng.order_history.date}</td>
+</tr>
+
+{foreach from=$actions_array item=v}
+<tr class="{cycle values="nicetablerow_even,nicetablerow_odd"}">
+	<td>#{$v.invoice}</td>
+	<td align="center"><b>{$v.processor_title}</b></td>
+	<td align="center" class="price">{$v.amount_nice}</td>
+	<td align="center">{if $v.completed}{$lng.order_history.completed}{else}{$lng.order_history.not_completed}{/if}{if !$v.completed && $v.processor!='manual'}&nbsp;<a href="complete_payment.php?id={$v.invoice}">[ {$lng.order_history.complete_payment} ]</a>{/if}</td>
+	{if $invoice_settings.enable_invoices}
+	<td>{if $v.invoice_id}<a href="{$live_site}/include/generate_invoice.php?id={$v.invoice_id}"><img src="{$template_path}images/download.png" /></a>{/if}</td>
+	{/if}
+	<td>{$v.action_str}</td>
+	<td align="center">{$v.date_nice}</td>
+</tr>
+{/foreach}
+
+{if $no_actions==0}
+	<tr class="nicetablerow_even">
+	<td colspan="6" align="center">{$lng.order_history.no_actions}</td></tr>
+{/if}
+</table>
+</form>
+
+{if $no_actions}{include file="paginator.html"}<br/>{/if}
+
+<div class="no_per_page">
+	{$lng.general.show}
+	<select name="no_per_page_sel" onchange="doSel(this);">
+		{section name=pg loop=60 start=10 step=10}
+		<option value="location.href='{$crt_page_link}&no_per_page={$smarty.section.pg.index}'" {if $no_per_page==$smarty.section.pg.index} selected="selected" {/if}>{$smarty.section.pg.index}</option>
+		{/section}
+	</select>
+	{$lng.general.on_a_page}
+</div>
+
+<br/>
+</div>
+{include file="footer.html"}

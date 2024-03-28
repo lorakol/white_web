@@ -1,0 +1,301 @@
+{if $step==1}
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{if isset($error)}{$error}{/if}</p></div>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div id="form_container">
+<h1>{$lng.credits.buy_extra_credits}</h1>
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function () {
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { var queryString = $.param(formData); return true;  },
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1) {
+
+				// go to payment page
+				var selected_processor = $('#selected_processor').val();
+
+				$("#payment").html(ret.payment_form);
+
+				if(selected_processor=="iyzico") {
+				    $("body").removeClass("loading");
+				}
+				else 
+				if(selected_processor=="klarna") {
+					$("body").removeClass("loading");
+					$("#payment").slideDown();
+					$('html,body').animate({scrollTop:$("#payment").offset().top}, 'slow');
+					$(".form_footer").hide();
+				}
+				else if(selected_processor=="stripe") {
+					$("#Submit").attr("disabled", "disabled");
+					setTimeout(function(){ $( ".stripe-button-el" ).trigger("click"); }, 2000);
+				}
+				else 
+					$("#payment_form").submit();
+
+				return;
+			}
+
+			// response = 0 -> show the error
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+
+			$("body").removeClass("loading"); 
+
+} 
+
+//initialize the AJAX form
+ $('#buy_credits').ajaxForm(options);
+
+$(document).on("click", ".select_plan", function(){ 
+
+	// get current selected plan
+	var plan_no = parseInt(jQuery(this).attr("id").substr(11));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var plan_no = split_res[0];
+	var plan_name = split_res[1];
+	var plan_price = split_res[2];
+
+	// set value for selected plan
+	$("#plan").val(plan_no);
+	// change button style
+	$(".select_plan").attr('class', "select_plan gray");
+	$("#select_plan"+plan_no).attr('class', "select_plan");
+
+	$("#plans").slideUp();
+
+	$("#plan_selected span.tag").html(plan_name+" ( "+plan_price+" )");
+	$("#plan_selected").slideDown();
+
+	loadPayment( plan_no);
+	reinit();
+
+}); // end select_plan click
+
+$(document).on("click", "#change_plan", function(){ 
+
+	// empty plan value
+	$("#plan").val(0);
+
+	// show plans box
+	$("#plan_selected").slideUp();
+	$("#plans").slideDown();
+
+	// hide payment_details form
+	$("#payment_details").html("");
+	$("#payment_details").show();
+
+}); // end change plan
+
+}); // end document ready
+
+
+function loadPayment (plan_no) {
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/buy_credits.php?step=2&plan="+plan_no,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#payment_details").html(data);
+		}// end data
+	}); // end ajax
+
+}
+
+{/literal}
+
+{if $only_plan}
+loadPayment ({$only_plan});
+{/if}
+</script>
+
+<div class="form_content">
+<form name="buy_credits" id="buy_credits" action="buy_credits.php?step=3" method="post">
+
+	<input type="hidden" name="plan" id="plan" value="{if isset($only_plan) && $only_plan}{$only_plan}{/if}" />
+
+{if $credits_packages|@count>1}
+
+<div id="plans" style="width: 100%; margin: auto;" >
+
+<table width="100%" align="center" cellspacing="10" id="plans-equal">
+	<tr>
+	{foreach from=$credits_packages item=v name=package}
+	<td width="33%" valign="top">
+		<div class="plan">
+		<h2>{$v.name}</h2>
+		<div style="margin: 10px; text-align: center; font-weight: bold;">{$v.no_credits} {$lng.credits.credits}</div>
+		<div class="price">{$v.price_curr}<br/><br/></div>
+		
+
+		<div class="dcenter"><div class="form_button" ><strong><a href="javascript:;" class="select_plan gray" id="select_plan{$v.id}" alt="{$v.id}^{$v.name}^{$v.price_curr}">{$lng.credits.select_package}</a></strong></div></div>
+
+		</div>
+
+	</td>
+	{if $smarty.foreach.package.index%3==2 && $smarty.foreach.package.index!=$no_packages}
+    </tr>
+    <tr>
+	{/if}
+	{/foreach}
+	</td></tr>
+    </table>
+
+</div>
+{/if} {* end if credits_packages *}
+	<br/>
+
+	<div class="dcenter eop" id="plan_selected" {if !isset($only_plan) || !$only_plan}style="display: none;"{/if}>
+
+	<div style="text-align: left;">{$lng.credits.credits_package}: <span class="tag">{$plan_name} ({$plan_price})</span></div>
+	{if !isset($only_plan) || !$only_plan}<div class="form_button">
+		<strong><a id="change_plan" class="gray" href="javascript:;">{$lng.listings.change_plan}</a></strong>
+	</div>
+	{/if}
+
+	</div>
+	<div id="payment_details"></div>
+
+</form>
+
+<div id="payment" style="display: none;"></div>
+
+</div>
+</div>{* end form_container *}
+{include file="footer.html"}
+
+{/if} {* end step1 *}
+
+{if $step==2}
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{$error}</p></div>
+{if !$error}
+	<input type="hidden" name="full_total" id="full_total" value="{$total}"/>
+
+	{if $enable_coupons}
+	<div class="dcenter eop topnoborder" id="div_discount" {if !$total}style="display: none;"{/if}>
+		<div class="left_div">{$lng.listings.enter_coupon} :</div>
+		<div class="right_div"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" value="{if isset($discount_code)}{$discount_code}{/if}"/></div>
+	</div>
+	{/if}
+
+	<div class="dcenter eop topnoborder" id="div_total" {if !$total}style="display: none;"{/if}>
+
+	{if $no_processors>1}
+
+	<div class="left_div">{$lng.listings.choose_payment_method} :</div>
+	<div class="right_div">
+	{foreach from=$payment_processors name=pp item=v}
+	<label class="enh_radio chk_container">
+	<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+
+	<div class="chk_indicator"></div>
+	</label>
+	{/foreach}
+	</div>
+	{else}
+	<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+	<div class="left_div">{$lng.subscribe.payment_method}:</div>
+	<div class="right_div">{$payment_processors[0].processor_title}</div>
+
+	{/if}
+	<input type="hidden" id="selected_processor" value="{$payment_processors[0].processor_code}"/>
+	</div>
+
+	<br/>
+
+	<div class="dcenter eop" style="text-align: right">
+	{$lng.listings.total}: <b>
+	{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+	</div>
+
+	<div class="dcenter eop topnoborder" id="tax_info" style="display: none;" style="text-align: right">
+	<b>{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;):</b> <b><span id="tax"></span></b>
+	</div>
+
+	<div class="dcenter eop topnoborder" id="total_with_tax_info" style="display: none;" style="text-align: right">
+	<b>{$lng.general.total_with_tax}:&nbsp;<span class="price" id="total_with_tax"></span></b>
+	</div>
+
+	<br/>
+	<br/>
+
+	<div class="dcenter form_footer">
+	<div class="buttons">
+		<span class="positive"><input type="submit" name="Submit" value="{$lng.general.submit}" /></span>
+	</div>
+	</div>
+	<div class="clearfix"></div>
+
+{literal}
+<script type="text/javascript">
+$(document).ready(function() {
+
+	// *********** tax value **************
+	{/literal}
+
+	{if $no_processors>1}
+	only_processor = 0;
+	{else}
+	only_processor = 1;
+	{/if}
+
+	{if $total}
+
+	if(only_processor)
+		var processor = $('input[name=processor]').val();
+	else 
+		var processor = $('input:radio[name=processor]:checked').val();		
+
+	var total = $("#full_total").val();
+	calculateTax(processor, total);
+
+
+	{/if} {* end if total *}
+
+	{literal}
+
+
+	$('input:radio[name=processor]').change(function() { 
+
+		processor = $('input:radio[name=processor]:checked').val();
+		calculateTax(processor, $("#full_total").val());
+
+		// for embedded payments
+		$("#selected_processor").val(processor);
+		reinit();
+
+	})
+
+	// end tax value
+
+
+});
+</script>
+{/literal}
+{/if} {* end if error *}
+
+
+{/if}

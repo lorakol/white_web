@@ -1,0 +1,66 @@
+<div class="classified relative">
+
+{capture name=some_content assign=dealer_url}
+{if $v.store}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$v.id p2=$v.contact_name}{else}{$live_site}/store.php?id={$v.id}{/if}
+{else}
+{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=$v.id p2=$v.contact_name}{else}{$live_site}/user_listings.php?id={$v.id}{/if}
+{/if}
+{/capture}
+
+	{if $dealers_page_settings.logo_field && $v[$dealers_page_settings.logo_field]}
+	<div class="lfloat">
+	<a href="{$dealer_url}">
+	<img src="{$live_site}{if $dealers_page_settings.logo_field=="store_banner"}/images/store/{$v[$dealers_page_settings.logo_field]}{else}/uploads/{$dealers_page_settings.logo_field}/{$v[$dealers_page_settings.logo_field]}{/if}" class="pic" alt="{$v[$dealers_page_settings.name_field]}" />
+	</a>
+	</div>{* end lfloat *}
+	{/if}
+
+	<div class="lfloat {if $dealers_page_settings.logo_field && $v[$dealers_page_settings.logo_field]}lpdiv1{/if}">
+		<div class="clearfix">
+
+		{* contact name *}
+		<a href="{$dealer_url}"><div class="title heading lfloat">{$v[$dealers_page_settings.name_field]}</div></a>
+
+		{* ratings *}
+		{if in_array("ratings",$modules_array)}
+		<div class="inline lpdiv2" style="width: 100px; line-height: 45px;">{include file="modules/ratings/stars.html"}</div>
+		{/if}
+
+		<div class="clearfix"></div>
+
+		{* special fields first *}
+		{foreach $dealers_page_settings.phone_fields_array as $ph}
+		{if !empty($v[$ph])}
+		<div class="clearfix mb10">
+		<div class="phone_icon"></div><span class="span_phone" id="span_{$ph}_{$v.id}">{$v[$ph]|substr:0:2}********</span><a class="ml20 med-btn btn2 show_phone" href="javascript:;" id="show|{$ph}|{$v.id}">{$lng.listings.show_phone}</a>
+		</div>
+		{/if}
+		{/foreach}
+		
+		{foreach $dealers_page_settings.whatsapp_fields_array as $wh}
+		{if !empty($v[$wh])}
+		<div class="clearfix mb10">
+		<div class="whatsapp_icon"></div><span class="span_phone" id="span_{$wh}_{$v.id}">{$v[$wh]|substr:0:2}********</span><a class="ml20 med-btn btn2 show_phone" href="javascript:;" id="show|{$wh}|{$v.id}">{$lng.listings.show_whatsapp}</a>
+		</div>
+		{/if}
+		{/foreach}
+		
+		{* extra fields *}
+		{foreach from=$dealers_page_settings.details_fields_array item=t}
+			{if !empty($v[$t]) && !in_array($t, $dealers_page_settings.phone_fields_array) && !in_array($t, $dealers_page_settings.whatsapp_fields_array)}<div><span class="light">{$field_names[$t]}: </span>{$v[$t]}</div>{/if}
+		{/foreach}
+
+		</div>
+
+
+
+	</div> {* end lpdiv1 *}
+{if $v.no_listings}
+<a href="{$dealer_url}"><div class="rfloat rbaligned mb20 med-btn btn2">{$v.no_listings}&nbsp;{if $v.no_listings>1}{$lng.stats.listings}{else}{$lng.listings.listing}{/if}</div></a>
+{/if}
+
+<div class="clearfix"></div>
+
+</div> {* end classified *}
+{*<div class="clearfix"></div> *}

@@ -1,0 +1,86 @@
+
+{literal}
+<script>
+//<![CDATA[
+
+$(document).on("click", ".delcomm", function(event){ 
+
+	var listing_id="{/literal}{$id}{literal}";
+	var id = parseInt(jQuery(this).attr("id").substr(7));
+
+	$.ajax({
+		type: "GET",
+		url: "{/literal}{$live_site}{literal}/modules/comments/actions.php",
+		data: { action: "delete", id: id, lid: listing_id}
+	})
+	.done(function( responseText ) {
+		$("#comment"+id).remove();
+
+	});
+	
+	
+});
+
+$(document).on("click", ".editcomm", function(event){ 
+
+	var id = parseInt(jQuery(this).attr("id").substr(8));
+	var listing_id="{/literal}{$id}{literal}";
+
+	$.ajax({
+		type: "GET",
+		url: "{/literal}{$live_site}{literal}/modules/comments/get_edit.php",
+		data: { id: id, lid: listing_id}
+	})
+	.done(function( responseText ) {
+		
+		var content = JSON.parse(responseText);
+		$("#comment"+id).html(content);
+
+	});
+	
+});
+
+$(document).on("click", ".enablecomm", function(event){ 
+
+	var id = parseInt(jQuery(this).attr("id").substr(10));
+	var listing_id="{/literal}{$id}{literal}";
+
+	$.ajax({
+		type: "GET",
+		url: "{/literal}{$live_site}{literal}/modules/comments/actions.php",
+		data: { action: "enable", id: id, lid: listing_id}
+	})
+	.done(function( responseText ) {
+		
+		$("#enablecomm"+id).hide();
+		$("#disablecomm"+id).show();
+		$("#disablecomm"+id).css("display", "inline");
+		$("#comment"+id).removeClass("disabled");
+
+	});
+	
+});
+
+$(document).on("click", ".disablecomm", function(event){ 
+
+	var id = parseInt(jQuery(this).attr("id").substr(11));
+	var listing_id="{/literal}{$id}{literal}";
+
+	$.ajax({
+		type: "GET",
+		url: "{/literal}{$live_site}{literal}/modules/comments/actions.php",
+		data: { action: "disable", id: id, lid: listing_id}
+	})
+	.done(function( responseText ) {
+		
+		$("#enablecomm"+id).show();
+		$("#disablecomm"+id).hide();
+		$("#enablecomm"+id).css("display", "inline");
+		$("#comment"+id).addClass("disabled");
+
+	});
+	
+});
+
+</script>
+{/literal}

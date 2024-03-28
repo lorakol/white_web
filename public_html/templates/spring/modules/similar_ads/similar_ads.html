@@ -1,0 +1,63 @@
+<!-- SIMILAR ADS --> 	
+	<div class="clearfix"></div>
+	{capture name=some_content assign=title_field}title_{$crt_lang}{/capture}
+	<div id="similar">
+		<h2 class="head1">{$similar_ads[$title_field]}</h2>
+
+		{capture name=some_content assign=item_width}{math equation="(w-w1)/no" w=$appearance.outer_table w1=100 no=$similar_ads.no_ads_on_row}{/capture}
+		<div class="similar">
+
+		<!-- root element for the items -->
+		{section name=loop start=0 loop=$no_similar step=1}
+
+			{if $smarty.section.loop.index < $no_similar-1 && $smarty.section.loop.index > 0 && $smarty.section.loop.index%$similar_ads.no_ads_on_row==0}
+
+			</div>
+			<div class="clearfix"><br/></div>
+			<div class="similar">
+			{/if}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$similar[loop].id p2=$similar[loop].title}{else}{$live_site}/details.php?id={$similar[loop].id}{/if}{/capture}
+
+			<div class="item{if $smarty.section.loop.index%$similar_ads.no_ads_on_row==$similar_ads.no_ads_on_row-1}-nosep{/if}" style="width: {$item_width}px">
+				<div class="box-image">
+				<a href="{$details_url}"><img class="pic" id="spic{$similar[loop].id}" src="{$live_site}/{$similar[loop].image}" alt="{if $similar[loop].image_id}{$similar[loop].title|strip_tags:false|substr:0:100}{/if}" /></a>
+				{if $similar[loop].rented && $ads_settings.enable_rented}<div class="rented" id="rented{$similar[loop].id}" style="display: none;"></div>{elseif $similar[loop].sold && $ads_settings.enable_sold}<div class="sold" id="sold{$similar[loop].id}" style="display: none;"></div>{/if}
+				</div>
+
+				<h3>{if $data_set=="cars" && ($similar[loop].make || $similar[loop].model)}<a href="{$details_url}">{$similar[loop].make} {$similar[loop].model}</a>{else}<a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$similar[loop].title|mb_truncate:21:"...":"UTF-8"}{else}{$similar[loop].title|truncate:21:"...":false}{/if}</a>{/if}</h3>
+
+				{$similar[loop].location_str}
+
+				{if $ads_settings.enable_price && $similar[loop].price>=0}<div class="price">{$similar[loop].price_curr}</div>
+				{/if}
+			</div>
+		{/section}
+
+
+		</div> {* end similar *}
+
+</div>
+<br/>
+<!-- END SIMILAR ADS -->
+<script type="text/javascript">
+{literal}
+$(window).load(function(){
+{/literal}
+{foreach from = $similar item=v}
+	{if $v.rented}
+	{literal}
+		$("#rented{/literal}{$v.id}{literal}").show();
+		$("#rented{/literal}{$v.id}{literal}").css({ top: $("#spic{/literal}{$v.id}{literal}").position().top-11, left: $("#spic{/literal}{$v.id}{literal}").position().left+ $("#spic{/literal}{$v.id}{literal}").width()-54});
+	{/literal}
+	{elseif $v.sold}
+	{literal}
+		$("#sold{/literal}{$v.id}{literal}").show();
+		$("#sold{/literal}{$v.id}{literal}").css({ top: $("#spic{/literal}{$v.id}{literal}").position().top-11, left: $("#spic{/literal}{$v.id}{literal}").position().left+ $("#spic{/literal}{$v.id}{literal}").width()-54});
+	{/literal}
+	{/if}
+{/foreach}
+{literal}
+});
+{/literal}
+</script>

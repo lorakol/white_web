@@ -1,0 +1,712 @@
+%PDF-1.3
+1 0 obj
+<< /Type /Catalog
+/Outlines 2 0 R
+/Pages 3 0 R >>
+endobj
+2 0 obj
+<< /Type /Outlines /Count 0 >>
+endobj
+3 0 obj
+<< /Type /Pages
+/Kids [6 0 R
+10 0 R
+21 0 R
+23 0 R
+25 0 R
+]
+/Count 5
+/Resources <<
+/ProcSet 4 0 R
+/Font << 
+/F1 8 0 R
+/F2 9 0 R
+/F3 12 0 R
+>>
+>>
+/MediaBox [0.000 0.000 595.280 841.890]
+ >>
+endobj
+4 0 obj
+[/PDF /Text ]
+endobj
+5 0 obj
+<<
+/Producer (dompdf + CPDF)
+/CreationDate (D:20170331173513+00'00')
+/ModDate (D:20170331173513+00'00')
+/Title (OxyClassifieds Installation Handbook)
+>>
+endobj
+6 0 obj
+<< /Type /Page
+/MediaBox [0.000 0.000 595.280 841.890]
+/Parent 3 0 R
+/Contents 7 0 R
+>>
+endobj
+7 0 obj
+<<
+/Length 9035 >>
+stream
+
+0.000 0.000 0.000 rg
+BT 34.016 768.985 Td /F1 24.0 Tf  [(OxyClassifieds Installation Handbook)] TJ ET
+BT 34.016 730.095 Td /F1 18.0 Tf  [(Script Requirements)] TJ ET
+BT 34.016 699.473 Td /F2 12.0 Tf  [(In order to properly install and run the script you will need a webhosting account or a dedicated server that )] TJ ET
+BT 34.016 685.217 Td /F2 12.0 Tf  [(runs:)] TJ ET
+0.000 0.000 0.000 RG
+57.816 662.066 m 
+57.816 662.616 57.589 663.162 57.201 663.551 c
+56.812 663.940 56.266 664.166 55.716 664.166 c
+55.166 664.166 54.620 663.940 54.231 663.551 c
+53.842 663.162 53.616 662.616 53.616 662.066 c
+53.616 661.516 53.842 660.970 54.231 660.581 c
+54.620 660.193 55.166 659.966 55.716 659.966 c
+56.266 659.966 56.812 660.193 57.201 660.581 c
+57.589 660.970 57.816 661.516 57.816 662.066 c f s
+BT 64.016 658.961 Td /F1 12.0 Tf  [(Unix / Linux / Windows)] TJ ET
+57.816 647.810 m 
+57.816 648.360 57.589 648.906 57.201 649.295 c
+56.812 649.684 56.266 649.910 55.716 649.910 c
+55.166 649.910 54.620 649.684 54.231 649.295 c
+53.842 648.906 53.616 648.360 53.616 647.810 c
+53.616 647.260 53.842 646.714 54.231 646.325 c
+54.620 645.937 55.166 645.710 55.716 645.710 c
+56.266 645.710 56.812 645.937 57.201 646.325 c
+57.589 646.714 57.816 647.260 57.816 647.810 c f s
+BT 64.016 644.705 Td /F1 12.0 Tf  [(PHP 5.2 or higher)] TJ ET
+57.816 633.554 m 
+57.816 634.104 57.589 634.650 57.201 635.039 c
+56.812 635.428 56.266 635.654 55.716 635.654 c
+55.166 635.654 54.620 635.428 54.231 635.039 c
+53.842 634.650 53.616 634.104 53.616 633.554 c
+53.616 633.004 53.842 632.458 54.231 632.069 c
+54.620 631.681 55.166 631.454 55.716 631.454 c
+56.266 631.454 56.812 631.681 57.201 632.069 c
+57.589 632.458 57.816 633.004 57.816 633.554 c f s
+BT 64.016 630.449 Td /F1 12.0 Tf  [(MySQL Database 4.0 or higher)] TJ ET
+57.816 619.298 m 
+57.816 619.848 57.589 620.394 57.201 620.783 c
+56.812 621.172 56.266 621.398 55.716 621.398 c
+55.166 621.398 54.620 621.172 54.231 620.783 c
+53.842 620.394 53.616 619.848 53.616 619.298 c
+53.616 618.748 53.842 618.202 54.231 617.813 c
+54.620 617.425 55.166 617.198 55.716 617.198 c
+56.266 617.198 56.812 617.425 57.201 617.813 c
+57.589 618.202 57.816 618.748 57.816 619.298 c f s
+BT 64.016 616.193 Td /F1 12.0 Tf  [(GD Library)] TJ ET
+57.816 605.042 m 
+57.816 605.592 57.589 606.138 57.201 606.527 c
+56.812 606.916 56.266 607.142 55.716 607.142 c
+55.166 607.142 54.620 606.916 54.231 606.527 c
+53.842 606.138 53.616 605.592 53.616 605.042 c
+53.616 604.492 53.842 603.946 54.231 603.557 c
+54.620 603.169 55.166 602.942 55.716 602.942 c
+56.266 602.942 56.812 603.169 57.201 603.557 c
+57.589 603.946 57.816 604.492 57.816 605.042 c f s
+BT 64.016 601.937 Td /F1 12.0 Tf  [(IonCube Encoder)] TJ ET
+BT 34.016 575.681 Td /F2 12.0 Tf  [(These features are available on almost any webhosting server. Still, before purchasing a hosting plan make )] TJ ET
+BT 34.016 561.425 Td /F2 12.0 Tf  [(sure that your hosting company supports those features.)] TJ ET
+BT 34.016 535.169 Td /F2 12.0 Tf  [(Other requirements:)] TJ ET
+57.816 512.018 m 
+57.816 512.568 57.589 513.114 57.201 513.503 c
+56.812 513.892 56.266 514.118 55.716 514.118 c
+55.166 514.118 54.620 513.892 54.231 513.503 c
+53.842 513.114 53.616 512.568 53.616 512.018 c
+53.616 511.468 53.842 510.922 54.231 510.533 c
+54.620 510.145 55.166 509.918 55.716 509.918 c
+56.266 509.918 56.812 510.145 57.201 510.533 c
+57.589 510.922 57.816 511.468 57.816 512.018 c f s
+BT 64.016 508.913 Td /F2 12.0 Tf  [(If you want to use SEO friendly URLs in your site, your server must support )] TJ ET
+BT 434.648 508.913 Td /F1 12.0 Tf  [(mod_rewrite)] TJ ET
+BT 500.624 508.913 Td /F2 12.0 Tf  [(. Usually, )] TJ ET
+BT 64.016 494.657 Td /F2 12.0 Tf  [(all servers running Apache have this option enabled.)] TJ ET
+57.816 483.506 m 
+57.816 484.056 57.589 484.602 57.201 484.991 c
+56.812 485.380 56.266 485.606 55.716 485.606 c
+55.166 485.606 54.620 485.380 54.231 484.991 c
+53.842 484.602 53.616 484.056 53.616 483.506 c
+53.616 482.956 53.842 482.410 54.231 482.021 c
+54.620 481.633 55.166 481.406 55.716 481.406 c
+56.266 481.406 56.812 481.633 57.201 482.021 c
+57.589 482.410 57.816 482.956 57.816 483.506 c f s
+BT 64.016 480.401 Td /F2 12.0 Tf  [(To be able to generate PDF invoices there are some additional requirements: )] TJ ET
+BT 434.612 480.401 Td /F1 12.0 Tf  [(PHP version 5.3)] TJ ET
+BT 516.944 480.401 Td /F2 12.0 Tf  [( or )] TJ ET
+BT 64.016 466.145 Td /F2 12.0 Tf  [(higher, )] TJ ET
+BT 100.676 466.145 Td /F1 12.0 Tf  [(DOM extension)] TJ ET
+BT 181.004 466.145 Td /F2 12.0 Tf  [( and )] TJ ET
+BT 204.332 466.145 Td /F1 12.0 Tf  [(MBString extension)] TJ ET
+BT 306.668 466.145 Td /F2 12.0 Tf  [(.)] TJ ET
+BT 34.016 431.247 Td /F1 18.0 Tf  [(Script Installation)] TJ ET
+BT 34.016 398.687 Td /F1 14.0 Tf  [(Free installation)] TJ ET
+BT 34.016 371.946 Td /F2 12.0 Tf  [(If you prefer us to make the installation for you, you can skip this part. Instead, please check below the list )] TJ ET
+BT 34.016 357.690 Td /F2 12.0 Tf  [(with information that we will need from you in order to make the script installation.)] TJ ET
+57.816 334.539 m 
+57.816 335.089 57.589 335.635 57.201 336.024 c
+56.812 336.412 56.266 336.639 55.716 336.639 c
+55.166 336.639 54.620 336.412 54.231 336.024 c
+53.842 335.635 53.616 335.089 53.616 334.539 c
+53.616 333.989 53.842 333.443 54.231 333.054 c
+54.620 332.665 55.166 332.439 55.716 332.439 c
+56.266 332.439 56.812 332.665 57.201 333.054 c
+57.589 333.443 57.816 333.989 57.816 334.539 c f s
+BT 64.016 331.434 Td /F2 12.0 Tf  [(Domain name)] TJ ET
+57.816 320.283 m 
+57.816 320.833 57.589 321.379 57.201 321.768 c
+56.812 322.156 56.266 322.383 55.716 322.383 c
+55.166 322.383 54.620 322.156 54.231 321.768 c
+53.842 321.379 53.616 320.833 53.616 320.283 c
+53.616 319.733 53.842 319.187 54.231 318.798 c
+54.620 318.409 55.166 318.183 55.716 318.183 c
+56.266 318.183 56.812 318.409 57.201 318.798 c
+57.589 319.187 57.816 319.733 57.816 320.283 c f s
+BT 64.016 317.178 Td /F2 12.0 Tf  [(FTP server)] TJ ET
+57.816 306.027 m 
+57.816 306.577 57.589 307.123 57.201 307.512 c
+56.812 307.900 56.266 308.127 55.716 308.127 c
+55.166 308.127 54.620 307.900 54.231 307.512 c
+53.842 307.123 53.616 306.577 53.616 306.027 c
+53.616 305.477 53.842 304.931 54.231 304.542 c
+54.620 304.153 55.166 303.927 55.716 303.927 c
+56.266 303.927 56.812 304.153 57.201 304.542 c
+57.589 304.931 57.816 305.477 57.816 306.027 c f s
+BT 64.016 302.922 Td /F2 12.0 Tf  [(FTP username and password)] TJ ET
+57.816 291.771 m 
+57.816 292.321 57.589 292.867 57.201 293.256 c
+56.812 293.644 56.266 293.871 55.716 293.871 c
+55.166 293.871 54.620 293.644 54.231 293.256 c
+53.842 292.867 53.616 292.321 53.616 291.771 c
+53.616 291.221 53.842 290.675 54.231 290.286 c
+54.620 289.897 55.166 289.671 55.716 289.671 c
+56.266 289.671 56.812 289.897 57.201 290.286 c
+57.589 290.675 57.816 291.221 57.816 291.771 c f s
+BT 64.016 288.666 Td /F2 12.0 Tf  [(MySQL server name \(this is usually )] TJ ET
+BT 240.668 288.666 Td /F2 12.0 Tf  [(localhost)] TJ ET
+BT 284.000 288.666 Td /F2 12.0 Tf  [(\))] TJ ET
+57.816 277.515 m 
+57.816 278.065 57.589 278.611 57.201 279.000 c
+56.812 279.388 56.266 279.615 55.716 279.615 c
+55.166 279.615 54.620 279.388 54.231 279.000 c
+53.842 278.611 53.616 278.065 53.616 277.515 c
+53.616 276.965 53.842 276.419 54.231 276.030 c
+54.620 275.641 55.166 275.415 55.716 275.415 c
+56.266 275.415 56.812 275.641 57.201 276.030 c
+57.589 276.419 57.816 276.965 57.816 277.515 c f s
+BT 64.016 274.410 Td /F2 12.0 Tf  [(MySQL username and password)] TJ ET
+57.816 263.259 m 
+57.816 263.809 57.589 264.355 57.201 264.744 c
+56.812 265.132 56.266 265.359 55.716 265.359 c
+55.166 265.359 54.620 265.132 54.231 264.744 c
+53.842 264.355 53.616 263.809 53.616 263.259 c
+53.616 262.709 53.842 262.163 54.231 261.774 c
+54.620 261.385 55.166 261.159 55.716 261.159 c
+56.266 261.159 56.812 261.385 57.201 261.774 c
+57.589 262.163 57.816 262.709 57.816 263.259 c f s
+BT 64.016 260.154 Td /F2 12.0 Tf  [(MySQL Database)] TJ ET
+0.639 0.725 0.808 rg
+34.016 182.291 527.249 60.012 re f
+0.443 0.565 0.675 RG
+0.75 w 0 J [  ] 0 d
+34.391 182.666 526.499 59.262 re S
+0.341 0.349 0.361 rg
+BT 49.766 215.148 Td /F2 12.0 Tf  [(For most of webhosting accounts you will need to create a MySQL database, username and password. )] TJ ET
+BT 49.766 200.892 Td /F2 12.0 Tf  [(You can do this from your webhosting control panel, from a section refering to MySQL databases.)] TJ ET
+0.639 0.725 0.808 rg
+34.016 121.535 527.249 45.756 re f
+0.75 w 0 J [  ] 0 d
+34.391 121.910 526.499 45.006 re S
+0.341 0.349 0.361 rg
+BT 49.766 140.136 Td /F2 12.0 Tf  [(Please provide us a temporary FTP account or change the password before sending us the information.)] TJ ET
+0.000 0.000 0.000 rg
+BT 34.016 95.130 Td /F2 12.0 Tf  [(If you don't know how to get these information or have trouble creating the database, you can send us your )] TJ ET
+BT 34.016 80.874 Td /F2 12.0 Tf  [(hosting control panel account information. The same rule applies, you should change the password with a )] TJ ET
+BT 34.016 66.618 Td /F2 12.0 Tf  [(temporary one.)] TJ ET
+endstream
+endobj
+8 0 obj
+<< /Type /Font
+/Subtype /Type1
+/Name /F1
+/BaseFont /Times-Bold
+/Encoding /WinAnsiEncoding
+>>
+endobj
+9 0 obj
+<< /Type /Font
+/Subtype /Type1
+/Name /F2
+/BaseFont /Times-Roman
+/Encoding /WinAnsiEncoding
+>>
+endobj
+10 0 obj
+<< /Type /Page
+/MediaBox [0.000 0.000 595.280 841.890]
+/Parent 3 0 R
+/Annots [ 13 0 R 15 0 R 17 0 R 19 0 R ]
+/Contents 11 0 R
+>>
+endobj
+11 0 obj
+<<
+/Length 6289 >>
+stream
+
+0.000 0.000 0.000 rg
+0.443 0.565 0.675 RG
+0.75 w 0 J [  ] 0 d
+BT 34.016 775.827 Td /F1 18.0 Tf  [(Installation steps)] TJ ET
+BT 34.016 745.205 Td /F2 12.0 Tf  [(The following section will explain installation steps. Do not skip any step, or your script may not install )] TJ ET
+BT 34.016 730.949 Td /F2 12.0 Tf  [(properly. If you encounter any problem during installation write us and we will gladly help you.)] TJ ET
+BT 34.016 702.755 Td /F1 14.0 Tf  [(1. Extract OxyClassifieds.ver.zip archive file)] TJ ET
+BT 34.016 676.014 Td /F2 12.0 Tf  [(After buying the script, your script order will arrive as a packed .zip archive. Extract all archive files to a )] TJ ET
+BT 34.016 661.758 Td /F2 12.0 Tf  [(newly created folder on your desktop station.)] TJ ET
+BT 34.016 635.502 Td /F2 12.0 Tf  [(To unzip your archive you will need to have installed a software that is able to decompress )] TJ ET
+BT 472.940 635.502 Td /F3 12.0 Tf  [(.zip)] TJ ET
+BT 489.944 635.502 Td /F2 12.0 Tf  [( files. )] TJ ET
+BT 34.016 621.246 Td /F2 12.0 Tf  [(Everybody has such applications installed. Even if you do not have it installed, newer operating systems )] TJ ET
+BT 34.016 606.990 Td /F2 12.0 Tf  [(recognize files within )] TJ ET
+BT 140.996 606.990 Td /F3 12.0 Tf  [(.zip)] TJ ET
+BT 158.000 606.990 Td /F2 12.0 Tf  [( archives.)] TJ ET
+BT 34.016 578.795 Td /F1 14.0 Tf  [(2. Upload all files to your server using FTP)] TJ ET
+BT 34.016 552.054 Td /F2 12.0 Tf  [(Upload extracted files to your server using a FTP account provided by your hosting, and a FTP client )] TJ ET
+BT 34.016 537.798 Td /F2 12.0 Tf  [(software installed on your computer.)] TJ ET
+BT 34.016 511.542 Td /F2 12.0 Tf  [(Some widely used free FTP client programs are: )] TJ ET
+BT 269.312 511.542 Td /F1 12.0 Tf  [(FileZilla)] TJ ET
+BT 312.656 511.542 Td /F2 12.0 Tf  [( \()] TJ ET
+0.000 0.000 0.800 rg
+BT 319.652 511.542 Td /F2 12.0 Tf  [(http://filezilla-project.org/)] TJ ET
+0.000 0.000 0.800 RG
+0.6 w 0 J [  ] 0 d
+319.652 508.842 m 444.644 508.842 l S
+0.000 0.000 0.000 rg
+BT 444.644 511.542 Td /F2 12.0 Tf  [(\), )] TJ ET
+BT 454.640 511.542 Td /F1 12.0 Tf  [(SmartFTP)] TJ ET
+BT 509.300 511.542 Td /F2 12.0 Tf  [( \()] TJ ET
+0.000 0.000 0.800 rg
+BT 34.016 497.286 Td /F2 12.0 Tf  [(http://www.smartftp.com/)] TJ ET
+0.6 w 0 J [  ] 0 d
+34.016 494.586 m 158.684 494.586 l S
+0.000 0.000 0.000 rg
+BT 158.684 497.286 Td /F2 12.0 Tf  [(\). Some commercial programs are: )] TJ ET
+BT 327.980 497.286 Td /F1 12.0 Tf  [(CuteFTP)] TJ ET
+BT 375.308 497.286 Td /F2 12.0 Tf  [( \( )] TJ ET
+0.000 0.000 0.800 rg
+BT 385.304 497.286 Td /F2 12.0 Tf  [(http://www.cuteftp.com/)] TJ ET
+0.6 w 0 J [  ] 0 d
+385.304 494.586 m 503.300 494.586 l S
+0.000 0.000 0.000 rg
+BT 503.300 497.286 Td /F2 12.0 Tf  [( \), )] TJ ET
+BT 34.016 483.030 Td /F1 12.0 Tf  [(CrossFTP)] TJ ET
+BT 86.012 483.030 Td /F2 12.0 Tf  [( \( )] TJ ET
+0.000 0.000 0.800 rg
+BT 96.008 483.030 Td /F2 12.0 Tf  [(http://www.crossftp.com)] TJ ET
+0.6 w 0 J [  ] 0 d
+96.008 480.330 m 215.336 480.330 l S
+0.000 0.000 0.000 rg
+BT 215.336 483.030 Td /F2 12.0 Tf  [( \).)] TJ ET
+BT 34.016 456.774 Td /F2 12.0 Tf  [(When uploading the files, you must choose the proper location for your installation. If you want to install the )] TJ ET
+BT 34.016 442.518 Td /F2 12.0 Tf  [(script in the root of your domain name \( to be accessed with http://www.yourdomain.com \), then you should )] TJ ET
+BT 34.016 428.262 Td /F2 12.0 Tf  [(upload the files in the base path for your domain. Usually this is in a folder called )] TJ ET
+BT 428.636 428.262 Td /F1 12.0 Tf  [(public_html)] TJ ET
+BT 490.652 428.262 Td /F2 12.0 Tf  [( or )] TJ ET
+BT 506.648 428.262 Td /F1 12.0 Tf  [(httpdocs)] TJ ET
+BT 550.652 428.262 Td /F2 12.0 Tf  [(.)] TJ ET
+BT 34.016 402.006 Td /F2 12.0 Tf  [(If you don't want to install the script in the root of your domain, but in a subfolder or a subdomain of your )] TJ ET
+BT 34.016 387.750 Td /F2 12.0 Tf  [(domain, then you must upload the files in that subfolder. For example, if you want your classifieds to show )] TJ ET
+BT 34.016 373.494 Td /F2 12.0 Tf  [(at the address )] TJ ET
+BT 102.332 373.494 Td /F1 12.0 Tf  [(http://www.yourdomain.com/classifieds/)] TJ ET
+BT 308.336 373.494 Td /F2 12.0 Tf  [(, then you must upload the files in the folder )] TJ ET
+BT 34.016 359.238 Td /F1 12.0 Tf  [(classifieds)] TJ ET
+BT 85.352 359.238 Td /F2 12.0 Tf  [(.)] TJ ET
+BT 34.016 331.044 Td /F1 14.0 Tf  [(3. Launch installation web based script)] TJ ET
+BT 34.016 304.303 Td /F2 12.0 Tf  [(Access the location where you uploaded the script with a browser. The install script will automatically )] TJ ET
+BT 34.016 290.047 Td /F2 12.0 Tf  [(launch if you did not made a previous installation. The install web based script will guide you through the )] TJ ET
+BT 34.016 275.791 Td /F2 12.0 Tf  [(install process.)] TJ ET
+BT 34.016 249.535 Td /F2 12.0 Tf  [(Ex: if you uploaded the script in the root of the domain )] TJ ET
+BT 301.328 249.535 Td /F1 12.0 Tf  [(yourdomain.com)] TJ ET
+BT 388.328 249.535 Td /F2 12.0 Tf  [(, then you will write in your )] TJ ET
+BT 34.016 235.279 Td /F2 12.0 Tf  [(browser address bar )] TJ ET
+BT 132.980 235.279 Td /F1 12.0 Tf  [(http://www.yourdomain.com)] TJ ET
+BT 280.976 235.279 Td /F2 12.0 Tf  [(. This will take you to the installation interface.)] TJ ET
+0.639 0.725 0.808 rg
+34.016 157.416 527.249 60.012 re f
+0.443 0.565 0.675 RG
+0.75 w 0 J [  ] 0 d
+34.391 157.791 526.499 59.262 re S
+0.341 0.349 0.361 rg
+BT 49.766 190.273 Td /F2 12.0 Tf  [(If the script was already installed, to reinstall the script you can access the installation script with a )] TJ ET
+BT 49.766 176.017 Td /F2 12.0 Tf  [(link like this: )] TJ ET
+BT 116.114 176.017 Td /F1 12.0 Tf  [(http://www.yourdomain.com/install/)] TJ ET
+BT 302.126 176.017 Td /F2 12.0 Tf  [(.)] TJ ET
+0.000 0.000 0.000 rg
+BT 34.016 131.011 Td /F2 12.0 Tf  [(The web installation script will guide you through the following steps:)] TJ ET
+BT 34.016 102.816 Td /F1 14.0 Tf  [(Step 1. Server configuration check.)] TJ ET
+BT 34.016 76.075 Td /F2 12.0 Tf  [(The script will check for you if your server configuration is fit for the script to perform correctly. The )] TJ ET
+BT 34.016 61.819 Td /F2 12.0 Tf  [(following will be checked: PHP version, MySQL version, GD Graphics Library, php.ini register_globals )] TJ ET
+endstream
+endobj
+12 0 obj
+<< /Type /Font
+/Subtype /Type1
+/Name /F3
+/BaseFont /Times-Italic
+/Encoding /WinAnsiEncoding
+>>
+endobj
+13 0 obj
+<< /Type /Annot
+/Subtype /Link
+/A 14 0 R
+/Border [0 0 0]
+/H /I
+/Rect [ 319.6517 510.4624 444.6437 522.3424 ]
+>>
+endobj
+14 0 obj
+<< /Type /Action
+/S /URI
+/URI (http://filezilla-project.org/)
+>>
+endobj
+15 0 obj
+<< /Type /Annot
+/Subtype /Link
+/A 16 0 R
+/Border [0 0 0]
+/H /I
+/Rect [ 34.0157 496.2064 158.6837 508.0864 ]
+>>
+endobj
+16 0 obj
+<< /Type /Action
+/S /URI
+/URI (http://www.smartftp.com/)
+>>
+endobj
+17 0 obj
+<< /Type /Annot
+/Subtype /Link
+/A 18 0 R
+/Border [0 0 0]
+/H /I
+/Rect [ 385.3037 496.2064 503.2997 508.0864 ]
+>>
+endobj
+18 0 obj
+<< /Type /Action
+/S /URI
+/URI (http://www.cuteftp.com/)
+>>
+endobj
+19 0 obj
+<< /Type /Annot
+/Subtype /Link
+/A 20 0 R
+/Border [0 0 0]
+/H /I
+/Rect [ 96.0077 481.9504 215.3357 493.8304 ]
+>>
+endobj
+20 0 obj
+<< /Type /Action
+/S /URI
+/URI (http://www.crossftp.com)
+>>
+endobj
+21 0 obj
+<< /Type /Page
+/MediaBox [0.000 0.000 595.280 841.890]
+/Parent 3 0 R
+/Contents 22 0 R
+>>
+endobj
+22 0 obj
+<<
+/Length 6261 >>
+stream
+
+0.000 0.000 0.000 rg
+0.443 0.565 0.675 RG
+0.75 w 0 J [  ] 0 d
+BT 34.016 796.469 Td /F2 12.0 Tf  [(value. If one of these will show an error, then you must solve the issue before continuing installation. If all )] TJ ET
+BT 34.016 782.213 Td /F2 12.0 Tf  [(these 4 items show green, then they are correct and you can continue to next step.)] TJ ET
+0.639 0.725 0.808 rg
+34.016 675.838 527.249 88.524 re f
+0.75 w 0 J [  ] 0 d
+34.391 676.213 526.499 87.774 re S
+0.341 0.349 0.361 rg
+BT 49.766 737.207 Td /F2 12.0 Tf  [(Last item checked, )] TJ ET
+BT 143.078 737.207 Td /F2 12.0 Tf  [(register_globals)] TJ ET
+BT 219.734 737.207 Td /F2 12.0 Tf  [( php.ini flag is not a requirement, but a recommendation. The )] TJ ET
+BT 49.766 722.951 Td /F2 12.0 Tf  [(script will work well even with this flag set to )] TJ ET
+BT 273.086 722.951 Td /F2 12.0 Tf  [(On)] TJ ET
+BT 287.750 722.951 Td /F2 12.0 Tf  [(, but we recommend you to set it to )] TJ ET
+BT 460.406 722.951 Td /F2 12.0 Tf  [(Off)] TJ ET
+BT 477.062 722.951 Td /F2 12.0 Tf  [( for security )] TJ ET
+BT 49.766 708.695 Td /F2 12.0 Tf  [(reasons. Also, newer PHP versions starting with 5.4 removed register_globals option, so you won't )] TJ ET
+BT 49.766 694.439 Td /F2 12.0 Tf  [(have to worry for it anymore.)] TJ ET
+0.000 0.000 0.000 rg
+BT 34.016 647.495 Td /F1 14.0 Tf  [(Step 2. Change files and folders permissions.)] TJ ET
+BT 34.016 620.754 Td /F2 12.0 Tf  [(Change permissions for some files and folders where the script needs to be able to write data. Change the )] TJ ET
+BT 34.016 606.498 Td /F2 12.0 Tf  [(permission for each file or folder to the permission listed in the last column \(Permission Needed\).)] TJ ET
+BT 34.016 580.242 Td /F2 12.0 Tf  [(You can change files permissions in 2 ways:)] TJ ET
+BT 48.816 553.991 Td /F2 12.0 Tf  [(1.)] TJ ET
+BT 64.016 553.986 Td /F2 12.0 Tf  [(Using the )] TJ ET
+BT 113.348 553.986 Td /F1 12.0 Tf  [(FTP client)] TJ ET
+BT 167.012 553.986 Td /F2 12.0 Tf  [( that you use to access your files. When connected with FTP to the location )] TJ ET
+BT 64.016 539.730 Td /F2 12.0 Tf  [(where the script is uploaded, select the file or folder you must change permission for. Search for )] TJ ET
+BT 64.016 525.474 Td /F2 12.0 Tf  [(something in the menus similar to )] TJ ET
+BT 230.024 525.474 Td /F1 12.0 Tf  [(Change permissions)] TJ ET
+BT 333.032 525.474 Td /F2 12.0 Tf  [( and choose the mode that the script tells you )] TJ ET
+BT 64.016 511.218 Td /F2 12.0 Tf  [(to choose.)] TJ ET
+BT 48.816 496.967 Td /F2 12.0 Tf  [(2.)] TJ ET
+BT 64.016 496.962 Td /F2 12.0 Tf  [(Using a )] TJ ET
+BT 104.012 496.962 Td /F1 12.0 Tf  [(File Manager)] TJ ET
+BT 173.000 496.962 Td /F2 12.0 Tf  [( from your hosting control panel, if available.)] TJ ET
+0.639 0.725 0.808 rg
+34.016 362.075 527.249 117.036 re f
+0.75 w 0 J [  ] 0 d
+34.391 362.450 526.499 116.286 re S
+0.341 0.349 0.361 rg
+BT 49.766 451.956 Td /F2 12.0 Tf  [(The number that represents the permission means in Linux \( in UNIX in general \) the "read", "write" )] TJ ET
+BT 49.766 437.700 Td /F2 12.0 Tf  [(and "execute" rights for this file or folder for owner, group and others. In order for PHP to be able to )] TJ ET
+BT 49.766 423.444 Td /F2 12.0 Tf  [(write and access, it will need 644 permission for a file and 755 permission for a folder. Exception )] TJ ET
+BT 49.766 409.188 Td /F2 12.0 Tf  [(make servers where PHP runs as )] TJ ET
+BT 209.726 409.188 Td /F1 12.0 Tf  [(Apache module)] TJ ET
+BT 289.394 409.188 Td /F2 12.0 Tf  [( instead of )] TJ ET
+BT 342.386 409.188 Td /F1 12.0 Tf  [(CGI)] TJ ET
+BT 365.054 409.188 Td /F2 12.0 Tf  [(. These servers will need 666 )] TJ ET
+BT 49.766 394.932 Td /F2 12.0 Tf  [(permission for a file and 777 permission for a folder. The script checks and gives you the correct )] TJ ET
+BT 49.766 380.676 Td /F2 12.0 Tf  [(permission to set, so you don't need to worry about this aspect.)] TJ ET
+0.639 0.725 0.808 rg
+34.016 258.551 527.249 88.524 re f
+0.75 w 0 J [  ] 0 d
+34.391 258.926 526.499 87.774 re S
+0.341 0.349 0.361 rg
+BT 49.766 319.920 Td /F2 12.0 Tf  [(After you change file permissions, use the )] TJ ET
+BT 255.062 319.920 Td /F2 12.0 Tf  [(Recheck)] TJ ET
+BT 296.378 319.920 Td /F2 12.0 Tf  [( button to reload the page and see if all )] TJ ET
+BT 49.766 305.664 Td /F2 12.0 Tf  [(permissions are set correctly. Check the column "State" for each of the elements in the table. If this )] TJ ET
+BT 49.766 291.408 Td /F2 12.0 Tf  [(column shows )] TJ ET
+BT 121.766 291.408 Td /F1 12.0 Tf  [(Writable)] TJ ET
+BT 167.762 291.408 Td /F2 12.0 Tf  [( written in green, then permissions are correct for that file/folder. If it )] TJ ET
+BT 49.766 277.152 Td /F2 12.0 Tf  [(indicates )] TJ ET
+BT 95.426 277.152 Td /F1 12.0 Tf  [(Unwritable)] TJ ET
+BT 153.422 277.152 Td /F2 12.0 Tf  [( in red, then you should recheck and change permissions.)] TJ ET
+0.000 0.000 0.000 rg
+BT 34.016 230.207 Td /F1 14.0 Tf  [(Step 3. Database information.)] TJ ET
+BT 34.016 203.466 Td /F2 12.0 Tf  [(You will have to enter MySQL database information needed for the script to install. You will get this )] TJ ET
+BT 34.016 189.210 Td /F2 12.0 Tf  [(information from your hosting control panel.)] TJ ET
+BT 34.016 162.954 Td /F3 12.0 Tf  [(Database Server)] TJ ET
+BT 114.332 162.954 Td /F2 12.0 Tf  [( - fill in your database server name. On most webhosting companies, or if you host the )] TJ ET
+BT 34.016 148.698 Td /F2 12.0 Tf  [(domain on your dedicated server, on the same server as your database server, this value will be )] TJ ET
+BT 492.908 148.698 Td /F3 12.0 Tf  [(localhost)] TJ ET
+BT 536.912 148.698 Td /F2 12.0 Tf  [(. If )] TJ ET
+BT 34.016 134.442 Td /F2 12.0 Tf  [(your database server is on other machine, fill in that machine \(server\) name. You will find this information )] TJ ET
+BT 34.016 120.186 Td /F2 12.0 Tf  [(on your hosting control panel in the section for databases.)] TJ ET
+BT 34.016 93.930 Td /F3 12.0 Tf  [(MySQL User)] TJ ET
+BT 97.004 93.930 Td /F2 12.0 Tf  [( - fill in your MySQL username. In order to install and use the script you must have a MySQL )] TJ ET
+BT 34.016 79.674 Td /F2 12.0 Tf  [(username with full rights to the database used by the script. This MySQL user can be created from your )] TJ ET
+BT 34.016 65.418 Td /F2 12.0 Tf  [(hosting control panel.)] TJ ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page
+/MediaBox [0.000 0.000 595.280 841.890]
+/Parent 3 0 R
+/Contents 24 0 R
+>>
+endobj
+24 0 obj
+<<
+/Length 5957 >>
+stream
+
+0.000 0.000 0.000 rg
+0.443 0.565 0.675 RG
+0.75 w 0 J [  ] 0 d
+BT 34.016 784.469 Td /F3 12.0 Tf  [(MySQL Password)] TJ ET
+BT 121.016 784.469 Td /F2 12.0 Tf  [( - fill in your MySQL password that corresponds to your MySQL user.)] TJ ET
+BT 34.016 758.213 Td /F3 12.0 Tf  [(Database Name)] TJ ET
+BT 111.008 758.213 Td /F2 12.0 Tf  [( - fill in the name of your database used for the script. Please note that on some web hostings )] TJ ET
+BT 34.016 743.957 Td /F2 12.0 Tf  [(you do not have rights to create new databases from a PHP script, so in that case you must first create that )] TJ ET
+BT 34.016 729.701 Td /F2 12.0 Tf  [(database from hosting control panel.)] TJ ET
+0.639 0.725 0.808 rg
+34.016 651.838 527.249 60.012 re f
+0.75 w 0 J [  ] 0 d
+34.391 652.213 526.499 59.262 re S
+0.341 0.349 0.361 rg
+BT 49.766 684.695 Td /F2 12.0 Tf  [(Depending on the control panel, you might have to attach the MySQL user to the MySQL database by )] TJ ET
+BT 49.766 670.439 Td /F2 12.0 Tf  [(choosing the permissions that user will have on the database. Choose )] TJ ET
+BT 384.398 670.439 Td /F3 12.0 Tf  [(All Permissions)] TJ ET
+BT 460.070 670.439 Td /F2 12.0 Tf  [( in this case.)] TJ ET
+0.000 0.000 0.000 rg
+BT 34.016 625.433 Td /F3 12.0 Tf  [(Create new database)] TJ ET
+BT 135.344 625.433 Td /F2 12.0 Tf  [( checkbox - use this option if you know your MySQL username is allowed to create )] TJ ET
+BT 34.016 611.177 Td /F2 12.0 Tf  [(new databases and the database name you entered in )] TJ ET
+BT 288.944 611.177 Td /F3 12.0 Tf  [(MySQL Database Name)] TJ ET
+BT 405.596 611.177 Td /F2 12.0 Tf  [( field does not exist already.)] TJ ET
+BT 34.016 584.921 Td /F3 12.0 Tf  [(Tables Prefix)] TJ ET
+BT 98.348 584.921 Td /F2 12.0 Tf  [( - fill in prefix for every table created within the database used by the script. This is useful if )] TJ ET
+BT 34.016 570.665 Td /F2 12.0 Tf  [(you have multiple scripts installed in the same database, to separate tables used by each script.)] TJ ET
+BT 34.016 544.409 Td /F2 12.0 Tf  [(After you've filled in all fields with proper data, press )] TJ ET
+BT 294.464 544.409 Td /F3 12.0 Tf  [(Next)] TJ ET
+BT 316.460 544.409 Td /F2 12.0 Tf  [( button.)] TJ ET
+BT 34.016 516.215 Td /F1 14.0 Tf  [(Step 4. Database charset and initial data.)] TJ ET
+BT 34.016 489.474 Td /F1 12.0 Tf  [(Database charset and collation)] TJ ET
+BT 191.012 489.474 Td /F2 12.0 Tf  [( - The default charset your database will be installed with is )] TJ ET
+BT 480.296 489.474 Td /F2 12.0 Tf  [(utf8)] TJ ET
+BT 499.628 489.474 Td /F2 12.0 Tf  [( \( UTF-8 )] TJ ET
+BT 34.016 475.218 Td /F2 12.0 Tf  [(charset \). If the alphabet that you will use for the script is contained in another charset and you prefer to use )] TJ ET
+BT 34.016 460.962 Td /F2 12.0 Tf  [(that one, then you must select it from the list. If you use the script in multilanguage mode it is advised to use )] TJ ET
+BT 34.016 446.706 Td /F2 12.0 Tf  [(utf8)] TJ ET
+BT 53.348 446.706 Td /F2 12.0 Tf  [(.)] TJ ET
+BT 34.016 420.450 Td /F3 12.0 Tf  [(Initial data set)] TJ ET
+BT 104.024 420.450 Td /F2 12.0 Tf  [( - You have some options about the initial data your script will be installed with. You can )] TJ ET
+BT 34.016 406.194 Td /F2 12.0 Tf  [(choose between the following data sets: Cars, General, Real Estate and Boats. Each has specialized )] TJ ET
+BT 34.016 391.938 Td /F2 12.0 Tf  [(categories and custom fields for the purpose they serve. If you don't want the script installed with any of )] TJ ET
+BT 34.016 377.682 Td /F2 12.0 Tf  [(these initial data, then choose )] TJ ET
+BT 178.664 377.682 Td /F3 12.0 Tf  [(None)] TJ ET
+BT 203.996 377.682 Td /F2 12.0 Tf  [( option.)] TJ ET
+BT 34.016 349.487 Td /F1 14.0 Tf  [(Step 5. Site information.)] TJ ET
+BT 34.016 322.746 Td /F3 12.0 Tf  [(Site Name)] TJ ET
+BT 83.012 322.746 Td /F2 12.0 Tf  [( - fill in your site name. This will be used as default site title if you do not configure a different )] TJ ET
+BT 34.016 308.490 Td /F2 12.0 Tf  [(title in script )] TJ ET
+BT 97.688 308.490 Td /F3 12.0 Tf  [(Settings / SEO Settings)] TJ ET
+BT 208.028 308.490 Td /F2 12.0 Tf  [( section. Also it will be used in mail texts as the name of the site.)] TJ ET
+BT 34.016 282.234 Td /F3 12.0 Tf  [(Site URL)] TJ ET
+BT 77.684 282.234 Td /F2 12.0 Tf  [( - The URL for your site. The script automatically detects your URL, so if you are not sure leave )] TJ ET
+BT 34.016 267.978 Td /F2 12.0 Tf  [(the URL as it is.)] TJ ET
+BT 34.016 241.722 Td /F3 12.0 Tf  [(Script Path)] TJ ET
+BT 88.352 241.722 Td /F2 12.0 Tf  [( - The path for your files. The script automatically detects your path, so if you are not sure leave )] TJ ET
+BT 34.016 227.466 Td /F2 12.0 Tf  [(it as it is.)] TJ ET
+BT 34.016 201.210 Td /F3 12.0 Tf  [(Admin Email)] TJ ET
+BT 97.016 201.210 Td /F2 12.0 Tf  [( - The email where all administration messages will be sent: pending users or listings )] TJ ET
+BT 34.016 186.954 Td /F2 12.0 Tf  [(notifications, contact form messages.)] TJ ET
+BT 34.016 160.698 Td /F3 12.0 Tf  [(Admin Username)] TJ ET
+BT 117.668 160.698 Td /F2 12.0 Tf  [( - You will use this username to login as site administrator and access the )] TJ ET
+BT 472.628 160.698 Td /F3 12.0 Tf  [(Administrator )] TJ ET
+BT 34.016 146.442 Td /F3 12.0 Tf  [(Panel)] TJ ET
+BT 62.012 146.442 Td /F2 12.0 Tf  [(. The default username is )] TJ ET
+BT 185.984 146.442 Td /F1 12.0 Tf  [(admin)] TJ ET
+BT 218.660 146.442 Td /F2 12.0 Tf  [(.)] TJ ET
+BT 34.016 120.186 Td /F3 12.0 Tf  [(Admin Password)] TJ ET
+BT 115.688 120.186 Td /F2 12.0 Tf  [( - The password for administrator account. The default password is )] TJ ET
+BT 440.288 120.186 Td /F1 12.0 Tf  [(admin)] TJ ET
+BT 472.964 120.186 Td /F2 12.0 Tf  [(.)] TJ ET
+BT 34.016 93.930 Td /F3 12.0 Tf  [(Confirm Password)] TJ ET
+BT 124.364 93.930 Td /F2 12.0 Tf  [( - Confirm the above password. You can leave blank for the default password )] TJ ET
+BT 499.280 93.930 Td /F1 12.0 Tf  [(admin)] TJ ET
+BT 531.956 93.930 Td /F2 12.0 Tf  [(.)] TJ ET
+endstream
+endobj
+25 0 obj
+<< /Type /Page
+/MediaBox [0.000 0.000 595.280 841.890]
+/Parent 3 0 R
+/Contents 26 0 R
+>>
+endobj
+26 0 obj
+<<
+/Length 3396 >>
+stream
+
+0.000 0.000 0.000 rg
+0.443 0.565 0.675 RG
+0.75 w 0 J [  ] 0 d
+BT 34.016 784.469 Td /F2 12.0 Tf  [(After you've filled in all fields with proper data, press )] TJ ET
+BT 294.464 784.469 Td /F3 12.0 Tf  [(Finish)] TJ ET
+BT 325.136 784.469 Td /F2 12.0 Tf  [(. You will be taken to a screen where you will )] TJ ET
+BT 34.016 770.213 Td /F2 12.0 Tf  [(be given the current installation information and some final installation tasks that have security purposes:)] TJ ET
+BT 48.816 743.962 Td /F2 12.0 Tf  [(1.)] TJ ET
+BT 64.016 743.957 Td /F2 12.0 Tf  [(Remove the )] TJ ET
+BT 124.676 743.957 Td /F3 12.0 Tf  [(install)] TJ ET
+BT 154.688 743.957 Td /F2 12.0 Tf  [( folder - if you will not reinstall the script, you should delete the install folder.)] TJ ET
+BT 48.816 729.706 Td /F2 12.0 Tf  [(2.)] TJ ET
+BT 64.016 729.701 Td /F2 12.0 Tf  [(Change permissions for the file )] TJ ET
+BT 217.664 729.701 Td /F3 12.0 Tf  [(config.php)] TJ ET
+BT 268.664 729.701 Td /F2 12.0 Tf  [( to 444.)] TJ ET
+BT 34.016 703.445 Td /F2 12.0 Tf  [(At this moment the script is installed and you can click the )] TJ ET
+BT 318.668 703.445 Td /F3 12.0 Tf  [(View Site)] TJ ET
+BT 363.668 703.445 Td /F2 12.0 Tf  [( button to access your site.)] TJ ET
+BT 34.016 675.251 Td /F1 14.0 Tf  [(4. Login as administrator user and start customizing the script.)] TJ ET
+BT 34.016 648.510 Td /F2 12.0 Tf  [(Please see the )] TJ ET
+BT 103.664 648.510 Td /F3 12.0 Tf  [(Administrator Interface Handbook)] TJ ET
+BT 270.320 648.510 Td /F2 12.0 Tf  [( document for a description of admin interface settings.)] TJ ET
+0.639 0.725 0.808 rg
+34.016 584.903 527.249 45.756 re f
+0.75 w 0 J [  ] 0 d
+34.391 585.278 526.499 45.006 re S
+0.341 0.349 0.361 rg
+BT 49.766 603.504 Td /F2 12.0 Tf  [(To login as administrator use the )] TJ ET
+BT 210.422 603.504 Td /F3 12.0 Tf  [(Login)] TJ ET
+BT 238.430 603.504 Td /F2 12.0 Tf  [( link from the frontend navigation bar.)] TJ ET
+0.000 0.000 0.000 rg
+BT 34.016 558.498 Td /F2 12.0 Tf  [(If you encounter problems while installing, please contact us for help.)] TJ ET
+BT 34.016 523.600 Td /F1 18.0 Tf  [(Issues that might appear at installation)] TJ ET
+BT 34.016 491.039 Td /F1 14.0 Tf  [(Ioncube Encoder not installed)] TJ ET
+BT 34.016 464.298 Td /F2 12.0 Tf  [(The script has a part encoded with Ioncube Encoder. If when accessing the site, instead of an installation )] TJ ET
+BT 34.016 450.042 Td /F2 12.0 Tf  [(script you see a warning page like the following, then it means Ioncube Encoder in not installed on your )] TJ ET
+BT 34.016 435.786 Td /F2 12.0 Tf  [(server.)] TJ ET
+0.996 0.847 0.478 rg
+34.016 357.923 527.249 60.012 re f
+1.000 0.729 0.063 RG
+0.75 w 0 J [  ] 0 d
+34.391 358.298 526.499 59.262 re S
+0.471 0.380 0.251 rg
+BT 49.766 390.780 Td /F2 12.0 Tf  [(Site error: the file mysql.php requires the ionCube PHP Loader ioncube_loader_lin_5.2.so to be )] TJ ET
+BT 49.766 376.524 Td /F2 12.0 Tf  [(installed by the site administrator.)] TJ ET
+0.639 0.725 0.808 rg
+34.016 282.911 527.249 60.012 re f
+0.443 0.565 0.675 RG
+0.75 w 0 J [  ] 0 d
+34.391 283.286 526.499 59.262 re S
+0.341 0.349 0.361 rg
+BT 49.766 315.768 Td /F2 12.0 Tf  [(The encoded files of the script are only the files from )] TJ ET
+BT 308.042 315.768 Td /F3 12.0 Tf  [(classes)] TJ ET
+BT 342.038 315.768 Td /F2 12.0 Tf  [( folder. All the other parts of the script )] TJ ET
+BT 49.766 301.512 Td /F2 12.0 Tf  [(are source code.)] TJ ET
+endstream
+endobj
+xref
+0 27
+0000000000 65535 f 
+0000000009 00000 n 
+0000000074 00000 n 
+0000000120 00000 n 
+0000000323 00000 n 
+0000000352 00000 n 
+0000000520 00000 n 
+0000000623 00000 n 
+0000009710 00000 n 
+0000009818 00000 n 
+0000009927 00000 n 
+0000010072 00000 n 
+0000016414 00000 n 
+0000016525 00000 n 
+0000016653 00000 n 
+0000016734 00000 n 
+0000016861 00000 n 
+0000016937 00000 n 
+0000017065 00000 n 
+0000017140 00000 n 
+0000017267 00000 n 
+0000017342 00000 n 
+0000017447 00000 n 
+0000023761 00000 n 
+0000023866 00000 n 
+0000029876 00000 n 
+0000029981 00000 n 
+trailer
+<<
+/Size 27
+/Root 1 0 R
+/Info 5 0 R
+>>
+startxref
+33430
+%%EOF

@@ -1,0 +1,150 @@
+{include file="header.html"}
+{include file="search.html"}
+
+<div id="heading"><div class="lfloat">{if $category_name}{$category_name} ({$total_items|number_format:0:"`$appearance.number_format_point`":"`$appearance.number_format_separator`"}) {else}{$total_items|number_format:0:"`$appearance.number_format_point`":"`$appearance.number_format_separator`"} {$lng.listings.results}{/if}</div>
+
+{if $ads_settings.alerts_enabled}{include file="data/magnific-popup.html"}<div class="rfloat" id="create_alert" style="cursor: pointer;">{$lng.alerts.create_alert}<img src="{$template_path}images/email-alert.png" class="mr10" style="width: 20px; height: 14px; margin-left: 10px; opacity: 0.7; " /></div>{/if}
+</div>
+
+{if $ads_settings.alerts_enabled}
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<div class="hidden email_alert_box p10">
+<form name="alert" id="alert" method="post" action="{$live_site}/include/add_alert.php?post=1">
+
+<input type="hidden" name="post_str" id="post_str" value='{if isset($post_json)}{$post_json}{/if}' />
+<div class="info alert_info" style="display: none"></div>
+<div class="error alert_error" style="display: none;"></div>
+
+<div class="alert_content">
+
+<h3><b>{$lng.alerts.email_alert_info}</b></h3>
+{if $str_search}<div class="small">{$str_search}</div>{else}<div class="small-light">{$lng.alerts.no_terms_searched}</div>{/if}
+
+<div class="mt20">
+{$lng.alerts.send_email_alerts}&nbsp;
+<select name="alert_frequency" id="alert_frequency">
+<option value="0">{$lng.alerts.immediately}</option>
+<option value="1" selected="selected">{$lng.alerts.daily}</option>
+<option value="7">{$lng.alerts.weekly}</option>
+</select>
+&nbsp;
+{$lng.general.to}
+&nbsp;<input type="text" size="30" name="alert_email" id="alert_email" class="defaultText" title="{$lng.alerts.your_email}" value="{if isset($crt_usr_sett.email)}{$crt_usr_sett.email}{/if}"/>
+</div>
+
+<div class="buttons"><span class="positive"><input type="submit" name="CreateAlert" id="CreateAlert" value="{$lng.alerts.create_alert}" /></span></div>
+
+</div>{* end alert_content *}
+
+</form>
+</div>
+
+{/if}
+
+
+{if $no_listings>0}
+<ul class="classified">
+{foreach name="listings" from=$listings_array item=v}
+	{include file="short_listing.html"}
+{/foreach}
+</ul>
+{if $no_pages>1}
+{include file="paginator.html"}
+{else}
+<div class="clearfix"></div>
+{/if}
+
+{else}
+	<div class="info"><p>{$lng.advanced_search.no_results}</p></div>
+{/if}
+
+<script type="text/javascript">
+{literal}
+$(window).load(function(){ // fix for safari and chrome setting width and height after the image is loaded
+{/literal}
+{foreach from = $listings_array item=v}
+	{if $v.rented}
+	{literal}
+		$("#rented{/literal}{$v.id}{literal}").show();
+		$("#rented{/literal}{$v.id}{literal}").css({ top: $("#pic{/literal}{$v.id}{literal}").position().top-2, left: $("#pic{/literal}{$v.id}{literal}").position().left+ $("#pic{/literal}{$v.id}{literal}").width()-31});
+	{/literal}
+	{elseif $v.sold}
+	{literal}
+		$("#sold{/literal}{$v.id}{literal}").show();
+		$("#sold{/literal}{$v.id}{literal}").css({ top: $("#pic{/literal}{$v.id}{literal}").position().top-2, left: $("#pic{/literal}{$v.id}{literal}").position().left+ $("#pic{/literal}{$v.id}{literal}").width()-31});
+	{/literal}
+	{/if}
+{/foreach}
+{literal}
+//$(".classifieds_content").width;
+
+
+$("#create_alert").click(function (event) {
+if($(".email_alert_box").is(":visible"))
+	$(".email_alert_box").hide();
+else 
+	$(".email_alert_box").show();
+
+})
+
+
+
+
+
+
+{/literal} 
+{if $ads_settings.alerts_enabled}
+{literal}
+
+//	$(".info").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+	var ret = JSON.parse(responseText);
+
+	$("body").removeClass("loading");
+
+	if(ret.response==1) {
+
+		$(".alert_info").html("<p>"+ret.info+"</p>");
+		$(".alert_info").show();
+		$(".alert_content").slideUp();
+		return;
+
+	}
+
+	// response = 0 -> there are errors
+	$(".alert_error").html("<p>"+ret.error+"</p>");
+	$(".alert_error").show();
+
+} 
+
+ $('#alert').ajaxForm(options);
+
+{/literal}
+{/if} 
+{literal} 
+
+
+
+
+
+
+
+
+
+
+});
+
+{/literal}
+</script>
+
+{include file="footer.html"}

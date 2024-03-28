@@ -1,0 +1,66 @@
+	{if $browse_location_settings.type!="single" && $bl_locations.values|@count > 1}
+		<div>
+		<ul id="location_tabnav">
+		{foreach name="master_loc" from=$bl_locations.values item=v}
+		<li><a id="location_tab{$v.id}" href="javascript:;" onclick="onChangeLocation('{$v.id}', '{$bl_locations.table1}', '{$live_site}')" {if $smarty.foreach.master_loc.index==0}class="active"{/if}>{$v.name}</a></li>
+		{/foreach}
+		</ul>
+		</div>
+	{/if}
+
+	<div id="location-box"> 
+
+	{capture name=some_content assign=title_field}title_{$crt_lang}{/capture}
+
+	{if ($browse_location_settings.type=="single" || $bl_locations.values|@count <= 1) && $browse_location_settings[$title_field]}
+	<h2>{$browse_location_settings[$title_field]}</h2>
+	{/if}
+	
+		{if $browse_location_settings.type=="single"}
+		
+			<table cellpadding="0" cellspacing="0" width="100%">
+			<tr><td valign="top">
+			<ul>
+			{foreach name=list from=$bl_locations.elements item=t}
+				{capture name=sfield assign=field2}{$t.el}{/capture}
+				<li><a href="{if $settings.enable_locations}{if $settings.enable_subdomains && $settings.subdomain_field == $bl_locations.caption}http://{$t.encoded_el}.{$main_domain}{elseif in_array($bl_locations.caption, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$bl_locations.caption}|{$field2|rawurlencode}'){/if}{else}{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$bl_locations.caption p2=$field2}{else}{$live_site}/listings.php?{$bl_locations.caption}={$field2}{/if}{/if}">{$t.el}</a></li>
+				{if ($smarty.foreach.list.index+1)%$bl_locations.no_each_row==0 && $smarty.foreach.list.index && $smarty.foreach.list.index!=$bl_locations.no_elements-1}
+			</ul>
+			</td>
+
+			<td valign="top">
+			<ul>
+				{/if}
+			{/foreach}
+			</ul>
+			</td></tr>
+			</table>
+		
+
+		{else}
+		{foreach name=loc1 from=$bl_locations.values item=v}
+
+			<div class="locdiv" id="loc1_{$v.id}" {if $smarty.foreach.loc1.index!=0}style="display: none; "{/if}>
+			<table cellpadding="0" cellspacing="0" width="100%">
+			<tr><td valign="top">
+			<ul>
+			{capture name=sfield assign=field1}{$v.name}{/capture}
+			{foreach name=list from=$v.elements item=t}
+				{capture name=sfield assign=field2}{$t.el}{/capture}
+				<li><a href="{if $settings.enable_locations}{if $settings.enable_subdomains && $settings.subdomain_field == $bl_locations.caption}http://{$t.encoded_el}.{$main_domain}{elseif in_array($bl_locations.caption, $location_fields)}javascript:;" onclick="changeDoubleLocation('{$live_site}', '{$seo_settings.enable_mod_rewrite}', '{$bl_locations.master_caption}|{$field1|rawurlencode},{$bl_locations.caption}|{$field2|rawurlencode}'){/if}{else}{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$bl_locations.master_caption p2=$field1 p3=$bl_locations.caption p4=$field2}{else}{$live_site}/listings.php?{$bl_locations.master_caption}={$field1|lower}&amp;{$bl_locations.caption}={$field2|lower}{/if}{/if}">{$t.el}</a></li>
+				{if ($smarty.foreach.list.index+1)%$v.no_each_row==0 && $smarty.foreach.list.index && $smarty.foreach.list.index!=$v.no_elements-1}
+			</ul>
+			</td>
+
+			<td valign="top">
+			<ul>
+				{/if}
+			{/foreach}
+			</ul>
+			</td></tr>
+			</table>
+			</div>
+		{/foreach}
+		{/if}
+
+        </div>

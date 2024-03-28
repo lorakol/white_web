@@ -1,0 +1,473 @@
+{if $ads_settings.enable_auctions && $listing.auction.active}
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+jQuery(document).ready(function() {
+
+	$(".bid_info").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$(".bid_info").html("<p>"+ret.info+"</p>");
+				$(".bid_info").show();
+				$(".form2").slideUp();
+
+				if(ret.new_max_bid != '0')
+					$("#max_bid").html(ret.new_max_bid);
+
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				if(err_field=="alert_window") { alert(err_string); $('input[type="submit"]').prop('disabled', true); break; }
+				$("#"+err_field).addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+//			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+} 
+
+ $('#bid_form').ajaxForm(options);
+
+});
+{/literal}
+//]]>
+</script>
+
+{/if}
+
+<script type="text/javascript">
+
+	{foreach from=$gmaps item=v}
+		{if isset($listing[$v.caption]) && $listing[$v.caption]}
+			{include file="data/map-ro.html"}
+		{/if}
+	{/foreach}
+
+	// maps for nologin users
+	{foreach from=$user_gmaps item=v}
+		{if isset($listing.user[$v.caption]) && $listing.user[$v.caption]}
+			{include file="data/map-ro.html" tmp=$listing.user}
+		{/if}
+	{/foreach}
+
+function init_gmap() {
+
+{*
+	{foreach from=$gmaps item=v}
+		{if isset($listing[$v.caption]) && $listing[$v.caption]}
+			init_gmap_{$v.caption}();
+		{/if}
+	{/foreach}
+*}
+	{foreach from=$user_gmaps item=v}
+		{if isset($listing.user[$v.caption]) && $listing.user[$v.caption]}
+			init_gmap_{$v.caption}();
+		{/if}
+	{/foreach}
+
+	}
+
+function init_osm() {
+{*
+	{foreach from=$gmaps item=v}
+		{if isset($listing[$v.caption]) && $listing[$v.caption]}
+			init_osm_{$v.caption}();
+		{/if}
+	{/foreach}
+*}	
+	{foreach from=$user_gmaps item=v}
+		{if isset($listing.user[$v.caption]) && $listing.user[$v.caption]}
+			init_osm_{$v.caption}();
+		{/if}
+	{/foreach}
+
+}
+
+$(document).ready(function() {
+
+	var gmaps_on = {if $user_gmaps_value_exists}1{else}0{/if};
+
+	// initialize google maps
+	{if $settings.map_type=="gmaps"}
+ 	load_gmaps();
+	{else}
+	init_osm();
+	{/if}
+
+{literal}
+	$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+{/literal}
+	if(history.length<2) $("#back_btn").hide();
+
+
+{if $no_images}
+{literal}
+
+	var sw = 0;
+	var scrll=4;
+	if(window.innerWidth<600) { sw=1; scrll=1; }
+	
+	//console.log(sw+"  "+scrll);
+	$("#smallimg-container").carouFredSel({
+
+	    items: {
+	        //visible: 4,
+	        //minimum: 1
+			visible: {
+				min: 1,
+				max: 4
+			}
+	    },
+	    scroll: {
+	        items: scrll,
+	        duration: 500,
+	        pauseOnHover: true,
+		conditions: function() { if(!sw) { {/literal}{if $listing.images|@count>4}return true; {else}return false;{/if}{literal} } else return true;}
+	    },
+	    auto: {
+		play: false
+		},
+	    responsive: true,
+	    prev: {
+	        button: ".prev-gallery",
+	        key: "left"
+	    },
+	    next: {
+	        button: ".next-gallery",
+	        key: "right"
+	    }
+	});
+
+	 $(".bigimg").on('click',function(){
+		$("a.fimage:first").trigger('click');
+	});
+{/literal}
+{/if}
+{literal}
+
+	 $("li.tlist").on('mouseenter',function(){
+		$(this).addClass("over");
+	});
+
+	$("li.tlist").on('mouseleave',function(){
+		$("li.tlist").removeClass("over");
+	});
+
+	$(".accordion-header").on('click',function(){
+		$("div.first").removeClass("first");
+	});
+
+	
+	$("#view-ad-details").on('click',function(){
+		$(".tab-content").hide();
+		$("#ad-details-view").show();
+		$("li.tlist").removeClass("crt");
+		$("#view-ad-details").parent().addClass("crt");
+	});
+
+	$("#view-contact-info").on('click',function(){
+		$(".tab-content").hide();
+		$("#contact-info-view").show();
+		$("li.tlist").removeClass("crt");
+		$("#view-contact-info").parent().addClass("crt");
+		{/literal}
+		{if $user_gmaps_value_exists}
+		init_gmap();
+		{/if}
+		{if $settings.contact_captcha && $settings.enable_recaptcha && (!$listing.sold || !$ads_settings.hide_contact_when_sold) && (!$listing.rented || !$ads_settings.hide_contact_when_rented) && ($logged_in || $is_admin || !$ads_settings.hide_contact_when_not_logged)}
+		//onloadRCCallback();
+		{/if}
+
+		{literal}
+	});
+	
+	$("#h-view-contact-info").on('click',function(){
+	
+		{/literal}
+		{if $user_gmaps_value_exists}
+		init_gmap();
+		{/if}
+		{if $settings.contact_captcha && $settings.enable_recaptcha && (!$listing.sold || !$ads_settings.hide_contact_when_sold) && (!$listing.rented || !$ads_settings.hide_contact_when_rented) && ($logged_in || $is_admin || !$ads_settings.hide_contact_when_not_logged)}
+		//onloadRCCallback();
+		{/if}
+
+		{literal}
+	});
+
+	{/literal}
+	{if in_array("ratings",$modules_array)}
+	{literal}
+	$("#view-reviews").on('click',function(){
+		$(".tab-content").hide();
+		$("#reviews-view").show();
+		{/literal}
+		{if $ratings_settings.ar_html_editor && !$rating_nologin && !$same_user}
+			loadReviewsEditor();
+		{/if}
+		{literal}
+		$("li.tlist").removeClass("crt");
+		$("#view-reviews").parent().addClass("crt");
+		{/literal}
+		{if $settings.enable_recaptcha && $ratings_settings.ar_captcha==1 || ($ratings_settings.ar_captcha==2 && !$logged_in)}
+		onloadRCCallback("_rev");
+		{/if}
+		{literal}
+	});
+
+	$("#h-view-reviews").on('click',function(){
+		{/literal}
+		{if $ratings_settings.ar_html_editor && !$rating_nologin && !$same_user}
+			loadReviewsEditor();
+		{/if}
+		{if $settings.enable_recaptcha && $ratings_settings.ar_captcha==1 || ($ratings_settings.ar_captcha==2 && !$logged_in)}
+		onloadRCCallback("_rev");
+		{/if}
+		{literal}
+	});
+	{/literal}
+	{/if}
+
+	
+	{if in_array("comments",$modules_array)}
+	{literal}
+	$("#view-comments").on('click',function(){
+		$(".tab-content").hide();
+		$("#comments-view").show();
+		{/literal}
+		{if $comments_settings.html_editor && !$comm_nologin}
+			loadCommentsEditor();
+		{/if}
+		{literal}
+		$("li.tlist").removeClass("crt");
+		$("#view-comments").parent().addClass("crt");
+		{/literal}
+		{if (($settings.enable_recaptcha && $comments_settings.captcha==1) || ($comments_settings.captcha==2 && !$logged_in)) && !$comm_nologin}
+		onloadRCCallback("_comm");
+		{/if}
+		{literal}
+	});
+	$("#h-view-comments").on('click',function(){
+		{/literal}
+		{if $comments_settings.html_editor && !$comm_nologin}
+			loadCommentsEditor();
+		{/if}
+		{if (($settings.enable_recaptcha && $comments_settings.captcha==1) || ($comments_settings.captcha==2 && !$logged_in)) && !$comm_nologin}
+		onloadRCCallback("_comm");
+		{/if}
+		{literal}
+	});
+	{/literal}
+	{/if}
+
+	{if in_array("loancalc",$modules_array)}
+	{literal}
+	$("#view-loancalc").on('click',function(){
+		$(".tab-content").hide();
+		$("#loancalc-view").show();
+		$("li.tlist").removeClass("crt");
+		$("#view-loancalc").parent().addClass("crt");
+	});
+	{/literal}
+	{/if}
+	{literal}
+
+	$("#view-video").on('click',function(){
+		$(".tab-content").hide();
+		$("#video-view").show();
+		$("li.tlist").removeClass("crt");
+	});
+	{/literal}
+
+{if !in_array($listing.id, $fav_array)}
+	$("a.addtofav").show();
+	$("a.remfav").hide();
+{else}
+	$(".addtofav").hide();
+	$(".remfav").show();
+{/if}
+{literal}
+
+/*
+$(function() {
+
+    $('.pic').css({
+        'position' : 'absolute',
+        'left' : (($(this).parent().width() - $(this).outerWidth()) / 2) + $(this).parent().scrollLeft() + "px",
+        'top' : (($(this).parent().height() - $(this).outerHeight()) / 2) + $(this).parent().scrollTop() + "px"
+    });
+
+});
+*/
+
+//$('.pic').center();
+
+	});// end document ready
+
+$('.tooltip').powerTip({
+	placement: 'n'
+});
+
+$('.fshare').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true
+});
+
+$('.freport').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true
+});
+
+$('.bmailto').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true
+});
+
+$('.addtofav').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true,
+  callbacks: {
+  close: function() {
+    $(".addtofav").hide();
+	$(".remfav").show();
+  }
+}
+});
+$('.remfav').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true,
+  callbacks: {
+  close: function() {
+    $(".addtofav").show();
+	$(".remfav").hide();
+  }
+}
+});
+
+$("#place_bid").click(function () { 
+
+	{/literal}
+	{if !isset($crt_usr)}
+	alert("{$lng.useraccount.login_to_bid}");
+	return 0;
+	{/if}
+	{literal}
+
+	if($(".auction-details").is(":visible"))
+		$(".auction-details").slideUp();
+	else $(".auction-details").slideDown();
+
+});
+
+$("#show_bids").click(function () { 
+
+	if($(".auction-details").is(":visible"))
+		$(".auction-details").slideUp();
+	else $(".auction-details").slideDown();
+
+});
+
+$("a.more_lf").click(function(event){
+
+	event.preventDefault();
+	var field = jQuery(this).attr("id").substr(5);
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/get_phone.php?aid={$listing.id}&type=listing&field={literal}"+field,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$("#span_"+field).html(data);
+				$("#show_"+field).hide();
+				
+
+			} // end data
+		});// end ajax
+
+});
+
+$("a.more").click(function(event){
+
+	var field = jQuery(this).attr("id").substr(5);
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/get_phone.php?aid={$listing.id}&{if $listing.user_id}id={$listing.user_id}{/if}&field={literal}"+field,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$("#span_"+field).html(data);
+				$("#show_"+field).hide();
+
+			} // end data
+		});// end ajax
+
+});
+
+
+$("a.fimage").fancybox({
+		'transitionIn'		: 'elastic',
+		'transitionOut'		: 'elastic',
+		'titlePosition' 	: 'over',
+		'titleFormat'       : function(title, currentArray, currentIndex, currentOpts) {
+
+		    return '<span id="fancybox-title-over">{/literal}{$lng.listings.image}{literal} ' +  (currentIndex + 1) + ' / ' + currentArray.length +'</span>';
+		},
+		'onComplete'	:	function(event) {
+
+			//$("#big_image").attr("src", _this.attr("id"));
+		}
+	});
+
+
+$('.show_map').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true
+});
+
+</script>
+{/literal}

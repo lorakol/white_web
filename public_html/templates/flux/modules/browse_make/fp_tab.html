@@ -1,0 +1,3 @@
+{capture name=some_content assign=title_field}title_{$crt_lang}{/capture}
+	<input id="tab_browse_make" type="radio" name="tabs2" {if !$ck}checked{/if}>
+	<label for="tab_browse_make">{$browse_make_settings[$title_field]}</label>

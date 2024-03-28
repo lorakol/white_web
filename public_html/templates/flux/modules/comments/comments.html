@@ -1,0 +1,60 @@
+{if $comments_settings.categories==0 || in_array($listing.category_id, $comments_settings.categories_array)}
+<section>
+
+<div class="button wide_button ha800 mb20" id="view_comments">{$no_comments} {if $no_comments!=1}{$lng_comments.scomments}{else}{$lng_comments.scomment}{/if}</div>
+<div class="button wide_button ha800 mb20" id="hide_comments" style="display: none;">{$lng.general.hide}</div>
+
+{if !isset($jqform_included) || !$jqform_included}
+<div class="wait"></div>
+{assign var="jqform_included" value="1"}
+{/if}
+
+<div class="hb800 mb20" id="comments_box">
+
+<h2 class="heading"><span id="no_comments">{$no_comments}</span> {if $no_comments!=1}{$lng_comments.scomments}{else}{$lng_comments.scomment}{/if} {$lng.general.on} {$listing.title}</h2>
+
+<div class="light-container" id="comments_container">
+
+	{include file="modules/comments/add_comment.html"}
+
+	{foreach from=$comments_array item=v name=cloop}
+	{include file="modules/comments/comment.html"}
+	{/foreach}	
+
+	{if $cm_no_pages>1}
+	{include file="modules/comments/paginator.html"}
+	{/if}
+
+	<div class="clearfix"></div>
+
+</div> {* end comments_container *}
+
+<div class="clearfix"></div>
+
+</div>
+
+<script type = "text/javascript">
+jQuery(document).ready(function() {
+	
+	$("#view_comments").click(function(){ 
+ 
+		$("#comments_box").slideDown();
+		$("#hide_comments").slideDown();
+		$("#view_comments").slideUp();
+		
+		loadCommentsEditor();
+	
+	});
+ 
+	$("#hide_comments").click(function(){ 
+ 
+		$("#comments_box").slideUp();
+		$("#view_comments").slideDown();
+		$("#hide_comments").slideUp();
+	
+	});
+
+});
+</script>
+</section>
+{/if}

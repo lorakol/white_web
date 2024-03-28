@@ -1,0 +1,33 @@
+{include file="header.html"}
+
+<div class="heading"><h1>{$lng.useraccount.statistics}</h1></div>
+
+<div id="account">
+      <div id="auth_left">
+        <div id="left_content" class="clearfix"> 
+		<h2>{$lng.stats.general}</h2>
+		<table class="stat" width="100%">
+			<tr><td>{$lng.useraccount.account_type}</td><td class="tright">{$group.name}</td></tr>
+			<tr><td>{$lng.users.affiliate_id}</td><td class="tright">{$crt_usr_sett.affiliate_id}</td></tr>
+			<tr><td>{$lng.users.affiliate_link}</td><td class="tright"><a href="{$user.affiliate_link}" target="_blank">{$user.affiliate_link}</a></td></tr>
+			<tr><td>{$lng.useraccount.last_login}</td><td class="tright">{if isset($last_login.date_login_nice) && $last_login.date_login_nice}{$last_login.date_login_nice}{else}-{/if}</td></tr>
+			<tr><td>{$lng.useraccount.last_login_ip}</td><td class="tright">{if isset($last_login.ip) && $last_login.ip}{$last_login.ip}{else}-{/if}</td></tr>
+			<tr><td>{$lng.affiliates.last_payment}</td><td class="tright">{if isset($last_payment.amount) && $last_payment.amount}{$last_payment.amount}{else}-{/if}</td></tr>
+			<tr><td>{$lng.affiliates.last_payment_date}</td><td class="tright">{if isset($last_payment.date) && $last_payment.date}{$last_payment.date}{else}-{/if}</td></tr>
+			<tr><td>{$lng.affiliates.next_payment_date}</td><td class="tright">{if isset($next_payment_date) && $next_payment_date}{$next_payment_date}{else}-{/if}</td></tr>
+
+			<tr><td>{$lng.affiliates.total_due}</td><td class="tright">{$total_due}&nbsp;&nbsp;<div class="form_button"><strong><a href="affiliate_revenue.php">{$lng.affiliates.revenue_history}</a></strong></div></td></tr>
+
+			<tr><td>{$lng.affiliates.total_payments}</td><td class="tright">{$total_payments}&nbsp;&nbsp;<div class="form_button"><strong><a href="affiliate_payments_history.php">{$lng.affiliates.payments_history}</a></strong></div></td></tr>
+
+			{if isset($pending_payment) && $pending_payment}
+			<tr><td>{$lng.affiliates.pending_payment}</td><td class="tright">{$pending_payment}</td></tr>
+			{/if}
+		</table>
+
+        </div>
+      </div>
+      <!-- end: #left_col -->
+</div>
+
+{include file="footer.html"}

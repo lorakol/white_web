@@ -1,0 +1,627 @@
+{if $step==1}
+<script src="https://js.stripe.com/v3/"></script>
+{literal}
+<script>
+
+//<![CDATA[
+
+$(document).ready(function() {
+
+var options = { 
+       // target:        '#output1',   // target element(s) to be updated with server response 
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  beforeSubmit,  // pre-submit callback 
+        success:       successResponse  // post-submit callback 
+ 
+        // other available options: 
+        //url:       url         // override for form's 'action' attribute 
+        //type:      type        // 'get' or 'post', override for form's 'method' attribute 
+        //dataType:  null        // 'xml', 'script', or 'json' (expected server response type) 
+        //clearForm: true        // clear all form fields after successful submit 
+        //resetForm: true        // reset the form after successful submit 
+ 
+        // $.ajax options can be used here too, for example: 
+        //timeout:   3000 
+    }; 
+
+function beforeSerialize(jqForm, options) {
+//alert("before serialize");
+	$("body").addClass("loading"); 
+
+	// capturing nicEditor content
+	if (typeof myNicEditor !== 'undefined')
+	for(var i=0;i<myNicEditor.nicInstances.length;i++){myNicEditor.nicInstances[i].saveContent(); }
+
+	if (typeof data_htmlarea !== 'undefined')
+	for(var i=0;i<data_htmlarea.nicInstances.length;i++){ data_htmlarea.nicInstances[i].saveContent(); }
+
+		
+	// international phones errors
+	var extra_phone_error = recheckIntlPhone();
+	if(extra_phone_error.length>0) {
+
+		// clean all fields possible err class
+		$(".err").removeClass("err");
+		// remove all err_labels
+		$(".err_label").remove();
+			
+		for (var i = 0, len = extra_phone_error.length; i < len; i++) {
+
+			$("#"+extra_phone_error[i]).addClass("err");
+			// add as child before form element
+			$("#"+extra_phone_error[i]).first().parents().eq(2).before('<label class="err_label">{/literal}{$lng.listings.errors.invalid_phone}{literal}</label>');
+			
+		}
+
+		$("body").removeClass("loading"); 
+
+		// move the page to the first err_label element
+		$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+		return false;
+			
+	} // end international phone error
+
+	// return false to cancel submit
+
+}
+
+// pre-submit callback 
+function beforeSubmit(formData, jqForm, options) { 
+
+    // formData is an array; here we use $.param to convert it to a string to display it 
+    // but the form plugin does this for you automatically when it submits the data 
+    var queryString = $.param(formData); 
+ 
+    // jqForm is a jQuery object encapsulating the form element.  To access the 
+    // DOM element for the form do this: 
+    // var formElement = jqForm[0]; 
+ 
+    //alert('About to submit: \n\n' + queryString); 
+ 
+    // here we could return false to prevent the form from being submitted; 
+    // returning anything other than false will allow the form submit to continue 
+
+	if($(".form_footer").find("input[type='submit']:focus").attr("id")=="Cancel") {
+		location.href='my_listings.php';
+		return false;
+	}
+
+
+    return true; 
+} 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+    // for normal html responses, the first argument to the success callback 
+    // is the XMLHttpRequest object's responseText property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'xml' then the first argument to the success callback 
+    // is the XMLHttpRequest object's responseXML property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'json' then the first argument to the success callback 
+    // is the json data object returned by the server 
+ 
+    //alert('status: ' + statusText + '\n\nresponseText: \n' + responseText + 
+    //    '\n\nThe output div should have already been updated with the responseText.'); 
+
+//alert(responseText);
+
+			var ret = JSON.parse(responseText);
+			
+			var final_amount = $("#full_total").val();
+
+			if(ret.response==1) {
+
+				// go to payment page
+				var selected_processor = $('#selected_processor').val();
+
+				$("#checkout-form").html("");
+
+				if(selected_processor=="iyzico") {
+					$("body").addClass("loading");
+					$( '<div id="checkout-form"><div id="iyzipay-checkout-form" class="responsive"></div></div>' ).insertAfter( "#newad" );
+					$("#newad").hide();
+				}
+                                
+				$("#payment").html(ret.payment_form);
+
+				if(selected_processor=="klarna" || selected_processor=="tpay" || selected_processor=="iyzico") {
+					$("body").removeClass("loading");
+					$("#payment").slideDown();
+					$('html,body').animate({scrollTop:$("#payment").offset().top}, 'slow');
+					$(".form_footer").hide();
+					$("#payment_form").submit();
+					$("#payment_form").submit();
+				}
+				else 
+					$("#payment_form").submit();
+//alert (ret.payment_form);
+
+				if(selected_processor=="iyzico") 
+					$("body").removeClass("loading");
+
+				return;
+			}
+
+			// response = 0 -> there are errors in submit ad process 
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+
+				// add the actual error next to the proper field
+				// nicEditor fix
+				if(err_field.match("description[a-z0-9_]*")) $("#"+err_field+"_elm").addClass("err");
+				
+				if(err_field=="selected_processor" ) { $("."+err_field).closest( ".option_right").prepend('<label class="err_label">'+err_string+'</label>'); continue; }
+				
+				if(!err_field) { $("#category_selected").before('<label class="err_label" id="nofield_err">'+err_string+'</label>'); $("#nofield_err").addClass("err"); continue; }
+
+				$("#"+err_field).addClass("err");
+				// add as child before form element
+				//$("#"+err_field).first().before('<label class="err_label">'+err_string+'</label>');
+				$('label[for='+err_field+']').after('<label class="err_label">'+err_string+'</label>');
+
+			}
+
+			// move the page to the first err_label element
+			if($(".err:first").offset()) $('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+			$("body").removeClass("loading");
+
+			{/literal}{if $settings.nologin_image_verification && $settings.enable_recaptcha && (!isset($crt_usr) || !$crt_usr)}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+//initialize the AJAX form for submit ad
+ $('#newad').ajaxForm(options);
+
+
+// ----------- SELECT CATEGORY ----------
+
+$(document).on("change", ".catselect", function(){ 
+
+	var level_no = parseInt(jQuery(this).attr("id").substr(8));
+
+	var selBox = "category"+level_no;
+	var selected_val = $("#"+selBox).val();
+	var group_id = $("#group").val();
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/include/get_info.php?type=subcat&id="+selected_val+"&group="+group_id,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			//data=cat_id@cat_name^cat_id@cat_name ....
+			// or 0 if the category has no subcats
+
+			if(data==0) {
+				$("#category").val(selected_val);
+				for(var i=level_no+1;i<=5; i++)
+					$("#level"+i).hide();
+				// hide categories selectors
+				$("#newad_category").slideUp();
+				$("#category_selected span.tag").html($("#"+selBox+" option:selected").text());
+				$("#category_selected").slideDown();
+				$.ajax({
+					type		: "GET",
+					cache		: false,
+					url		: "{/literal}{$live_site}{literal}/new_listing.php?step=2&category="+selected_val,
+					data		: $(this).serializeArray(),
+					success: function(data) {
+						// look for "only_plan" string
+						// the only plan
+						if(data.substring(0, 9) === "only_plan") {
+							// "only_plan|plan_id|plan_name"
+							var split=data.split("|");
+							$("#package").val(split[1]);
+							$("#subscription").val(0);
+							$("#no_words").val(split[3]);
+							$("#plan_selected span.tag").html(split[2]);
+							$("#subscription_selected").hide();
+							//$("#plan_selected").slideDown();
+							$(".change_plan_selection").hide();
+							
+							$(".more_plans").hide();
+
+							loadAdDetailsForm(split[1], 0);
+							loadPlanInfo();
+						
+							if(split[3]>0) $("#count").show(); else $("#count").hide();
+
+						}
+						// look for "only_sub" string
+						// the only subscription
+						else if(data.substring(0, 8) === "only_sub") {
+
+							// "only_sub|sub_id|plan_name|subscription_details"
+							var split=data.split("|");
+							$("#subscription").val(split[1]);
+							$("#package").val(split[2]);
+							$("#no_words").val(split[4]);
+							$("#subscription_selected span.tag").html(split[3]);
+							$("#subscription_selected span.details").html(split[5]);
+							$("#subscription_selected").slideDown();
+							$("#plan_selected").hide();
+
+							if(split[4]>0) $("#count").show(); else $("#count").hide();
+
+							loadAdDetailsForm(split[2], split[1]);
+							loadPlanInfo();
+							
+						} else { // choose from a number of plans
+
+							$("#newad_plans").html(data);
+							$('html,body').animate({scrollTop:$("#newad_plans").offset().top}, 'slow');
+
+						}	
+
+					}// end data
+				}); // end ajax
+
+				return;
+			}
+
+			var split_res=data.split("^");
+			var no_cats = split_res.length;
+
+			var next_level = level_no+1;
+			//$("#category"+next_level).empty().append('<option value=""> - </option>'); // empty options list
+			$("#level"+next_level).show();
+
+			for(var i=level_no+2;i<=5; i++)
+				$("#level"+i).hide();
+
+			// empty category value
+			$("#category").val(0);
+
+			// remove the content for plans, fields, images and options boxes
+			//$("#newad_plans").html('');
+			//$("#newad_details").html('');
+
+			$("#category"+next_level).empty();
+			var select_scat = "{/literal}{$lng.listings.select_subcategory}{literal}";
+			var options_str = '<option disabled selected value="">'+select_scat+'</option>';
+			for (var idx=1;idx<=no_cats;idx++) {
+
+				var vals=split_res[(idx-1)].split("@");
+				cid = vals[0];
+				cname = vals[1];
+				options_str+='<option value="'+cid+'">'+cname+'</option>';
+
+			} //end for (var idx=1;idx<level_no;idx++)
+			$("#category"+next_level).append(options_str);
+
+			} // end data
+		});// end ajax
+
+}); // end $(".levels").click
+
+// ----------- SELECT PLAN ----------
+$(document).on("click", ".select_plan", function(){ 
+
+	// get current selected plan
+	var plan_no = parseInt(jQuery(this).attr("id").substr(11));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var plan_name = split_res[0];
+	var no_words = split_res[1];
+
+	// set value for selected plan
+	$("#package").val(plan_no);
+	$("#subscription").val(0);
+	$("#no_words").val(no_words);
+	if(no_words>0) $("#count").show(); else $("#count").hide();
+
+	$("#newad_plans").slideUp();
+	$("#plan_selected span.tag").html(plan_name);
+	$("#plan_selected").slideDown();
+	$("#subscription_selected").hide();
+
+	loadAdDetailsForm(plan_no, 0);
+	loadPlanInfo();
+
+	reinit();
+
+}); // end select_plan click
+
+// ----------- SELECT SUBSCRIPTION ----------
+$(document).on("click", ".select_subscription", function(){ 
+
+	// get current selected subscription
+	var sub_no = parseInt(jQuery(this).attr("id").substr(19));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var plan_no = split_res[0];
+	var sub_name = split_res[1];
+	var sub_details = split_res[2];
+	var no_words = split_res[3];
+	if(no_words>0) $("#count").show(); else $("#count").hide();
+
+	// set value for selected plan
+	$("#package").val(plan_no);
+	$("#subscription").val(sub_no);
+
+	$("#newad_plans").slideUp();
+
+	$("#subscription_selected span.tag").html(sub_name);
+	$("#subscription_selected span.details").html(sub_details);
+	$("#plan_selected").hide();
+	$("#subscription_selected").slideDown();
+
+	loadAdDetailsForm(plan_no, sub_no);
+	loadPlanInfo();
+	reinit();
+
+}); // end select_plan click
+
+$(document).on("click", "#change_category", function(){ 
+
+	// empty category and plan values
+	$("#category").val(0);
+	$("#package").val(0);
+	$("#subscription").val(0);
+
+	// reset the select boxes
+	$('#category1').val('');
+	for(var i=2;i<=5; i++)
+		$("#level"+i).hide();
+
+	// show the select category form
+	$("#category_selected").slideUp();
+	$("#newad_category").slideDown();
+
+	// empty plans box
+	$("#plan_selected").hide();
+	$("#subscription_selected").hide();
+	$("#newad_plans").html("");
+	$("#newad_plans").show();
+
+	// empty listing details form
+	$("#newad_details").html("");
+	$("#newad_details").show();
+
+}); // end change category
+
+$(document).on("click", "#change_plan", function(){ 
+
+	// empty plan value
+	$("#package").val(0);
+
+	// show plans box
+	$("#plan_selected").slideUp();
+	$("#newad_plans").slideDown();
+
+	// hide listing details form
+	$("#newad_details").html("");
+	$("#newad_details").show();
+
+}); // end change plan
+
+$(document).on("click", "#choose_subscription", function(){ 
+
+	$("#active_subscriptions").slideDown();
+	$("#available_plans").slideUp();
+
+}); // end choose subscription
+
+
+$(document).on("click", "#choose_plan", function(){ 
+
+	$("#subscription_selected").slideUp();
+	$("#active_subscriptions").slideUp();
+	$("#newad_plans").slideDown();
+	$("#available_plans").slideDown();
+
+}); // end choose plan
+
+
+$("#view_plan_info,#view_sub_info").magnificPopup({
+		type: 'inline',
+		fixedContentPos: false,
+		fixedBgPos: true,
+		overflowY: 'auto',
+		closeBtnInside: true,
+		preloader: false,
+		midClick: true
+});
+
+}); // end document.ready
+
+function loadAdDetailsForm(plan_no, sub_no) {
+
+	var str = "";
+	if(plan_no>0) str+="&plan="+plan_no;
+	if(sub_no>0) str+="&subscription="+sub_no;
+	// get custom fields, images and extra options boxes
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/new_listing.php?step=3&category="+$("#category").val()+str,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#newad_details").html(data);
+			createUploader();// no photos allowed??
+			$('html,body').animate({scrollTop:$("#newad_category").offset().top}, 'slow');
+		}// end data
+	}); // end ajax
+
+}
+
+function loadPlanInfo() {
+
+	var plan_no = $("#package").val();
+
+	var str = "";
+	if(plan_no>0) str+="&plan="+plan_no;
+	
+	// get listing plan information
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/new_listing.php?step=5"+str,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#plan_details").html(data);
+		}// end data
+	}); // end ajax
+
+}
+
+function onVideo() {
+	if($('#video').is(':checked')) $("#video_div").slideDown();
+	else $("#video_div").slideUp();
+}
+
+function onUrl() {
+	if($('#url').is(':checked')) $("#url_div").slideDown();
+	else $("#url_div").slideUp();
+}
+
+//]]>
+
+</script>
+{/literal}
+{/if}
+
+{if $step==3}
+{literal}
+<script>
+
+$(document).ready(function() {
+
+	$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+
+	$('.tooltip').powerTip();
+
+	{/literal}{if $no_words && !$html_editor}{literal}
+
+	$('.counter').textcounter({
+		type: "word",
+		max: {/literal}{$no_words}{literal},
+		stopInputAtMaximum       : true,
+		countDown: true,
+		countDownText: "%d {/literal} {$lng.listings.words_left}{literal}"
+	});
+	
+	{/literal}  
+	{/if}
+	{literal}
+
+	// *********** tax value **************
+	{/literal}
+
+	{if $no_processors>1 || ($no_processors==1 && isset($credits_allowed) && $credits_allowed)}
+	only_processor = 0;
+	{else}
+	only_processor = 1;
+	{/if}
+
+	{if $total}
+
+	if(only_processor)
+		var processor = $('input[name=processor]').val();
+	else 
+		var processor = $('input:radio[name=processor]:checked').val();		
+
+	var total = $("#full_total").val();
+	calculateTax(processor, total);
+
+
+	{/if} {* end if total *}
+
+	{literal}
+
+
+	$('input:radio[name=processor]').change(function() { 
+
+		processor = $('input:radio[name=processor]:checked').val();
+		calculateTax(processor, $("#full_total").val());
+		// for embedded payments
+		$("#selected_processor").val(processor);
+
+		reinit();
+
+	})
+
+	// end tax value
+
+{/literal}
+var gmaps_on = {if $gmaps}1{else}0{/if};
+// initialize google maps
+if (gmaps_on) { 
+	{if $settings.map_type=="gmaps"}
+	load_gmaps();
+	{else}
+	init_osm();
+	{/if}
+}	
+{literal}
+
+$("#view_plan_info1").magnificPopup({
+		type: 'inline',
+		fixedContentPos: false,
+		fixedBgPos: true,
+		overflowY: 'auto',
+		closeBtnInside: true,
+		preloader: false,
+		midClick: true
+});
+
+});
+
+
+function createUploader(){
+	var uploader = new qq.FileUploader({
+
+		element: document.getElementById('file-uploader'),
+		action: 'include/upload.php',{/literal}
+		max_photos: '{$no_photos}',
+		crt_photos: '{if isset($crt_photos)}{$crt_photos}{/if}',
+		order_up: '{$lng.listings.order_up|addslashes}',
+		order_down: '{$lng.listings.order_down|addslashes}',
+		delete_file: '{$lng.general.delete|addslashes}',
+		template_path: '{$template_path}',
+		files_uploaded: "{$lng.listings.files_uploaded|addslashes}",
+		allowed: "{$lng.listings.allowed|addslashes}",
+		limit_reached: "{$lng.listings.limit_reached|addslashes}",
+		click_to_upload: "{$lng.listings.click_to_upload|addslashes}",
+		{literal}
+		messages: { 
+		failed_message: "{/literal}{$lng.failed|addslashes}{literal}",
+		typeError: "{/literal}{$lng.images.errors.file_type_not_accepted|addslashes}{literal}" 
+		},
+		params: {
+       			max_photos: '{/literal}{$no_photos}{literal}'
+   			},
+		allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
+		debug: false,
+		title_field: '{/literal}{if $languages|@count>1 && $ads_settings.translate_title_description==1}title_{$crt_lang}{else}title{/if}{literal}'
+ 	});
+}
+
+</script>
+{/literal}
+
+{/if}

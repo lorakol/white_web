@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="{$crt_lang_code}">
+
+<head>
+<title>{$page_info.title}</title>
+
+<meta charset="{$appearance.charset}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<meta name="description" content="{$page_info.meta_description}" />
+<meta name="keywords" content="{$page_info.meta_keywords}" />
+{if (isset($noindex) && $noindex) || $page_info.noindex==1}
+<meta NAME="robots" content="noindex, nofollow" />
+{else}
+<meta name="robots" content="index, follow" />
+{/if}
+
+{if $page_info.canonical}<link rel="canonical" href="{$page_info.canonical}"/>
+{/if}
+
+{if $self_noext=="details" && in_array("social_networks", $modules_array)}
+{include file="modules/social_networks/sn_meta.html"}
+{/if}
+
+{if isset($head_includes)}
+{foreach from=$head_includes item=l}
+{include file="$l"}
+{/foreach}
+{/if}
+
+<link href="{$template_path}css/style{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+{if $appearance.template_colorscheme}<link href="{$template_path}css/style_{$appearance.template_colorscheme}{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>{/if}
+
+{if $self_noext=="listings"}
+<script src="{$live_site}/js/search.js"></script>
+{elseif $self_noext=="details"}
+<script src="{$live_site}/js/details.js"></script>
+{elseif $self_noext=="index"}
+<script src="{$live_site}/js/index.js"></script>
+{elseif $self_noext=="user_listings" || $self_noext=="store"}
+<script src="{$live_site}/js/ul.js"></script>
+{else}
+<script src="{$live_site}/js/base.js"></script>
+{/if}
+
+{if isset($htmlarea) && $htmlarea}<script src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+{/if}
+
+{include file="js/header_js.html"}
+
+
+{if $seo_settings.analytics_code}
+{$seo_settings.analytics_code}
+{/if}
+
+
+<style>
+{literal}
+{/literal}{if $appearance.header_pic}{literal}.logo { background: url('{/literal}{$live_site}/images/{$appearance.small_header_pic}{literal}') no-repeat; {/literal}width:{$appearance.small_header_pic_width}px; height:{$appearance.small_header_pic_height}px;{literal} }{/literal}{/if}{literal}
+{/literal}{if $appearance.header_pic}{literal}.small-logo { background: url('{/literal}{$live_site}/images/{$appearance.small_header_pic}{literal}') no-repeat; {/literal}width:{$appearance.small_header_pic_width}px; height:{$appearance.small_header_pic_height}px;{literal} }{/literal}{/if}{literal}
+header { height: {/literal}{$appearance.small_header_pic_height+10}{literal}px; }
+	.bgheader { height: {/literal}{$appearance.small_header_pic_height+10}{literal}px; }
+
+@media all and (min-width: {/literal}{$appearance.outer_table}{literal}px)
+{
+
+	.bottom-notice { min-width: {/literal}{$appearance.outer_table}{literal}px; }
+	.page_bounds { min-width: {/literal}{$appearance.outer_table}{literal}px; width: {/literal}{$appearance.outer_table}{literal}px;  margin: 0 auto !important;}
+	{/literal}{if $appearance.header_pic}{literal}.logo { background: url('{/literal}{$live_site}/images/{$appearance.header_pic}{literal}') no-repeat; {/literal}width:{$appearance.header_pic_width}px; height:{$appearance.header_pic_height}px;{literal} }{/literal}{/if}{literal}
+	.box-container { width: {/literal}{if $appearance.outer_table>=1300}16.66{elseif $appearance.outer_table>=1100}20%{else}25%{/if}{literal}; }
+	header { height: {/literal}{$appearance.header_pic_height+10}{literal}px; }
+	.bgheader { height: {/literal}{$appearance.header_pic_height+10}{literal}px; }
+
+}
+
+{/literal}
+</style>
+
+{if in_array('background',$banners_positions)}
+
+{banner->getTemplateBanners p1='background' p2=$section p3=$cat p4=$bloc assign='bg_banners'}
+
+{if $bg_banners[0]}
+<style>
+
+{literal}
+
+#skin {
+	position: absolute;
+	width: 100%;
+	height: {/literal}{$bg_banners[0].size[1]}{literal}px;
+	margin-left: auto;
+	margin-right: auto;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+}
+
+#background
+{
+	background: url({/literal}{$live_site}/images/baners/{$bg_banners[0].filename}{literal}) no-repeat 50% 0;
+	background-color: #dee0e2;
+	width: 100%;
+	height: {/literal}{$bg_banners[0].size[1]}{literal}px;
+	position: absolute;
+	top:0px;
+	z-index: 1;
+}
+{/literal}
+</style>
+{/if}
+{/if}
+
+</head>
+<body>
+
+{if in_array("adisclaimer", $modules_array)}
+{include file="modules/adisclaimer/disclaimer.html"}
+{/if}
+
+{if in_array("abdetector", $modules_array)}
+{include file="modules/abdetector/header.html"}
+{/if}
+
+{if isset($top_content)}{$top_content}{/if}
+
+{if !isset($bloc)}{$bloc=''}{/if}
+
+{if in_array('left',$banners_positions)}
+{* ----------- left banners ------------ *}
+<div class="left_banners" style="display: none;">
+{banner->getTemplateBanners p1='left' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners raligned">{include file="banner.html" bclass="btype_side"}</div>
+	{/foreach}
+</div>
+{* ----------- end left banners ------------ *}
+{/if}
+
+{if in_array('right',$banners_positions)}
+{* ----------- right banners ------------ *}
+<div class="right_banners" style="display: none;">
+{banner->getTemplateBanners p1='right' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners">{include file="banner.html" bclass="btype_side"}</div>
+	{/foreach}
+</div>
+{* ----------- end right banners ------------ *}
+{/if}
+
+{if in_array("social_networks", $modules_array) && (($self_noext=="index" && ($sn_settings.enable_fb_page_plugin)) || ($self_noext=="details" && ($sn_settings.enable_fb_like_button ||  $sn_settings.enable_fb_comments)))}
+{include file="modules/social_networks/init_fb_sdk.html"}
+{/if}
+
+{* ---------- background takeover ad --------- *}
+{if in_array('background',$banners_positions) && $bg_banners[0]}
+<div id="background"><a href="{$bg_banners[0].link}" id="skin" target="_blank"></a></div>
+{/if}
+{* ---------- end background takeover ad --------- *}
+
+
+<header>
+	<div class="page_bounds" id="top">
+
+{*  --------------- top logo ------------- *}
+<div class="top-logo">
+	{* store banner *}
+	{if isset($store_banner) && $store_banner}
+	{if $store_banner_ext=='swf'}
+		{include file="data/flash.html" img_name=$store_banner img_width=$store_banner_width img_height=$store_banner_height}
+	{else}<img src="{$live_site}/images/store/{$store_banner}" alt="" />{/if}
+	{elseif $appearance.show_header==1 && $appearance.header_pic!=''}
+
+	<a href="{$live_site}">
+
+	{* header picture flash *}
+
+	{if $appearance.header_is_flash}
+		{include file="data/flash.html" img_name=$appearance.header_pic img_width=$appearance.header_pic_width img_height=$appearance.header_pic_height}
+	{else}
+
+	{* header picture *}
+	{if $self_noext=="index"}<h1 class="logo" id="logo">{$settings.site_name}</h1>{else}<div class="logo" id="logo">&nbsp;</div>{/if}{/if}
+	</a>
+
+	{* default template header picture *}
+
+	{elseif $appearance.show_header==1 && !$appearance.header_pic!=''}<a href="{$live_site}"><div class="default_logo">&nbsp;</div></a>{/if}
+</div>
+{* end top-logo *}
+
+
+{* ------ top banners ------- *}
+{if in_array('top',$banners_positions)}
+{banner->getTemplateBanners p1='top' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{if $array_banners|@count}
+{foreach from=$array_banners item=v}
+<div class="fb_center">{include file="banner.html" bclass="btype_top"}</div>
+{/foreach}
+{/if}{* if count *}
+{/if}
+{* ------- end header banners ------- *}
+
+{* mobile menu *}
+<div id="menu" onclick="toggleMenu(this)">
+	<div class="bar1"></div>
+	<div class="bar2"></div>
+	<div class="bar3"></div>
+</div>
+
+<div class="ssclear"></div>
+
+<ul id="nav">
+
+	<li class="show_search"><a href="javascript:;" id="show_search"><div class="search_icon"><div class="search_circle"></div><div class="search_rectangle"></div></div><span>{$lng.general.search}</span></a></li>
+
+	{capture name=nl_link assign=nl_link}{if $seo_settings.enable_mod_rewrite}{$sef_links.new_listing}{else}new_listing.php{/if}{/capture}
+	<li class="post-listing"><a href="{$live_site}/{if $logged_in || $settings.nologin_enabled}{$nl_link}{else}{if $seo_settings.enable_mod_rewrite}{$sef_links.login}{else}login.php{/if}?loc={$nl_link}{/if}"><div class="post-listing-btn"><div class="plus"></div><span>{$lng.listings.post_your_ad|replace:" ":"&nbsp;"}</span></div></a></li>
+
+	{if $languages|@count >1}
+	<li class="languages">
+		<a class="arrow-button current_language" href="#"><span class="down-arrow">{if $crt_lang_flag}<img src="{$live_site}/images/languages/{$crt_lang_flag}" alt="{$crt_lang_name}" />{else}{$crt_lang_name}{/if}</span></a>
+		<ul>
+			{foreach from=$languages item=v}
+			<li><a {if $v.id==$crt_lang}class="nolink"{/if} href="javascript:;" onclick="document.cookie='default_lang={$v.id}; path=/; expires = '+exdate.toUTCString()+'; {if $settings.enable_locations && $settings.enable_subdomains}domain={$main_domain};{/if}'; window.location.reload( false );">{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />&nbsp;{/if}{$v.name}</a></li>
+			{/foreach}
+
+		</ul>
+	</li> {* end languages *}
+	{/if}
+
+	<li>
+
+	<a class="arrow-button" href="#"><span class="down-arrow">{if $logged_in}{$logged_in}{else}{$lng.navbar.my_account}{/if}</span></a>
+
+ 	{if $logged_in}
+
+		<ul>
+
+			<li><a href="{$live_site}/useraccount.php">{$lng.useraccount.statistics}</a></li>
+
+			{if isset($crt_usr_sett) && $crt_usr_sett.post_ads}
+			<li><a href="{$live_site}/my_listings.php">{$lng.useraccount.browse_your_listings}</a></li>
+			{/if}
+
+			<li><a href="{$live_site}/account_info.php">{$lng.useraccount.modify_account_info}</a></li>
+
+
+			{if in_array("change_fg_theme", $modules_array)}
+			{include file="modules/change_fg_theme/settings_lnk.html"}
+			{/if}
+
+			{if $is_aff}
+
+			<li><a href="{$live_site}/affiliate_revenue.php">{$lng.affiliates.revenue_history}</a></li>
+
+			<li><a href="{$live_site}/affiliate_payments_history.php">{$lng.affiliates.payments_history}</a></li>
+
+			{/if}
+
+			{if isset($crt_usr_sett) && $crt_usr_sett.post_ads}
+
+			<li><a href="{$live_site}/order_history.php">{$lng.useraccount.order_history}</a></li>
+
+			{if $subscription_exists}<li><a href="{$live_site}/subscriptions.php">{$lng.useraccount.subscriptions}</a></li>{/if}
+
+			{if $bulk_uploads}
+			<li><a href="{$live_site}/bulk_uploads.php">{$lng.useraccount.bulk_uploads}</a></li>
+			{/if}
+
+			{if $settings.internal_messaging}
+			<li><a href="{$live_site}/messages.php">{$lng.useraccount.messages}</a></li>
+			{/if}
+
+			{/if} {* end if post ads *}
+
+			{if $ads_settings.alerts_enabled}
+			<li><a href="{$live_site}/alerts.php?action=user&id={$crt_usr}">{$lng.alerts.email_alerts}</a></li>
+			{/if}
+
+			{if $ads_settings.saved_searches_enabled}
+			<li><a href="{$live_site}/saved_searches.php?id={$crt_usr}">{$lng.useraccount.saved_searches}</a></li>
+			{/if}
+
+			{if $is_mod}
+			<li><a href="{$live_site}/{$admin_folder}">{$lng.navbar.administrator_panel}</a></li>
+			{/if}
+
+			<li><a class="starfav" href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.favorites}{else}favorites.php{/if}">{$lng.general.favourites}</a></li>
+
+			<li class="em"><a href="{$live_site}/logout.php">{$lng.navbar.logout}</a></li>
+
+		</ul>
+
+	{elseif $is_admin}
+
+		{* admin drop down menu *}
+		<ul>
+			<li><a href="{$live_site}/{$admin_folder}">{$lng.navbar.administrator_panel}</a></li>
+			<li class="em"><a href="{$live_site}/logout.php">{$lng.navbar.logout}</a></li>
+		</ul>
+
+	{else}
+		<ul>
+			<li><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.login}{else}login.php{/if}" class="login-lnk">{$lng.navbar.login}</a></li>
+			<li><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.register}{else}register.php{/if}">{$lng.navbar.register}</a></li>
+			<li><a class="starfav" href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.favorites}{else}favorites.php{/if}">{$lng.general.favourites}</a></li>
+		</ul>
+
+	{/if}
+
+	</li> {* end my account *}
+
+</ul> {* end #nav *}
+
+<div class="clearfix"></div>
+
+	</div>{* end page_bounds *}
+</header>{* end header *}
+
+{* sticky header *}
+{* <div class="bgheader"></div>*}
+
+{* ------ header-mobile banners ------- *}
+{if in_array('header-mobile',$banners_positions)}
+{banner->getTemplateBanners p1='header-mobile' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{if $array_banners|@count}
+{foreach from=$array_banners item=v}
+<div class="fb_center">{include file="banner.html" bclass="btype_header_mobile btype100p"}</div>
+{/foreach}
+{/if}{* if count *}
+{/if}
+{* ------- end header-mobile banners ------- *}
+
+{include file="quick-search.html"}
+
+{if $self_noext=="index"}
+{include file="categories.html"}
+{/if}
+
+<main>
+	<div class="page_bounds page">
+
+
+{if isset($db_error) && $db_error!=''}<div class="db_error error mt20">{$db_error}</div>{/if}
+
+{* ------ header banners ------- *}
+{if in_array('header',$banners_positions)}
+{banner->getTemplateBanners p1='header' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{if $array_banners|@count}
+{foreach from=$array_banners item=v}
+<div class="center hb">{include file="banner.html" bclass="btype728"}</div>
+{/foreach}
+<div class="clearfix"></div>
+{/if}{* if count *}
+{/if}
+{* ------- end header banners ------- *}
+
+
+	</div> {* end page_bounds *}

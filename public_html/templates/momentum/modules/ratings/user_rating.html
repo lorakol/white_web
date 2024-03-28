@@ -1,0 +1,69 @@
+	{* ----------- start rating ------------ *}
+	<script type="text/javascript" src="{$live_site}/modules/ratings/js/jquery.rating.min.js"></script>
+	<link href="{$template_path}modules/ratings/css/rating{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+
+	<div class="rating" id="user_rating">
+
+	{if $ratings_settings.enable_reviews && (in_array($user.group, $ratings_settings.groups_array) || !$ratings_settings.groups)}
+
+	<div class="blind_ratings">
+	{section name=loop start=0 loop=5 step=1}
+	<img src="{$template_path}modules/ratings/css/images/star{if $user.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />
+	{/section}
+	</div>
+
+	{else}
+
+	{section name=loop start=0 loop=5 step=1}
+	<input name="star" type="radio" class="star" {if $user.rating|round>=($smarty.section.loop.index+1)}checked="checked"{/if} value="{$smarty.section.loop.index+1}"/>
+	{/section}&nbsp;<span id="thanks">{if $voted}{$lng_ratings.you_rated_user} {$voted}{/if}</span>
+	<div class="clearfix"></div> 
+	{/if}
+
+	<div id="rating_text" class="small">{$lng_ratings.rating}: {$user.rating|round} ( {$user.no_ratings} {if $user.no_ratings!=1}{$lng_ratings.votes}{else}{$lng_ratings.vote}{/if}{if $ratings_settings.enable_reviews}, {$no_reviews} {if $no_reviews!=1}{$lng_ratings.reviews}{else}{$lng_ratings.review}{/if}{/if})</div>
+
+
+	</div>
+	<div class="clearfix"></div>
+
+<script type = "text/javascript">
+
+{if $voted || $same_user || $rating_nologin}
+{literal}
+jQuery(document).ready(function() {
+	$('.star').rating('readOnly',true);
+	$('.star').click(function(){
+		{/literal}{if $same_user}alert("{$lng_ratings.you_cannot_rate_your_user}");{elseif $voted}alert("{$lng_ratings.you_already_rated}");{elseif $rating_nologin}alert("{$lng_ratings.you_need_to_login}"){/if}{literal}
+	});
+
+});
+{/literal}
+{/if}
+{literal}
+
+$('.star').rating({
+  callback: function(value, link){
+	$.post("{/literal}{$live_site}{literal}/modules/ratings/add_user_rating.php", { id: "{/literal}{$id}{literal}", rating: value, ip: "{/literal}{$ip}{literal}"}, function(data){ 
+		//alert(data);
+		var arr = data.split("|");
+		var rating = arr[0];
+		var info = arr[1];
+		$('#rating_text').html(info);
+		$('#thanks').html('{/literal}{$lng_ratings.thanks_for_rating}{literal}');
+		$('.star').rating('readOnly',true);
+	} );
+  }
+
+});
+
+	$(".blind_ratings").on('click',function(){
+
+		$( "#view-reviews" ).trigger( "click" );
+		$('html,body').animate({scrollTop:$(".col-7").offset().top-40}, 'slow');
+
+	});
+
+{/literal}
+</script>
+
+{* ----------- end rating ------------ *}

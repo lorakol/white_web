@@ -1,0 +1,162 @@
+<script src="{$live_site}/libs/jQuery/plugins/slick/slick.min.js"></script>
+<link href="{$live_site}/libs/jQuery/plugins/slick/slick.css" rel="stylesheet" type="text/css"/>
+<link href="{$live_site}/libs/jQuery/plugins/slick/slick-theme.css" rel="stylesheet" type="text/css"/>
+<style>
+	.slick-track {
+		display: flex !important;
+		margin-left: 0px;
+	}
+
+	.slick-slide {
+		height: inherit !important;
+	}
+
+	.slick-slider .slick-track {
+		margin-bottom: 10px;
+	}
+
+	.recent-container-mod {
+		display: flex;
+		flex-flow: column nowrap;
+	}
+
+	.recent-container-mod > .lprice {
+		margin-top: auto;
+		margin-bottom: unset;
+	}
+
+	.recent-container-mod > .starfav {
+		margin: -22px -3px 10px auto;
+	}
+	.recent-container h3 {
+		font-size: 1em;
+		font-weight: normal;
+	}
+
+	.slick-dotted.slick-slider {
+		margin-bottom: 0;
+	}
+</style>
+
+<section id="latest_visited">
+
+	<div class="left_tabs mb0">
+		{capture name=some_content assign=field_name}title_{$crt_lang}{/capture}
+		<h2><span>{$lv_settings[$field_name]}</span></h2>
+		<div class="eq_height_tab_content" id="latest_visited_content">
+
+			{section name=loop start=0 loop=$no_latest_visited step=1}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$latest_visited[loop].id p2=$latest_visited[loop].title p3='' p4=$latest_visited[loop].category_id p5=$latest_visited[loop].slug}{else}{$live_site}/details.php?id={$latest_visited[loop].id}{/if}{/capture}
+
+			<a href="{$details_url}">
+				<div class="small-box recent-container-mod recent-container{* clearfix*}">
+
+					<img alt="{if $latest_visited[loop].image_id}{$latest_visited[loop].title|strip_tags:false|substr:0:100}{/if}" id="fpic{$latest_visited[loop].id}" src="{$live_site}/{$latest_visited[loop].image}"/>
+
+					{if in_array("acategories", $modules_array) && in_array($latest_visited[loop].category_id, $ac_settings.array_categories_list)}
+					<div class="ac_over" id="ac{$latest_visited[loop].id}">{$lng.general.click_to_view}</div>
+					{/if}
+
+					<h3 class="ltitle">{if $data_set=="cars" && ((isset($latest_visited[loop].make) && $latest_visited[loop].make) || (isset($latest_visited[loop].model) && $latest_visited[loop].model))}{$latest_visited[loop].make} {$latest_visited[loop].model}{else}{if $appearance.charset=="UTF-8"}{$latest_visited[loop].title|mb_truncate:30:"...":"UTF-8"}{else}{$latest_visited[loop].title|truncate:30:"...":false}{/if}{/if}</h3>
+
+					<div class="lloc">{$latest_visited[loop].location_str}</div>
+
+					{if $ads_settings.enable_price}
+
+					{if in_array("price_extra",$modules_array) && (isset($pe_settings[$latest_visited[loop].fieldset]) || isset($pe_settings[0])) }
+
+					{include file="modules/price_extra/gallery_listing.html" pe_listing=$latest_visited[loop]}
+
+					{else}
+
+					{if !empty($latest_visited[loop].price) && $latest_visited[loop].price>=0}
+					<div class="lprice">{$latest_visited[loop].price_curr}</div>
+					{/if}
+
+					{/if}
+
+					{/if} {* end if enable price *}
+
+					<div class="starfav addtofav tooltip make-fav" id="fav{$latest_visited[loop].id}" title="{$lng.listings.add_to_favourites}"></div>
+				</div>
+			</a>
+			{/section}
+			<div class="clearfix"></div>
+
+		</div>
+		{* end tab_content *}
+
+		{if $no_latest_visited}
+		<div><a href="{$live_site}/modules/latest_visited/latest_visited.php"><h2 class="view_more">{$lng_lv.view_all}</h2></a></div>
+		<div class="clearfix"></div>
+		{/if}
+
+	</div>
+	{* end latest_visited *}
+
+</section>
+
+
+<script>
+	$(document).ready(function () {
+
+		$(".ac_over").on('click', function () {
+			var acid = jQuery(this).attr("id").substr(2);
+			$("#ac" + acid).hide();
+		});
+
+
+		$('#latest_visited_content').slick({
+			dots: true,
+			infinite: false,
+			adaptiveHeight: true,
+			autoplay: true,
+			autoplaySpeed: 3000,
+			speed: 300,
+			slidesToShow: 7,
+			slidesToScroll: 7,
+			responsive: [
+				{
+					breakpoint: 1200,
+					settings: {
+						slidesToShow: 6,
+						slidesToScroll: 6,
+						infinite: true,
+						dots: true
+					}
+				},
+
+				{
+					breakpoint: 960,
+					settings: {
+						slidesToShow: 5,
+						slidesToScroll: 5
+					}
+				},
+				{
+					breakpoint: 800,
+					settings: {
+						slidesToShow: 4,
+						slidesToScroll: 4
+					}
+				},
+				{
+					breakpoint: 650,
+					settings: {
+						slidesToShow: 3,
+						slidesToScroll: 3
+					}
+				},
+				{
+					breakpoint: 480,
+					settings: {
+						slidesToShow: 2,
+						slidesToScroll: 2
+					}
+				}
+			]
+		});
+
+	});
+</script>

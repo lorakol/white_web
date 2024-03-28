@@ -1,0 +1,13 @@
+{* ----------- start rating ------------ *}
+{if in_array($listing.user.group, $ratings_settings.groups_array) || !$ratings_settings.groups}
+
+	<script src="{$live_site}/modules/ratings/js/jquery.rating.min.js"></script>
+	<link href="{$template_path}modules/ratings/css/rating{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+
+	{section name=loop start=0 loop=5 step=1}
+	<img src="{$template_path}modules/ratings/css/images/star{if $v.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />
+	{/section}
+
+{/if}
+
+{* ----------- end rating ------------ *}

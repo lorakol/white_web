@@ -1,0 +1,69 @@
+<script type="text/javascript">
+{literal}
+//<![CDATA[
+
+$(document).ready(function() {
+
+	$(".info").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading"); 
+
+			if(ret.response==1) {
+
+				$(".info").find("span.content").html("<p>"+ret.info+"</p>");
+				$(".info").show();
+				$(".contact_form").slideUp();
+				$(".button").hide();
+				$('html,body').animate({scrollTop:$(".info:first").offset().top-60}, 'slow');
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			{/literal}{if $settings.contact_captcha && $settings.enable_recaptcha}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+ $('#contact').ajaxForm(options);
+
+});
+//]]>
+{/literal}
+</script>

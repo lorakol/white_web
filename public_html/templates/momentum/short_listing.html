@@ -1,0 +1,107 @@
+{capture name=some_content assign=details_url}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title p3=$post_array.search_id p4=$v.category_id p5=$v.slug}{else}{$live_site}/details.php?id={$v.id}{/if}
+{/capture}
+
+<div class="classified{if $v.highlited && $ads_settings.enable_highlited} highlited{/if}">
+
+	<div class="lfloat gallery-img-bg smallimg">
+
+	<a href="{$details_url}" name="listing{$v.id}">
+	<img src="{$live_site}/{$v.image}" class="pic" id="pic{$v.id}" alt="{if $v.image_id}{$v.title|strip_tags:false|substr:0:100}{/if}" />
+	</a>
+
+	{if $v.featured && $ads_settings.enable_featured}<div class="featured-icon"></div>{/if}
+	{if $v.sold}<div class="sold-bg">{$lng.listings.sold}</div>{/if}
+	{if $v.rented}<div class="rented-bg">{$lng.listings.rented}</div>{/if}
+	{if $v.no_pictures}<div class="images-no">{$v.no_pictures}</div>{/if}
+
+	</div> {* end picture *}
+
+	<div class="lpdiv1 rclass">
+
+		{if $v.auction}<div class="lfloat small-btn pendingbutton icon">{$lng.useraccount.auction}</div>{/if}
+		{if $v.priority}<div class="lfloat priority"><img src="{$template_path}images/priority{$v.priority}.png" alt="priority{$v.priority}" title="{$v.priority_name}" class="tooltip" /></div>{/if}
+		{if $v.urgent && $ads_settings.enable_urgent}<div class="lfloat urgent-btn">{$lng.listings.urgent}</div>{/if}
+		{if $v.video && $v.enable_video && $ads_settings.enable_video}<div class="lfloat video"><img src="{$template_path}images/{$appearance.template_colorscheme}/video-icon.png" alt="{$lng.listings.video}" title="{$lng.listings.video}" class="tooltip" /></div>{/if}
+		<div class="title lfloat"><a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$v.title|mb_truncate:100:"...":"UTF-8"}{else}{$v.title|truncate:100:"...":false}{/if}</a></div>
+
+		{* ratings *}
+
+		{if in_array("ratings",$modules_array) && $ratings_settings.rate_listings}
+		<div class="ratings">
+		{include file="modules/ratings/stars.html"}
+		</div>
+		{/if}
+
+		{* end ratings *}
+
+		{if $ads_settings.enable_price}
+		
+		{if in_array("price_extra",$modules_array) && (isset($pe_settings[$v.fieldset]) || isset($pe_settings[0])) }
+	
+		{include file="modules/price_extra/short_listing.html"}
+	
+		{else}
+
+		{if $v.price>=0}<div class="sl-price price">{$v.price_curr}</div>{/if}
+ 
+		{/if}
+			
+		{/if} {* end if enable price *}
+
+		{if $v.location_str}<div class="sl-loc">{$v.location_str}</div>{/if}
+
+		<div class="small-light sl-small">{if $ads_settings.show_ad_date_for_everybody==1}{if $v.date_added!=$v.date_updated}{$lng.listings.updated}&nbsp;{$v.date_updated_nice}{else}{$lng.listings.added_on}&nbsp;{$v.date_nice}{/if}{else}{$lng.listings.posted}{/if}&nbsp;{$lng.general.to}&nbsp;<u><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.category_id p2=$category}{else}{$live_site}/listings.php?category={$v.category_id}{/if}">{$v.category}</a></u></div>
+
+		<div class="sl-options">
+
+		<a href="javascript:;" class="ddl-cto" id="ddl-cto{$v.id}"><img src="{$template_path}images/share-btn.png" width="60" height="24"  /></a>
+
+		</div>
+		{* end options *}
+
+
+		<div class="ddl-open"  id="ddl-open{$v.id}" style="display: none;">
+
+			{* share *}
+			<div><a href="{$live_site}/recommend.php?id={$v.id}" class="ddl share" id="share{$v.id}"><img src="{$template_path}images/share-icon.png" alt="{$lng.listings.recommend_this}" />{$lng.listings.recommend_this}</a></div>
+
+			{* contact *}
+			{if ($logged_in || !$ads_settings.hide_contact_when_not_logged)  && (!$v.sold || !$ads_settings.hide_contact_when_sold) && (!$v.rented || !$ads_settings.hide_contact_when_rented)}
+			<div><a href="{$live_site}/mailto.php?id={$v.user_id}&aid={$v.id}" class="ddl fmailto" id="mailto{$v.user_id}_{$v.id}"><img src="{$template_path}images/contact-icon.png" alt="{$lng.general.contact}" />{$lng.general.contact}</a>
+			</div>
+			{/if}
+
+			{if $self_noext!="favorites"}
+
+			{* add remove favorites *}
+			<div><a href="{$live_site}/include/add_favorite.php?id={$v.id}&logged_in={$logged_in}"  class="ddl addtofav" id="fav{$v.id}" {if in_array($v.id, $fav_array)}style="display: none;"{/if}><img src="{$template_path}images/add-fav-icon.png" alt="{$lng.listings.add_to_favourites}" />{$lng.listings.add_to_favourites}</a>
+			</div>
+
+			<div><a href="{$live_site}/include/remove_favorite.php?id={$v.id}"  class="ddl remfav" id="remfav{$v.id}" {if !in_array($v.id, $fav_array)}style="display: none;"{/if}><img src="{$template_path}images/rem-fav-icon.png" alt="{$lng.listings.remove_favourite}" />{$lng.listings.remove_favourite}</a>
+			</div>
+			{* end add remove favorites *}
+			{/if} {* end if no favorites page *}
+
+			{* listings_compare *}
+			{if in_array("listings_compare", $modules_array)}
+
+			<div>
+			<a href="{$live_site}/modules/listings_compare/add_to_compare.php?id={$v.id}"  class="ddl addcmpwin" id="cmp{$v.id}" {if in_array($v.id, $cmp)}style="display: none;"{/if}><img src="{$template_path}images/compare-icon.png" alt="{$lng_compare.add_to_compare}" />{$lng_compare.add_to_compare}</a>
+			</div>
+
+			<div>
+			<a href="{$live_site}/modules/listings_compare/remove_compare.php?id={$v.id}"  class="ddl remcmpwin" id="remcmp{$v.id}" {if !in_array($v.id, $cmp)}style="display: none;"{/if}><img src="{$template_path}images/rem-compare-icon.png" alt="{$lng_compare.rem_compare}" />{$lng_compare.rem_compare}</a>
+			</div>
+
+			{/if}
+			{* end listings_compare *}
+
+		</div>
+		{* end options-open *}
+
+
+	</div> {* end lfloat lpdiv1 rclass *}
+	<div class="clearfix"></div>
+
+</div> {* end classified *}

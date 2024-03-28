@@ -1,0 +1,82 @@
+{include file="header.html"}
+
+<style>
+
+.dcol { float: left; width: 50%; }
+.dcontent { width: 90%; margin: 0 auto;  }
+.dcol img { opacity: 0.8; margin-bottom: -7px; margin-right: 5px; }
+
+@media all and (min-width: 700px) {
+	.dcol { width: {math equation="x/y" x=100 y=$dealers_page_settings.categories_on_row}%; padding-top: 10px;}
+}
+</style>
+
+<div class="main1 box">
+<div class="page_title heading"><h1>{$dealers_page_settings.link_name}</h1></div>
+
+<div class="pdiv5 mb40">
+
+{include file="modules/dealers_page/search_form.html"}
+
+	{if $dealers_page_settings.group_on_categories && $dealers_page_settings.category_field && !$dcat && (!isset($post) || !$post)}
+
+	<div class="dcontent mt40">
+	{foreach from=$dealer_categories name=dcat item=v}
+	<div class="dcol center">
+		{if $v.image}<div><img src="{$live_site}/images/categories/{$v.image}" /></div>{/if}
+		<a href="{$live_site}/modules/dealers_page/dealers.php?dcat={$v.category}">{$v.category} ( {$v.no_dealers} )</a>
+	</div>
+	{/foreach}
+	<div class="clearfix"></div>
+	</div>
+
+	{else}
+	{if $dealers_page_settings.group_on_categories && $dealers_page_settings.category_field && $dcat}
+
+	{if $dcat_image}<div><img src="{$live_site}/images/categories/{$dcat_image}" /></div>{/if}
+
+	<div class="mb20"><a href="{$live_site}/modules/dealers_page/dealers.php">{$dealers_page_settings.link_name}</a> <a href="{$live_site}/modules/dealers_page/dealers.php?dcat={$dcat}">&raquo; {$dcat}</a></div>
+	{/if}
+
+	{if $no_dealers>0}
+
+<div class="graytab">
+{if $dealers_page_settings.enable_map_search}
+<div class="lfloat pdiv4" id="showMap" {if $dealers_page_settings.map_visible}style="display: none;"{/if}><img src="{$template_path}images/map.png" alt="{$lng.listings.show_map}" title="{$lng.listings.show_map}" class="tooltip" /></div><!--
+--><div class="lfloat pdiv4" id="hideMap" {if !$dealers_page_settings.map_visible}style="display: none;"{/if}><img src="{$template_path}images/map_off.png" alt="{$lng.listings.hide_map}" title="{$lng.listings.hide_map}" class="tooltip" /></div><!--
+-->
+{/if}
+{include file="paginator.html"}
+
+	</div>
+
+{if $dealers_page_settings.enable_map_search}
+	{include file="modules/dealers_page/dealers_map.html"}
+	{/if}
+
+	{foreach name="dealers" from=$dealers_array item=v}
+		{include file="modules/dealers_page/short_dealer.html"}
+
+		{if ($smarty.foreach.dealers.index+1)==$appearance.ads_per_page/2|ceil && $smarty.foreach.dealers.index!=$dealers_array|@count-1}
+		{* ------ listings4 banners ------- *}
+		{if in_array('listings4',$banners_positions)}
+		{banner->getTemplateBanners p1='listings4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+		{if $array_banners|@count}<div class="clearfix" style="margin: 10px 0 10px 0;"></div><div class="dcenter">{/if}
+		{foreach from=$array_banners item=v}
+		<div class="vert_banners">{include file="banner.html"}</div><div class="clearfix"></div>
+		{/foreach}
+		{if $array_banners|@count}</div>{/if}{/if}
+		{* ------- end listings4 banners ------- *}
+		{/if}
+	{/foreach}
+
+
+	{include file="paginator.html"}
+	{else}
+	{/if}
+
+	{/if}
+
+	</div> {* end pdiv5 *}
+	</div> {* end main1 *}
+{include file="footer.html"}

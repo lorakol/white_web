@@ -1,0 +1,17 @@
+<div class="categories page_bounds">
+{assign var="in" value="1"}
+	{foreach from=$categories item=v name=cat}
+		{if $v.level==1}
+		<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/listings.php?category={$v.id}{/if}" class="main_cat">
+			<div class="cat_title">{$v.name}</div>
+			{if $v.description}<div class="cat_desc">{$v.description}</div>{/if}
+		</a>
+		{if $in%$appearance.max_cat_per_row==0}
+		</div><div class="categories page_bounds">
+		{/if}
+		
+		{assign var="in" value="`$in+1`"}
+		{/if}
+	{/foreach}
+
+</div>

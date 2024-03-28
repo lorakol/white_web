@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "https://www.wapforum.org/DTD/xhtml-mobile10.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<title>{$page_info.title}</title>
+<link href="{$template_path}css/style{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta http-equiv="Content-Type" content="text/html; charset={$appearance.charset}" />
+<meta name="description" content="{$page_info.meta_description}" />
+<meta name="keywords" content="{$page_info.meta_keywords}" />
+{if (isset($noindex) && $noindex) || $page_info.noindex==1}
+<meta NAME="robots" content="noindex, nofollow" />
+{else}
+<meta name="robots" content="index, follow" />
+{/if}
+{if $page_info.canonical}<link rel="canonical" href="{$page_info.canonical}"/>
+{/if}
+{if $self_noext=="details" && in_array("social_networks", $modules_array)}
+{include file="modules/social_networks/sn_meta.html"}
+{/if}
+
+
+{if isset($head_includes)}
+{foreach from=$head_includes item=l}
+{include file="$l"}
+{/foreach}
+{/if}
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/jquery.js"></script>
+<script type="text/javascript" src="{$live_site}/js/common.min.js"></script>
+
+<script type="text/javascript">
+{if $settings.google_maps_api_key}gmak='{$settings.google_maps_api_key}';{/if}
+places=0;
+dsearch=0;
+exdate=new Date();
+exdate.setDate(exdate.getDate() + 365);
+</script>
+{if $seo_settings.analytics_code}
+{$seo_settings.analytics_code}
+{/if}
+{if isset($htmlarea) && $htmlarea}<script type="text/javascript" src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+{/if}
+
+</head>
+<body>
+
+{if in_array("adisclaimer", $modules_array)}
+{include file="modules/adisclaimer/disclaimer.html"}
+{/if}
+
+{if in_array("social_networks", $modules_array) && $self_noext=="details"}
+{include file="modules/social_networks/init_fb_sdk.html"}
+{/if}
+
+<div class="page">
+<div id="header">
+	{if $mobile_settings.mobile_show_header==1 && $mobile_settings.mobile_header_pic!=''}
+	{if $mobile_settings.mobile_header_pic_link!=''}<a href="{$mobile_settings.mobile_header_pic_link}">{/if}<img src="{$live_site}/images/{$mobile_settings.mobile_header_pic}" alt="{$settings.site_name}"/>{if $mobile_settings.mobile_header_pic_link!=''}</a>{/if}
+	{/if}
+	{if !$logged_in && !$is_admin && !$settings.nologin_enabled}
+	<div id="newad_button"><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.login}/{else}login.php{/if}?loc=new_listing.php"><div>{$lng.listings.post_your_ad|replace:" ":"&nbsp;"}</div></a></div>
+	{/if}
+
+	{if $logged_in || ($settings.nologin_enabled && !$no_groups)}
+	<div id="newad_button"><a href="{$live_site}/new_listing.php"><div>{$lng.listings.post_your_ad|replace:" ":"&nbsp;"}</div></a></div>
+	{/if}
+
+	{if !$is_admin && !$logged_in && $settings.nologin_enabled && $no_groups}
+	<div id="newad_button"><a href="{$live_site}/{if $logged_in}new_listing.php{elseif $settings.nologin_enabled}new_listing.php{else}{if $seo_settings.enable_mod_rewrite}{$sef_links.login}/{else}login.php{/if}?loc=new_listing.php{/if}"><div>{$lng.listings.post_your_ad|replace:" ":"&nbsp;"}</div></a></div>
+	{/if}
+
+</div>
+<div class="main">
+
+{* ------ header banners ------- *}
+{if in_array('header-mobile',$banners_positions)}
+{banner->getTemplateBanners p1='header-mobile' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{foreach from=$array_banners item=v}
+<div class="hor_banners">{include file="banner.html"}</div>
+{/foreach}
+{/if}
+{* ------- end header banners ------- *}

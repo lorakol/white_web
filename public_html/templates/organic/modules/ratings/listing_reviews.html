@@ -1,0 +1,58 @@
+{if $ratings_settings.ar_enable_reviews}
+
+<div class="box_heading">{$lng_ratings.reviews}</div>
+
+	{if $ratings_settings.require_login && !$logged_in}
+		<p>{$lng_ratings.login_to_post|replace:'::LOGIN_LINK::':$login_link}</p>
+	{else}
+		<div class="form_button"><strong><a  id="add_review" href="javascript:;"  {if $voted || $same_user}class="gray"{/if}>{$lng_ratings.add_review}</a></strong></div>{if $same_user}&nbsp;<span class="small" id="review_info">{$lng_ratings.you_cannot_rate_your_listings}</span>{elseif $voted}&nbsp;<span class="small" id="review_info">{$lng_ratings.you_already_rated_listing}</span>{/if}
+	{/if}
+
+	<br/><br/>
+
+	<div id="reviews_container">
+
+	{foreach from=$reviews_array item=v}
+	{include file="modules/ratings/review.html" prefix="lr_"}
+	{/foreach}	
+
+	{if $lr_no_pages>1}
+	{include file="modules/ratings/lr_paginator.html"}
+	{/if}
+
+	</div>
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+jQuery(document).ready(function() {
+
+{/literal}
+{if $voted || $same_user}
+{literal}
+$("a#add_review").click(function(event){ 
+	$('#review_info').animate({ color: '#FF0033' }, 'slow');
+})
+{/literal}
+{else}
+{literal}
+$("a#add_review").fancybox({
+	'width'         		: 630,
+	'height'        		: 700,
+	'transitionIn'		: 'none',
+	'transitionOut'		: 'none',
+	'margin'		: '0',
+	'padding'		: '0',
+	'titleShow'		: false,
+	'type'			: 'iframe',
+	'href'			: '{/literal}{$live_site}/modules/ratings/add_listing_review.php?aid={$listing.id}&user_id={$listing.user_id}{literal}'
+});
+{/literal}
+{/if}
+{literal}
+});
+</script>
+{/literal}
+<br/>
+{/if}

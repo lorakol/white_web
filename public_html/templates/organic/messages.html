@@ -1,0 +1,211 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+{include file="data/fancybox.html"}
+<div class="heading"><h1>{$lng.useraccount.messages}</h1></div>
+<div id="browse">
+<form name="browse" id="browse" method="post" action="messages.php">
+	{include file="paginator.html"}
+
+<div style="float: left;">
+	<span><input type="image" value="delete_selected" name="delete_selected" id="delete_selected" src="{$template_path}images/delete_all.gif" onclick="return myConfirm('{$lng.messages.confirm_delete_all|addslashes}')" style="border: 0px;" class="tooltip" title="{$lng.general.delete_all}"/></span>
+</div>
+
+<div style="float: right;">
+	<a href="javascript:;" class="small" onclick="checkAll(document)">{$lng.general.check_all}</a> | <a href="javascript:;" class="small" onclick="uncheckAll(document)">{$lng.general.uncheck_all}</a>
+
+	&nbsp;
+	<img src="{$template_path}/images/add_search.png" id="add_search" /><img src="{$template_path}/images/remove_search.png" id="remove_search" />
+
+</div>
+
+<div class="clearfix"></div>
+<div id="search_box" style="text-align: left; display: none;">
+
+<input type="hidden" name="page" value = "{$page}" />
+<input type="hidden" name="order" value = "{$order}" />
+<input type="hidden" name="order_way" value = "{$order_way}" />
+<input type="hidden" name="no_per_page" value = "{$no_per_page}" />
+
+<input type="text" name="id" size="6" class="defaultText" title="{$lng.listings.id}" value="{if isset($post_array.id)}{$post_array.id}{/if}"/>
+
+<input type="text" name="keyword" size="20" class="defaultText" title="{$lng.advanced_search.word}" value="{if isset($post_array.keyword)}{$post_array.keyword}{/if}" />
+
+<input type="text" name="name" size="30" class="defaultText" title="{$lng.contact.name}" value="{if isset($post_array.name)}{$post_array.name}{/if}"/>
+
+<input type="text" name="email" size="30" class="defaultText" title="{$lng.contact.email}" value="{if isset($post_array.email)}{$post_array.email}{/if}"/>
+<br/>
+<input name="date_from_vis" id="date_from_vis" type="text" size="15" class="defaultText" title="{$lng.useraccount.date_start}"/>
+<input name="date_from" id="date_from" type="hidden"/>
+
+<input name="date_to_vis" id="date_to_vis" type="text" size="15" class="defaultText" title="{$lng.useraccount.date_end}" />
+<input name="date_to" id="date_to" type="hidden" />
+
+<div class="buttons">
+	<strong><input type="submit" name="Search" value="{$lng.general.search}" /></strong>
+</div>
+</div>
+
+{literal}
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("input").keypress(function(e)
+		{
+        		// if the key pressed is the enter key
+        		if (e.which == 13)
+        		{
+
+				// delay action so the autocomplete list to fill
+				setTimeout(function() { $("#search").submit();}, 200);
+
+				return false;
+        		}
+		});
+		$("#remove_search").hide();
+		$("#search_box").hide();
+		$("#add_search").click(function()
+		{
+			$("#remove_search").show();
+			$("#add_search").hide();
+			$("#search_box").slideDown('fast').show();
+		});
+
+		$("#remove_search").click(function()
+		{
+			$("#add_search").show();
+			$("#remove_search").hide();
+			$("#search_box").hide().slideUp('fast');
+		});
+
+	});
+</script>
+{/literal}
+
+<script type="text/javascript">
+{literal}
+	$(function() {
+		$('#date_from_vis').datepicker({
+			dateFormat: "M dd yy",
+			changeMonth: true,
+			changeYear: true,
+			altField: '#date_from', altFormat: 'yy-mm-dd'
+		});
+
+		$('#date_to_vis').datepicker({
+			dateFormat: "M dd yy",
+			changeMonth: true,
+			changeYear: true,
+			altField: '#date_to', altFormat: 'yy-mm-dd'
+		});
+	});
+{/literal}
+</script>
+
+<table cellpadding="0" cellspacing="0" align="center" width="100%" id="nicetable">
+<tr id="tab_header">
+	<td width="10"></td>
+	<td width="10">{$lng.listings.id}</td>
+	<td></td>
+	<td width="60">{$lng.general.action}</td>
+</tr>
+
+{foreach from=$messages_array item=v}
+<tr class="{cycle values="nicetablerow_even,nicetablerow_odd"}{if $v.to==$crt_usr} received{/if}">
+	<td><input type="checkbox" class="noborder" name="msg{$v.msg_id}" id="msg{$v.msg_id}" /></td>
+	<td>#{$v.msg_id}<br/><br/>{if $v.from==$crt_usr}<img src="{$template_path}/images/sent.png" />{else}<img src="{$template_path}/images/received.png" />{/if}</td>
+	<td style="padding: 10px; line-height: 22px;">
+
+	{if $v.from!=$crt_usr}
+	<h4>{$lng.messages.from}: {if $v.from}{$v.contact_name}, <span class="current">{$v.email}</span>{else}<span class="current">{$v.from_email}</span>{/if}{if $v.from_phone}, {$v.from_phone}{/if} {$lng.messages.on}: {$v.date_nice}</h4>
+	{else}
+	<h4>{$lng.messages.to}: {if $v.to}{$v.to_contact_name}, <span class="current">{$v.to_email}</span>{else}<span class="current">{$v.to_email}</span>{/if} {$lng.messages.on}: {$v.date_nice}</h4>
+	{/if}
+
+	<p>{if $appearance.charset=="UTF-8"}{$v.message|mb_truncate:400:"...":"UTF-8"}{else}{$v.messages|truncate:400:"...":false}{/if}</p>
+
+	<div style="position: relative;">
+	<div style="float: left; width: 50%;">
+	{if isset($v.ad_id) && $v.ad_id}<div class="small">{$lng.messages.started_for_listing}: <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.ad_id p2=$v.title}{else}{$live_site}/details.php?id={$v.ad_id}{/if}" style="color: #197fc9" target="_blank">{$v.title}</a></div>{/if}
+
+	<a href="view_message.php?id={$v.msg_id}">
+	<div class="buttonwrapper"><div class="gray-button-left"><span class="gray-button-right">{$lng.messages.view_complete_message}</span></div></div>
+	</a>
+	</div>
+
+	{if isset($v.starting) && $v.starting}<div style="float: right;"><a href="message_history.php?id={$v.starting}">
+	<div class="buttonwrapper"><div class="gray-button-left"><span class="gray-button-right">{$lng.messages.view_thread}</span></div></div>
+	</a></div>{/if}
+	</div>
+	</td>
+
+	<td>
+		<span><a href="javascript:;" onclick="onDelete('{$v.msg_id}','{$lng.messages.confirm_delete|addslashes}', 'msg');">
+		<img src="{$template_path}images/delete.gif" class="tooltip" title="{$lng.general.delete}" alt="Delete" />
+		</a></span>
+
+		{if $v.to == $crt_usr}
+		<span><a href="javascript:;" class="freply" id="msg{$v.msg_id}"><img src="{$template_path}images/reply.png" class="tooltip" title="{$lng.general.reply}" alt="Reply" />
+		</a></span>
+		{/if}
+
+		{if $v.to == $crt_usr && $v.report==0}<span><a href="javascript:;" onclick="onReportMsg('{$v.msg_id}','{$lng.messages.confirm_report_spam}');">
+		<img src="{$template_path}images/up.png" class="tooltip" name="{$lng.messages.report_spam}" alt="Report" />
+		</a></span>{/if}
+
+		{if $v.to == $crt_usr && $v.report==1}<span><img src="{$template_path}images/down.png" class="tooltip" title="{$lng.messages.reported_as_spam}" /></span>{/if}
+		
+	
+	</td>
+</tr>
+{/foreach}
+
+{if $no_messages==0}
+	<tr class="nicetablerow_even">
+	<td colspan="6" align="center">{$lng.messages.no_messages}</td></tr>
+{/if}
+</table>
+</form>
+
+{if $no_messages}{include file="paginator.html"}<br/>{/if}
+
+<div class="no_per_page">
+	{$lng.general.show}
+	<select name="no_per_page" onchange="doSel(this);">
+		{section name=pg loop=60 start=10 step=10}
+		<option value="location.href='{$crt_page_link}&no_per_page={$smarty.section.pg.index}'" {if $no_per_page==$smarty.section.pg.index} selected="selected" {/if}>{$smarty.section.pg.index}</option>
+		{/section}
+	</select>
+	{$lng.general.on_a_page}
+</div>
+
+
+</div>
+
+
+<script type="text/javascript">
+{literal}
+
+$(document).ready(function() {
+$("a.freply").click(function(event){
+	var msg_id = jQuery(this).attr("id").substr(3);
+	$.fancybox({
+		'width'         		: 630,
+		'height'        		: 500,
+		'transitionIn'		: 'none',
+		'transitionOut'		: 'none',
+		'margin'		: '0',
+		'padding'		: '10',
+		'titleShow'		: false,
+		'type'			: 'iframe',
+		'href'                  : '{/literal}{$live_site}/reply.php?id='+msg_id+'{literal}',
+                'onClosed': function() {
+                       parent.location.reload(true);
+                }
+
+	});
+});
+
+});
+{/literal}
+</script>
+
+{include file="footer.html"}

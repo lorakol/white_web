@@ -1,0 +1,117 @@
+	<div class="wait"></div>
+
+	<div class="right_box_heading">{$lng.listings.email_seller}</div>
+
+	<div id="mailto_info" class="info1" style="display: none;"></div>
+
+	<div id="contact" class="small_form">
+	<form name="contact_details" id="contact_details" method="post" action="{$live_site}/mailto.php?post=1&aid={$listing.id}&id={if $listing.user_id}{$listing.user_id}{else}0{/if}">
+	<ul>
+	<li>
+	<label>{$lng.contact.name}</label>
+	<input type="text" id="name" name="name" size="40" value="{if isset($crt_usr_sett)}{$crt_usr_sett[$settings.contact_name_field]}{/if}" />
+	</li>
+
+	<li>
+	<label>{$lng.contact.email}</label>
+	<input type="text" id="email" name="email" size="40" value="{if isset($crt_usr_sett)}{$crt_usr_sett.email}{/if}" />
+	</li>
+
+	<li>
+	<label>{$lng.contact.phone}</label>
+	<input type="text" id="phone" name="phone" size="40" />
+	</li>
+
+	<li>
+	<label>{$lng.contact.comments}</label>
+	<textarea name="comments" id="comments" rows="6" cols="40"></textarea>
+	</li>
+	</ul>
+
+	{if $settings.contact_captcha}
+	{if $settings.enable_recaptcha}
+	{include file="data/recaptcha.html"}
+	{else}
+	{include file="data/random_image.html"}
+	{/if}
+	{/if}
+
+	<div class="buttons">
+	<strong><input type="submit" name="ContactSeller" id="ContactSeller" value="{$lng.general.send}" /></strong>
+	</div>
+
+	</form> {* end contact_details *}
+
+
+	</div>
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+jQuery(document).ready(function() {
+
+	$("#mailto_info").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$("#mailto_info").html("<p>"+ret.info+"</p>");
+				$("#mailto_info").show();
+				$("#contact").slideUp();
+				$('html,body').animate({scrollTop:$("#mailto_info").offset().top}, 'slow');
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			{/literal}{if $settings.contact_captcha && $settings.enable_recaptcha}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+ $('#contact_details').ajaxForm(options);
+
+});
+
+//]]>
+</script>
+{/literal}

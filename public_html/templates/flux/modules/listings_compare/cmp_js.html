@@ -1,0 +1,32 @@
+<script type="text/javascript">
+{literal}
+jQuery(document).ready(function() {
+
+$('a.addcmp').click(function() {
+	var live_site = '{/literal}{$live_site}{literal}';
+	var listing_id = $(this).attr("id").substr(3);
+	addToCompare(listing_id, live_site);
+	
+	$(this).hide();
+	$("#compare_btn").show();
+	$(".compare_button").show();
+
+	}
+);
+
+});
+
+function addToCompare(listing_id, live_site='') {
+	
+	if(live_site) var url_str = live_site+"/";
+	url_str+="modules/listings_compare/add_to_compare_action.php?id="+listing_id;
+
+	$.get( url_str, function( data ) {
+		
+	});
+	
+}
+
+
+{/literal}
+</script>

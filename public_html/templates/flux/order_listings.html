@@ -1,0 +1,36 @@
+	<div class="fbc_inv">
+	<div class="search_details fb_inv">
+
+	{* -------- multicurrency ---------- *}
+	{if in_array("multicurrency", $modules_array) && ($self_noext=="listings")}
+	{include file="modules/multicurrency/search_currencies.html"}
+	{/if}
+	{* -------- end multicurrency ---------- *}
+
+	{if $self_noext=="listings" || $self_noext=="user_listings" || $self_noext=="store" || $self_noext=="auctions" || $self_noext=="featured_ads"}
+	
+	<select id="order" name="order" onchange="doSel(this)">
+	<option value="location.href='{$order_link|replace:'##order##':'date_updated'|replace:'##order_way##':'desc'}'" {if $order=='' && $order_way==""}selected="selected"{/if}>{$lng.advanced_search.sort_by}</option>
+	<option value="location.href='{$order_link|replace:'##order##':'date_updated'|replace:'##order_way##':'desc'}'" {if $order=='date_updated' && $order_way=="desc"}selected="selected"{/if}>{$lng.listings.date} {$lng.general.desc}</option>
+	<option value="location.href='{$order_link|replace:'##order##':'date_updated'|replace:'##order_way##':'asc'}'" {if $order=='date_updated' && $order_way=="asc"}selected="selected"{/if}>{$lng.listings.date} {$lng.general.asc}</option>
+	{if $self_noext!="auctions"}
+	<option value="location.href='{$order_link|replace:'##order##':'price'|replace:'##order_way##':'desc'}'" {if $order=='price' && $order_way=="desc"}selected="selected"{/if}>{$lng.listings.price} {$lng.general.desc}</option>
+	<option value="location.href='{$order_link|replace:'##order##':'price'|replace:'##order_way##':'asc'}'" {if $order=='price' && $order_way=="asc"}selected="selected"{/if}>{$lng.listings.price} {$lng.general.asc}</option>
+	{/if}
+	</select>
+	{/if}
+
+	</div> {* end search_details *}
+	
+	{if $self_noext=="listings" && $ads_settings.search_by_account_type}
+	<h2 class="search_tabs fb_inv">
+	<a href="{$acctype_link|replace:'##acctype##':'all'}" {if !isset($post_array.account_type) || !$post_array.account_type || $post_array.account_type|lower=='all'}class="crt"{/if}>{$lng.general.all}</a>
+	<a href="{$acctype_link|replace:'##acctype##':'private'}" {if isset($post_array.account_type) && $post_array.account_type|lower=='private'}class="crt"{/if}>{$lng.search.private}</a>
+	<a href="{$acctype_link|replace:'##acctype##':'professional'}" {if isset($post_array.account_type) && $post_array.account_type|lower=='professional'}class="crt"{/if}>{$lng.search.professional}</a>
+	</h2> {* end search_tabs *}
+	{/if}
+
+	<div class="clearfix"></div>
+	
+	</div> {* end fbc_inv *}
+

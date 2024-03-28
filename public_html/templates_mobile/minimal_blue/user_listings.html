@@ -1,0 +1,147 @@
+{include file="header.html"}
+{if isset($invalid_user) && $invalid_user}
+<div id="page_content">
+<div class="info"><p>{$lng.users.no_such_id}</p></div>
+</div>
+{else}
+
+	<script type="text/javascript">
+	//<![CDATA[
+	{literal}
+	$(document).ready(function() {
+	{/literal}
+
+	{foreach from=$gmaps item=v}
+		{if $user[$v.caption] && $v.public}
+			{include file="data/gmap-ro.html"}
+		{/if}
+	{/foreach}
+	{literal}
+	});
+	{/literal}
+	//]]>
+	</script>
+
+      <!-- begin: #dp_left -->
+      <div id="dp_left">
+        <div id="left_content" class="clearfix"> 
+	<h1>{$lng.listings.all_listings_for} <b>{$user[$settings.contact_name_field]}</b></h1>
+
+	{if in_array("ratings",$modules_array) && $ratings_settings.rate_users}
+	{include file="modules/ratings/user_rating.html"}
+	{/if}
+
+	{if $special_user_fields.logo && $special_user_fields.logo && isset($user[$special_user_fields.logo]) && $user[$special_user_fields.logo]}
+	<img src="{$live_site}/uploads/{$special_user_fields.logo}/{$user[$special_user_fields.logo]}" />
+	{/if}
+
+	<div id="details">
+	{foreach from=$user_fields_array item=v}
+	{capture name=some_content assign=pub_field}pb_{$v.caption}{/capture}
+	{if  isset($user[$v.caption]) && $user[$v.caption] && ($v.public==1 || ($v.public==2 && $user[$pub_field]==1 )) && $v.type!="google_maps" && $v.type!="checkbox_group" && $v.type!="youtube"&& $v.type!="image" && $v.type!="htmlarea"&& $v.type!="textarea"&& $v.type!="logo"}
+	<div>
+		<span>{$v.name}:</span>
+		{if $v.type=='url'}<a href="{$user[$v.caption]}" target="_blank" rel="nofollow">{/if}
+
+		{if $v.prefix}{$v.prefix}{/if}
+
+		{if $v.type=="file"}
+			<a href="{$live_site}/uploads/{$v.caption}/{$user[$v.caption]}"><img src="{$template_path}/images/download.png" class="tooltip" alt="" title="{$lng.general.download}"/></a>
+		{elseif $v.type=="date"}
+		{$user.vis[$v.caption]}
+
+		{elseif $v.validation_type=="numeric"}
+		{$user.formatted[$v.caption]}
+
+		{elseif $v.type=="textarea"}
+		{$user.formatted[$v.caption]}
+
+		{elseif $v.type=="multiselect"}
+		{$user[$v.caption]|@implode:', '}
+
+		{elseif $v.type=="checkbox"}
+		{if $user[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+		{else}
+
+		{if $v.type=="menu" && $user[$v.caption]=="all" && $v.all_val}
+		{$lng.general.all}
+		{else}
+		{$user[$v.caption]}
+		{/if}
+
+		{/if}
+
+		{if $v.postfix}{$v.postfix}{/if}
+
+		{if $v.type=='url'}</a>{/if}
+	</div>
+	{/if}
+	{/foreach}
+	</div>
+
+	{foreach from=$user_fields_array item=v}
+	{if isset($user[$v.caption]) && $user[$v.caption] && $v.public && ($v.type=="htmlarea" || $v.type=="textarea")}
+	<div class="box_heading">{$v.name}</div>
+	<p>
+		{$user[$v.caption]}
+	</p>
+	{/if}
+	{/foreach}
+
+	{* -------- special fields -------- *}
+	{foreach from=$user_fields_array item=v}
+
+	{if isset($user[$v.caption]) && $user[$v.caption] && $v.public && ( $v.type=="google_maps" || $v.type=="checkbox_group" || $v.type=="youtube" )}
+
+	{if $v.type=="checkbox_group"}
+	<div class="box_heading">{$v.name}</div>
+
+	<table cellpadding="3" cellspacing="3" width="100%" align="center">
+	<tr>
+
+	{*  uncomment the following to show only checked options  *}
+	{foreach from=$user[$v.caption] item=t name=check}
+		<td class="options" width="33%"><img src="{$template_path}images/checkbox_on.png" alt="" />&nbsp;&nbsp;{$t}</td>
+		{if $smarty.foreach.check.index!=0 && $smarty.foreach.check.index%3==2}</tr><tr>{/if}
+	{/foreach}
+
+	</tr></table>
+
+	{elseif $v.type=="youtube"}
+	<div class="box_heading">{$v.name}</div>
+	<div style="text-align: center; ">{$user[$v.caption]}</div>{* limit video width *}
+	{else}	{* -------- google maps -------- *}
+	<div class="box_heading">{$v.name}</div>
+	<input type="hidden" name="{$v.caption}" id="{$v.caption}" value="{$user[$v.caption]}"/>
+	<div id="gm_{$v.caption}" class="bordered_map"></div>
+	{/if}
+	{/if}
+
+	{/foreach}	
+
+	</div>
+      </div>
+
+	<div class="clearfix"></div>
+
+	<div id="page_content">
+
+	{if $no_listings}
+	{include file="paginator.html"}
+	{/if}
+
+	{foreach name="listings" from=$listings_array item=v}
+		{include file="short_listing.html"}
+		{if !$v.featured && !$v.highlited}<hr/>{/if}
+	{/foreach}
+
+	<div class="clearfix"></div>
+	{if $no_listings}
+	{include file="paginator.html"}
+	{/if}
+
+	</div>
+	<div class="clearfix"></div>
+{/if}
+{include file="footer.html"}

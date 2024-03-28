@@ -1,0 +1,400 @@
+{if !isset($step) || !$step}
+{include file="header.html"}
+{include file="data/magnific-popup.html"}
+<script src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+
+<div class="wait"></div>
+
+
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<script src="{$live_site}/libs/jQuery/plugins/jquery.number.min.js"></script>
+<script src="{$live_site}/libs/jQuery/plugins/textcounter.min.js"></script>
+
+<link rel="stylesheet" href="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.css">
+<script src="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.min.js"></script>
+
+{include file="js/edit_listing_js.html"}
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng.navbar.editad} <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id}{else}{$live_site}/details.php?id={$id}{/if}"> #{$id}</a></h1></div>
+</div>
+
+<div class="page_bounds mb40">
+
+{if $pending_edited}
+<div class="wbg p30 mb40">
+<div class="warning mb20">{$lng.listings.info.listing_pending_edited}</div>
+</div>
+{/if}
+
+{* ---------------- ad details after saving ------------------  *}
+<div id="ad_details" style="display: none;" ></div>
+
+{* -------------------- edit ad form ------------------------ *}
+<div id="editad_form">
+
+<form name="newad" id="newad" method="post" enctype="multipart/form-data" action="edit_listing.php?id={$id}&step=2{if isset($key) && $key}&key={$key}{/if}">
+
+{if $no_words}<input name="no_words" id="no_words" type="hidden" value="{$no_words}">{/if}
+
+{if $ads_settings.hide_contact_button==2}
+<div class="heading form_heading">{$lng.newad.contact_options}</div>
+<div class="wbg p30 form_container">
+	<input type="checkbox" name="email_contact" {if $tmp.email_contact==1}checked{/if}>&nbsp;&nbsp;&nbsp;{$lng.newad.contact_via_email}
+</div>
+{/if}
+
+<div class="heading form_heading">{$lng.listings.ad_description}</div>
+
+<div class="wbg p30">
+
+<div class="form_container">
+
+{if $languages|@count>1 && $ads_settings.translate_title_description==1}
+
+{foreach from=$languages item=v}
+
+	{capture name=some_content assign=title_field}title_{$v.id}{/capture}
+	{capture name=some_content assign=desc_field}description_{$v.id}{/capture}
+
+	<div class="fel">
+	<label for="title_{$v.id}">{$lng.listings.title}<span class="mandatory"> *</span></label>
+	<input type="text" id="title_{$v.id}" name="title_{$v.id}" class="title_input" value="{$tmp.$title_field}" maxlength="150"/>
+	&nbsp;{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />{else}{$v.name}{/if}
+	</div>
+
+<!-- DESCRIPTION -->
+
+	<div class="fel">
+	<label for="description_{$v.id}">{$lng.listings.description}<span class="mandatory"> *</span></label>
+	<textarea name="description_{$v.id}"  class="{if $no_words}counter {/if}description_input" rows="12" id="description_{$v.id}">{$tmp.$desc_field}</textarea>
+	&nbsp;{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />{else}{$v.name}{/if}
+	</div>
+
+	{if $no_words && $html_editor}
+	<!-- COUNT WORDS -->
+		<input readonly name="count_{$v.id}" id="count_{$v.id}" type="text" size="3" value="{$no_words}" />
+		{$lng.listings.words_left}
+	{/if}
+
+{/foreach}
+
+{else}
+<!--  TITLE -->
+
+	<div class="fel">
+	<label for="title">{$lng.listings.title}<span class="mandatory"> *</span></label>
+	<input type="text" name="title" id="title" class="title_input" value="{$tmp.title}" maxlength="150"/>
+	</div>
+
+<!-- DESCRIPTION -->
+
+	<div class="fel">
+	<label for="description">{$lng.listings.description}<span class="mandatory"> *</span></label>
+	<textarea name="description" id="description"  class="{if $no_words}counter {/if}description_input" rows="12">{$tmp.description}</textarea>
+	</div>
+
+	{if $no_words && $html_editor}
+	<!-- COUNT WORDS -->
+		<input readonly name="count" id="count" type="text" size="3" value="{$no_words}"/>
+		{$lng.listings.words_left}
+	{/if}
+
+{/if}
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+<div class="heading form_heading">{$lng.listings.ad_information}</div>
+
+<div class="wbg p30">
+
+<div class="form_container">
+{if $html_editor}
+{include file="data/description_editor.html"}
+{/if}
+{include file="data/form_includes.html" fields_array=$fields}
+{include file="custom_fields_form.html" fields_array=$fields type="listing"}
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+
+{if $ads_settings.enable_url && $tmp.enable_url}
+
+<div class="heading form_heading">{$lng.listings.url}</div>
+
+<div class="wbg p30">
+
+<div class="form_container">
+
+<div class="fel">
+	<label for="site_url">{$lng.listings.site_url}</label>
+	<input type="text" name="site_url" id="site_url" size="70" value="{if isset($tmp.site_url)}{$tmp.site_url}{/if}" />
+</div>
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+{/if}
+
+{if $ads_settings.enable_video && $tmp.enable_video}
+
+<div class="heading form_heading">{$lng.listings.video}</div>
+
+<div class="wbg p30">
+
+<div class="form_container">
+
+<div class="fel">
+	<label for="video_code">{$lng.listings.video_code}</label>
+	<textarea name="video_code" id="video_code" cols="55" rows="10">{if isset($tmp.video)}{$tmp.video}{/if}</textarea>
+</div>
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+{/if}
+
+{if $ads_settings.add_meta_with_listings}
+
+<div class="heading form_heading">{$lng.listings.meta_info}</div>
+
+<div class="wbg p30">
+
+<div class="form_container">
+
+{* -------------------- META_KEYWORDS --------------------- *}
+	<div class="fel">
+	<label for="meta_keywords">{$lng.listings.meta_keywords}</label>
+	<textarea id="meta_keywords" name="meta_keywords" cols="50" rows="3">{if isset($tmp.meta_keywords)}{$tmp.meta_keywords}{/if}</textarea>
+	</div>
+
+{* -------------------- META_DESCRIPTION --------------------- *}
+	<div class="fel">
+	<label for="meta_description">{$lng.listings.meta_description}</label>
+	<textarea id="meta_description" name="meta_description" cols="50" rows="3">{if isset($tmp.meta_description)}{$tmp.meta_description}{/if}</textarea>
+	</div>
+
+	</div> {* end form_container *}
+</div> {* end wbg *}
+
+{/if}
+
+{if $settings.nologin_enabled && (!isset($crt_usr) || !$crt_usr)}
+
+<div class="heading form_heading">{$lng.listings.your_info}</div>
+
+<div class="wbg p30 mb40">
+
+<div class="form_container">
+
+{include file="custom_fields_form.html" fields_array=$user_fields type="user" tmp=$tmp.user}
+
+	{if $settings.nologin_image_verification}
+
+		{if $settings.enable_recaptcha}
+		{include file="data/recaptcha.html"}
+		{else}
+		{include file="data/random_image.html"}
+		{/if}
+		
+	{/if}
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+{/if}
+
+<div class="form_footer mb40">
+	<input type="submit" class="button wide_button positive" name="Submit" id="Submit" value="{$lng.general.save}" />
+</div>
+
+</form>
+
+</div> {* end editad_form *}
+
+</div>{* end page_bounds *}
+
+{include file="footer.html"}
+{/if}
+
+{if isset($step) && $step==3}
+
+<div class="heading form_heading">{$lng.listings.ad_details}</div>
+
+<div class="wbg p30 mb40">
+
+<div class="form_container">
+
+<div class="clearfix">
+	<div class="left_form">{$lng.listings.category}:</div>	
+	<div class="right_form">{$tmp.category}</div>
+</div>
+
+{if $languages|@count>1 && $ads_settings.translate_title_description==1}
+
+{foreach from=$languages item=v}
+
+	{capture name=some_content assign=title_field}title_{$v.id}{/capture}
+	{capture name=some_content assign=desc_field}description_{$v.id}{/capture}
+
+	<div class="clearfix">
+	<div class="left_form">{$lng.listings.title}:</div>
+	<div class="right_form">{$tmp.$title_field}	&nbsp;{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />{else}{$v.name}{/if}
+	</div>
+	</div>
+
+<!-- DESCRIPTION -->
+	<div class="clearfix">
+	<div class="left_form">{$lng.listings.description}:</div>
+	<div class="right_form">{$tmp.$desc_field}&nbsp;{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />{else}{$v.name}{/if}
+	</div>
+	</div>
+
+{/foreach}
+
+{else}
+<div class="clearfix">
+	<div class="left_form">{$lng.listings.title}:</div>	
+	<div class="right_form">{$tmp.title|wordwrap:70:" ":true}</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.listings.description}:</div>	
+	<div class="right_form">{$tmp.description_formatted|wordwrap:70:" ":true}</div>
+</div>
+{/if}
+
+<script>
+//<![CDATA[
+{if isset($gmaps)}
+{foreach from=$gmaps item=v}
+	{if isset($tmp[$v.caption]) && $tmp[$v.caption]}
+		{include file="data/map-ro.html" prefix="_ro"}
+	{/if}
+{/foreach}
+{/if}
+
+{if isset($user_gmaps)}
+{foreach from=$user_gmaps item=v}
+	{if isset($tmp.user[$v.caption]) && $tmp.user[$v.caption]}
+		{include file="data/map-ro.html" tmp=$tmp.user prefix="_ro"}
+	{/if}
+{/foreach}
+{/if}
+
+function init_map_ro() {
+	{if isset($gmaps)}
+	{foreach from=$gmaps item=v}
+		{if isset($tmp[$v.caption]) && $tmp[$v.caption]}
+			{include file="data/init_map.html" prefix="_ro"}
+		{/if}
+	{/foreach}
+	{/if}
+
+	{if isset($user_gmaps)}
+	{foreach from=$user_gmaps item=v}
+		{if isset($tmp.user[$v.caption]) && $tmp.user[$v.caption]}
+			{include file="data/init_map.html" tmp=$tmp.user prefix="_ro"}
+		{/if}
+	{/foreach}
+	{/if}
+
+	}
+
+$(document).ready(function() {
+
+	var gmaps_on = {if (isset($gmaps) && $gmaps) || ( isset($user_gmaps) && $user_gmaps )}1{else}0{/if};
+	// initialize google maps
+ 	if (gmaps_on) { 
+		setTimeout(() => { init_map_ro();}, 1000);
+	}	
+
+});
+
+//]]>
+</script>
+
+{include file="custom_fields_form_list.html" fields_array=$fields_array values_array=$tmp}
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+{if $ads_settings.add_meta_with_listings}
+<div class="heading form_heading">{$lng.listings.meta_info}</div>
+
+<div class="wbg p30">
+
+<div class="form_container">
+
+	<div class="clearfix">
+		<div class="left_form">{$lng.listings.meta_keywords}:</div>	
+		<div class="right_form">{if isset($tmp.meta_keywords)}{$tmp.meta_keywords}{else}-{/if}</div>
+	</div>
+
+	<div class="clearfix">
+		<div class="left_form">{$lng.listings.meta_description}:</div>	
+		<div class="right_form">{if isset($tmp.meta_description)}{$tmp.meta_description}{else}-{/if}</div>
+	</div>
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+{/if}
+
+{* nologin fields *}
+
+{if !$tmp.user_id}
+<div class="heading form_heading">{$lng.listings.your_info}</div>
+
+<div class="wbg p30">
+
+<div class="form_container">
+
+	{include file="custom_fields_form_list.html" fields_array=$user_fields values_array=$tmp.user}
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+{/if}{* end if not logged in *}
+
+{if isset($tmp.enable_url) && $tmp.enable_url && isset($tmp.site_url) && $tmp.site_url}
+
+<div class="heading form_heading">{$lng.listings.url}</div>
+
+<div class="wbg p30">
+
+<div class="form_container">
+
+	<div><a href="{$tmp.site_url}" target="_blank" rel="nofollow">{$tmp.site_url}</a></div>
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+{/if}{* end video *}
+
+
+{if isset($tmp.enable_video) && $tmp.enable_video && isset($tmp.video) && $tmp.video}
+
+<div class="heading form_heading">{$lng.listings.video}</div>
+
+<div class="wbg p30">
+
+<div class="form_container">
+
+	<div class="center">{$tmp.video|regex_replace:'/ width="[0-9]+"/':' width="500"'|regex_replace:'/ height="[0-9]+"/':' height="388"'}</div>
+
+</div> {* end form_container *}
+</div> {* end wbg *}
+
+{/if}{* end video *}
+
+<div class="form_footer mb40">
+		<a class="button positive" href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id p2=$tmp.title}{else}{$live_site}/details.php?id={$id}{/if}">{$lng.general.view}</a>
+
+		<a class="button positive" id="editad" class="gray" href="javascript:;">{$lng.navbar.editad}</a>
+<div class="clearfix"></div>
+</div>
+
+{/if} {* end step 3 *}

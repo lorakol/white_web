@@ -1,0 +1,34 @@
+	<!-- SIMILAR ADS --> 	
+	<div class="clearfix"></div>
+
+	{capture name=some_content assign=item_width}{math equation="(w-w1)/no" w=$appearance.outer_table w1=75 no=$similar_ads.no_ads_on_row}{/capture}
+
+	{capture name=some_content assign=title_field}title_{$crt_lang}{/capture}
+
+	<div class=""></div>
+	<div class="gray-box3 head heading heading_large">{$similar_ads[$title_field]}</div>
+	<div class="wtbbox sads">
+
+
+		{section name=loop start=0 loop=$no_similar step=1}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$similar[loop].id p2=$similar[loop].title}{else}{$live_site}/details.php?id={$similar[loop].id}{/if}{/capture}
+
+
+			<div class="lbox square-lbox lfloat mb20" style="width: {$item_width}px;">
+
+				{if $similar[loop].rented && $ads_settings.enable_rented}<div class="rented_featured" id="frented{$similar[loop].id}" ></div>{elseif $similar[loop].sold && $ads_settings.enable_sold}<div class="sold_featured" id="fsold{$similar[loop].id}" ></div>{/if}
+
+				<div class="gallery-img-bg smallimg mb15 centered">
+				<a href="{$details_url}"><img class="pic" id="fpic{$similar[loop].id}" src="{$live_site}/{$similar[loop].image}" alt="{if $similar[loop].image_id}{$similar[loop].title|strip_tags:false|substr:0:100}{/if}" /></a>
+				</div>
+
+				<h3>{if $data_set=="cars" && ($similar[loop].make || $similar[loop].model)}<a href="{$details_url}">{$similar[loop].make} {$similar[loop].model}</a>{else}<a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$similar[loop].title|mb_truncate:30:"...":"UTF-8"}{else}{$similar[loop].title|truncate:30:"...":false}{/if}</a>{/if}</h3>
+
+				{if $ads_settings.enable_price && $similar[loop].price>=0}<div class="small-dark-gray">{$similar[loop].price_curr}</div>
+				{/if}
+			</div>
+		{/section}
+
+	<div class="clearfix"></div>
+	</div> {* end box *}

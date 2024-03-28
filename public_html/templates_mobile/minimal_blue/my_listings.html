@@ -1,0 +1,130 @@
+{include file="header.html"}
+<div id="heading">{$lng.useraccount.browse_your_listings}</div>
+
+{foreach from=$listings_array item=v}
+
+<div class="classified_nl">
+
+{capture name=some_content assign=details_url}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title p3='' p4=$v.category_id p5=$v.slug}{else}{$live_site}/details.php?id={$v.id}{/if}
+{/capture}
+
+<div class="classifieds_content">
+<a href="{$details_url}"><h3>{$v.title}</h3></a>
+{if $data_set=="cars"}<h4>{$v.make} {$v.model}</h4>{/if}
+{$lng.listings.category}: <b>{$v.category}</b><br/>
+{$lng.listings.package}: <b>{$v.package}</b><br/>
+{if $ads_settings.enable_price && $v.price>=0}<div class="price">{$v.price_curr}</div>{/if}
+
+{$lng.listings.added_on}: <b>{$v.date_nice}</b>
+{if $v.expired}<br /><font color="#ff0000">{$lng.listings.expired_on}: {$v.date_expires_nice}</font>
+{elseif $v.date_expires}<br />{$lng.listings.expires_on}: <b>{$v.date_expires_nice}</b>
+{else}<br/>{$lng.listings.expires_on}: <b>{$lng.general.never}</b>
+{/if}<br/>
+<b>#{$v.id} | {$lng.listings.views}: {$v.viewed}</b>
+</div>
+
+<div class="classified_photo"><a href="{$details_url}">
+	<img src="{$live_site}/{$v.image}" id="pic{$v.id}" alt="{if $v.image_id}{$v.title|strip_tags:false|substr:100}{/if}" />
+</a></div>
+
+<div class="clearfix"></div>
+
+<div class="class_buttons">
+{if $v.active}
+	<div class="buttonwrapper" ><div class="activebutton"><span class="button">{$lng.listings.active}</span></div></div>
+{elseif $v.user_approved==0 && !$v.expired}
+	<a href="new_listing.php?step=6&id={$v.id}&finalize=1">
+	<div class="buttonwrapper"><div class="inactivebutton"><span class="button tooltip" title="{$lng.listings.approve}">{$lng.listings.finalize}</span></div></div></a>
+{else}
+	<div class="buttonwrapper"><div class="inactivebutton"><span class="button">{$lng.listings.inactive}</span></div></div>
+{/if}
+{if $v.pending || $v.pending_actions|@count}
+	<div class="buttonwrapper"><div class="pendingbutton"><span class="button tooltip" title="{$v.pending_info}">{$lng.listings.pending}</span></div></div>
+{/if}
+{if $v.expired}
+	<div class="buttonwrapper"><div class="expiredbutton"><span class="button">{$lng.listings.expired}</span></div></div>
+{/if}
+{if $ads_settings.enable_sold && $v.sold}
+	<div class="buttonwrapper"><div class="soldbutton"><span class="button">{$lng.listings.sold}</span></div></div>
+{/if}
+{if $ads_settings.enable_rented && $v.rented}
+	<div class="buttonwrapper"><div class="rentedbutton"><span class="button">{$lng.listings.rented}</span></div></div>
+{/if}
+{if $v.featured && $ads_settings.enable_featured}
+	<div class="buttonwrapper"><div class="featuredbutton"><span class="button">{$lng.listings.featured}{if isset($v.featured_no_days) && $v.featured_no_days}&nbsp;{$v.featured_no_days}&nbsp;{$lng.days}{/if}</span></div></div>
+{/if}
+{if isset($v.enable_video) && $v.enable_video && $ads_settings.enable_video}
+	<div class="buttonwrapper"><div class="featuredbutton"><span class="button">{$lng.listings.short_video}</span></div></div>
+{/if}
+{if $v.highlited && $ads_settings.enable_highlited}
+	<div class="buttonwrapper"><div class="featuredbutton"><span class="button">{$lng.listings.highlited}</span></div></div>
+{/if}
+{if isset($v.priority_name) && $v.priority_name && $ads_settings.enable_priorities}
+	<div class="buttonwrapper"><div class="featuredbutton"><span class="button">{$v.priority_name}</span></div></div>
+{/if}
+
+{if isset($v.urgent) && $v.urgent && $ads_settings.enable_urgent}
+<div class="buttonwrapper"><div class="featuredbutton"><span class="button">{$lng.listings.urgent}</span></div></div>
+{/if}
+
+{if isset($v.enable_url) && $v.enable_url && $ads_settings.enable_url}
+<div class="buttonwrapper"><div class="featuredbutton"><span class="button">{$lng.listings.url}</span></div></div>
+{/if}
+
+
+</div>
+
+<div class="icons">
+		<a href="edit_listing.php?id={$v.id}"><span><img src="{$template_path}images/edit.gif" name="{$lng.general.edit}" alt="" /></span></a>
+
+		<a href="edit_photos.php?id={$v.id}"><span><img src="{$template_path}images/edit_photos.jpg" name="{$lng.listings.edit_photos}" alt="" /></span></a>
+
+		{if $settings.users_feature_ads && ($ads_settings.enable_featured || $ads_settings.enable_highlited || $ads_settings.enable_priorities || $ads_settings.enable_video)}
+		<span><a href="edit_options.php?id={$v.id}"><img src="{$template_path}images/feature.gif" name="{$lng.listings.edit_ad_options}" alt="" /></a></span>
+		{/if}
+		{if $settings.users_delete_ads}
+		<span><a href="javascript:;" onclick="onDelete('{$v.id}','{$lng.listings.confirm_delete|addslashes}', 'listing');"><img src="{$template_path}images/delete.gif" name="{$lng.general.delete}" alt="Delete" /></a></span>
+		{/if}
+		{if $ads_settings.enable_sold}
+			<span id="div_sold{$v.id}">
+			{if $v.sold==0}
+			<a href="javascript:;" onclick="onSold('{$v.id}', 'listing');"><img id="sold{$v.id}" src="{$template_path}images/mark_sold.gif" alt="Mark Sold" name="{$lng.listings.mark_sold}" /></a>
+			{else}
+			<a href="javascript:;" onclick="onUnsold('{$v.id}', 'listing');"><img id="unsold{$v.id}" src="{$template_path}images/unsold.gif" name="{$lng.listings.mark_unsold}" alt="" /></a>
+			{/if}
+			</span>
+		{/if}
+
+		{if $ads_settings.enable_rented}
+			<span id="div_rented{$v.id}">
+			{if $v.rented==0}
+			<a href="javascript:;" onclick="onRented('{$v.id}', 'listing');"><img id="rented{$v.id}" src="{$template_path}images/mark_rented.gif" alt="Mark Rented" name="{$lng.listings.mark_rented}" /></a>
+			{else}
+			<a href="javascript:;" onclick="onUnrented('{$v.id}', 'listing');"><img id="unrented{$v.id}" src="{$template_path}images/unrented.gif" name="{$lng.listings.mark_unrented}" alt=""/></a>
+			{/if}
+			</span>
+		{/if}
+
+		{if $v.expired}
+			<span><a href="renew_listing.php?id={$v.id}"><img src="{$template_path}images/renew.gif" name="{$lng.listings.renew}" alt=""/></a></span>
+		{/if}
+</div>
+<div class="clearfix"></div>
+</div>
+
+{/foreach}
+
+{if $no_listings==0}
+	<div class="p10">
+	{$lng.listings.no_listings}
+	</div>
+{/if}
+
+{if $no_pages>1}
+{include file="paginator.html"}
+{else}
+<div class="clearfix"></div>
+{/if}
+
+{include file="footer.html"}

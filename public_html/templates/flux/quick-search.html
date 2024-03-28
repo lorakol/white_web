@@ -1,0 +1,302 @@
+{assign var="extra_fields_no" value=$qfields|@count}
+
+<div id="quick-search" {if $self_noext=="index"}class="first-page-quick-search"{/if}>
+<div class="page_bounds">
+<form name="qsearch" id="qsearch" method="post" action="{$live_site}/listings.php">
+<div id="qs_container">
+	
+	<div class="qs_category qsf">
+		<select name="qs_category" id="qs_category">
+				<option value="">{$lng.search.all_categories}</option>
+				{foreach from=$categories item=v name=cat}
+				<option value="{$v.id}" {if isset($post_array.category) && $post_array.category==$v.id}selected{/if}>{$v.str}{$v.name}</option>
+				{/foreach}
+			</select>
+	</div>
+	
+	<div class="qs_keyword qsf relative">
+	<input type="text" name="qs_{$keyword_name}" id="qs_{$keyword_name}" placeholder="{$lng.search.search_for}" value="{if isset($post_array[$keyword_name]) && $post_array[$keyword_name]}{$post_array[$keyword_name]}{/if}"/>
+	<a href="javascript:;" id="remove_qs_keyword" class="close qs_delete{if !isset($post_array[$keyword_name]) || !$post_array[$keyword_name]} hidden{/if}" ></a>
+	</div>
+	
+	<div class="qs_location qsf relative">
+	<input type="text" name="qs_location" id="qs_location" placeholder="{$lng.quick_search.location}" value="{if isset($post_array.location) && $post_array.location}{$post_array.location}{/if}"/>
+	<a href="javascript:;" id="remove_qs_location" class="close qs_delete{if !isset($post_array.location) || !$post_array.location} hidden{/if}" ></a>
+	</div>
+	
+	{if $ads_settings.enable_distance_search}
+	<div class="qs_distance_search qsf">
+		<select name="qs_dist" id="qs_dist" {if !isset($post_array.location) || !$post_array.location}disabled{/if}>
+			<option value="0">+&nbsp;0&nbsp;{$ads_settings.ds_measuring_unit}</option>
+			{foreach from=$ads_settings.array_ds_distances_list item=v name=dist}
+			<option value="{$v}" {if isset($post_array.dist) && $post_array.dist==$v}selected{/if}>+&nbsp;{$v}&nbsp;{$ads_settings.ds_measuring_unit}</option>
+			{/foreach}
+		</select>
+	</div>
+	{/if}
+	
+	{if $ads_settings.enable_location_autosuggest}
+	{foreach from=$ads_settings.address_components item = c key=k }
+	{if $c.field}<input type="hidden" name="qs_{$c.field}" id="qs_{$c.field}" class="location_ac_field" value="{if isset($post_array[$c.field]) && $post_array[$c.field]}{$post_array[$c.field]}{/if}">{/if}
+	{/foreach}
+	{/if}
+	
+	{if $ads_settings.enable_distance_search}
+	<input type="hidden" name="qs_lat" id="qs_lat" value="{if isset($post_array.lat) && $post_array.lat}{$post_array.lat}{/if}">
+	<input type="hidden" name="qs_long" id="qs_long" value="{if isset($post_array.long) && $post_array.long}{$post_array.long}{/if}">
+	{/if}
+	
+	<div class="search-button qsf search-button-nomob"><input type="submit" name="Search" id="Search" value="{$lng.general.search}"/></div>
+	
+</div> {* end qs_container *}
+	
+{* quick search extra fields *}
+{if $extra_fields_no}
+<div id="qs_extended" {*{if $self_noext!="index"}style="display: none"{/if}*}>
+	{foreach from=$qfields item=v name=custom}
+
+	{if $v.type=="depending"}
+	<div class="qsf" {if $v.fieldset!=0} id="li_{$v.depending.caption1}" style="display: none"{/if}>
+	<select name="qs_{$v.depending.caption1}" id="qs_{$v.depending.caption1}" {if $multi_depending && in_array($v.dep_id, ','|explode:$multi_depending)}disabled="disabled"{/if} onchange="selDepending(1, 'qs_{$v.depending.caption1}', 'qs_{$v.depending.caption2}', '{$v.depending.id}', {if $multi_depending && in_array($v.dep_id, ','|explode:$multi_depending)}this.form.qs_category.value{else}0{/if}, 0, '', 0, '', '{$live_site}', '' )">
+		<option value="">{$v.depending.name1}</option>
+		{foreach from=$v.depending.elements item=t}
+		<option value="{$t.name}">{$t.name}</option>
+		{/foreach}
+	</select>
+	<input type="hidden" name="dep_id_qs_{$v.depending.caption1}" id="dep_id_qs_{$v.depending.caption1}" value="" />
+
+	{* set the value for location filter if the case *}
+	{if $settings.enable_locations && in_array($v.depending.caption1, $location_fields) && $location_array[$v.depending.caption1]}
+	<script type="text/javascript">
+	{literal}
+	jQuery(document).ready(function(){
+	{/literal}
+		// field 1
+		$('select[name="qs_{$v.depending.caption1}"]').find('option:icontains("{$location_array[$v.depending.caption1]|rawurlencode}")').attr("selected",true);
+		selDepending(1, 'qs_{$v.depending.caption1}', 'qs_{$v.depending.caption2}', '{$v.depending.id}', {if $multi_depending && in_array($v.dep_id, ','|explode:$multi_depending)}this.form.qs_category.value{else}0{/if}, 0, '', 0, '', '{$live_site}', '' );
+
+		// field2
+		{if in_array($v.depending.caption2, $location_fields) && $location_array[$v.depending.caption2]}
+		{literal}
+		setTimeout(function() {{/literal} $('select[name="qs_{$v.depending.caption2}"]').find('option:icontains("{$location_array[$v.depending.caption2]|rawurlencode}")').attr("selected",true);{literal}}, 500);{/literal}
+
+		{if $v.depending.no>=3}
+		selDepending(1, 'qs_{$v.depending.caption2}', 'qs_{$v.depending.caption3}', '{$v.depending.id}', {if $multi_depending && in_array($v.dep_id, ','|explode:$multi_depending)}this.form.qs_category.value{else}0{/if}, 0, '', 0, '', '{$live_site}', '' );
+
+		// field3
+		{if in_array($v.depending.caption3, $location_fields) && $location_array[$v.depending.caption3]}
+		{literal}
+		setTimeout(function() {{/literal} $('select[name="qs_{$v.depending.caption3}"]').find('option:icontains("{$location_array[$v.depending.caption3]|rawurlencode}")').attr("selected",true);{literal}}, 1000);{/literal}
+
+		{if $v.depending.no>=4}
+		selDepending(1, 'qs_{$v.depending.caption3}', 'qs_{$v.depending.caption4}', '{$v.depending.id}', {if $multi_depending && in_array($v.dep_id, ','|explode:$multi_depending)}this.form.qs_category.value{else}0{/if}, 0, '', 0, '', '{$live_site}', '' );
+
+		// field4
+		{if in_array($v.depending.caption4, $location_fields) && $location_array[$v.depending.caption4]}
+		{literal}
+		setTimeout(function() {{/literal} $('select[name="qs_{$v.depending.caption4}"]').find('option:icontains("{$location_array[$v.depending.caption4]|rawurlencode}")').attr("selected",true);{literal}}, 1000);{/literal}
+
+		{if $v.depending.no>=5}
+		selDepending(1, 'qs_{$v.depending.caption4}', 'qs_{$v.depending.caption5}', '{$v.depending.id}', {if $multi_depending && in_array($v.dep_id, ','|explode:$multi_depending)}this.form.qs_category.value{else}0{/if}, 0, '', 0, '', '{$live_site}', '' );
+		
+		{/if} {* end if 5 fields *}
+
+		{/if} {* end if field4 in location array *}
+
+		{/if} {* end if 4 fields *}
+
+		{/if}{* end if field3 in location array *}
+
+		{/if} {* end if no  >=3 *}
+	
+		{/if}{* end if field2 in location array *}
+
+		{literal}
+
+	});
+	{/literal}
+	</script>
+	{/if}
+	{* end set the value for location filter if the case *}
+
+	</div>
+	<div class="qsf" {if $v.fieldset!=0} id="li_{$v.depending.caption2}" style="display: none"{/if}>
+	<select disabled='disabled' name="qs_{$v.depending.caption2}" id="qs_{$v.depending.caption2}" 
+	{if $v.depending.no>=3}onchange="selDepending(2, 'qs_{$v.depending.caption2}', 'qs_{$v.depending.caption3}', '{$v.depending.id}', 0, 0, '', 0, '' , '{$live_site}', 'dep_id_qs_{$v.depending.caption1}')"{/if}>
+		<option value="">{$v.depending.name2}</option>
+	</select><input type="hidden" name="dep_id_qs_{$v.depending.caption2}" id="dep_id_qs_{$v.depending.caption2}" value="" />
+
+{if $v.depending.no>=3}
+	</div>
+	<div class="qsf" {if $v.fieldset!=0} id="li_{$v.depending.caption3}" style="display: none"{/if}>
+	<select disabled='disabled' name="qs_{$v.depending.caption3}" id="qs_{$v.depending.caption3}" {if $v.depending.no>=4}onchange="selDepending(3, 'qs_{$v.depending.caption3}', 'qs_{$v.depending.caption4}', '{$v.depending.id}', 0, 0, '', 0, '', '{$live_site}', 'dep_id_qs_{$v.depending.caption2}' )"{/if}>
+		<option value="">{$v.depending.name3}</option>
+	</select></span><input type="hidden" name="dep_id_qs_{$v.depending.caption3}" id="dep_id_qs_{$v.depending.caption3}" value="" />
+
+{/if}
+
+{if $v.depending.no>=4}
+	</div>
+	<div class="qsf" {if $v.fieldset!=0} id="li_{$v.depending.caption4}" style="display: none"{/if}>
+	<select disabled='disabled' name="qs_{$v.depending.caption4}" id="qs_{$v.depending.caption4}" {if $v.depending.no>=5}onchange="selDepending(4, 'qs_{$v.depending.caption4}', 'qs_{$v.depending.caption5}', '{$v.depending.id}', 0, 0, '', 0, '', '{$live_site}', 'dep_id_qs_{$v.depending.caption3}' )"{/if}>
+		<option value="">{$v.depending.name4}</option>
+	</select>
+
+{/if}
+
+{if $v.depending.no>=5}
+	</div>
+	<div class="qsf" {if $v.fieldset!=0} id="li_{$v.depending.caption5}" style="display: none"{/if}>
+	<select disabled='disabled' name="qs_{$v.depending.caption5}" id="qs_{$v.depending.caption5}">
+		<option value="">{$v.depending.name5}</option>
+	</select>
+
+{/if}
+	</div>
+
+	{else}
+
+	{if $v.type=="textbox" || $v.type=="url" || $v.type=="email" || ($v.type=="price" && $ads_settings.enable_price) || !in_array($v.type, $default_fields_types) }
+		<div class="qsf" {if $v.fieldset!=0} id="li_{$v.caption}{if $v.search_type==2}_low{/if}" style="display: none"{/if}>
+		{if $v.prefix!=""} {$v.prefix} {/if}
+
+		{if $v.search_type==2}
+
+		{if $v.is_numeric && $v.search_elements}
+		<select id="qs_{$v.caption}_low" name="qs_{$v.caption}_low">
+			<option value="">- {$lng.general.min} {$v.name} -</option>
+			{foreach from=$v.search_elements_array item=t}
+			<option value="{$t|replace:',':''|replace:'.':''}">{$t}</option>
+			{/foreach}
+		</select>
+		</div>
+		<div class="qsf" {if $v.fieldset!=0} id="li_{$v.caption}_high" style="display: none"{/if}>
+		<select id="qs_{$v.caption}_high" name="qs_{$v.caption}_high">
+			<option value="">- {$lng.general.max} {$v.name} -</option>
+			{foreach from=$v.search_elements_array item=t}
+			<option value="{$t|replace:',':''|replace:'.':''}">{$t}</option>
+			{/foreach}
+		</select>
+		{else}
+		<input name="qs_{$v.caption}_low" id="qs_{$v.caption}_low" type="text" size="{$v.size}" placeholder="- {$lng.general.min} {$v.name} -"/>
+		&nbsp;{$lng.advanced_search.to}&nbsp;
+		<input name="qs_{$v.caption}_high" id="qs_{$v.caption}_high" type="text" size="{$v.size}" placeholder="- {$lng.general.max} {$v.name} -"/>
+		{/if}
+
+		{else}
+
+		<input name="qs_{$v.caption}" id="qs_{$v.caption}" type="text" size="{$v.size}" placeholder="{$v.name}"/>
+		{/if}
+
+		</div>
+
+	{elseif $v.type=="menu"}
+		<div class="qsf" {if $v.fieldset!=0} id="li_{$v.caption}{if $v.search_type==2}_low{/if}" style="display: none"{/if}>
+		{if $v.prefix!=""} {$v.prefix} {/if}
+
+		{if $v.search_type==2}
+
+		<select id="qs_{$v.caption}_low" name="qs_{$v.caption}_low">
+			<option value="">- {$lng.general.min} {$v.name} -</option>
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}">{$t}</option>
+			{/foreach}
+		</select>
+		</div>	
+		<div class="qsf" {if $v.fieldset!=0} id="li_{$v.caption}_high" style="display: none"{/if}>
+		<select id="qs_{$v.caption}_high" name="qs_{$v.caption}_high">
+			<option value="">- {$lng.general.max} {$v.name} -</option>
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}">{$t}</option>
+			{/foreach}
+		</select>
+
+		{else}
+
+		<select id="qs_{$v.caption}" name="qs_{$v.caption}">
+			<option value="">{$v.name}</option>
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}"{if $settings.enable_locations && in_array($v.caption, $location_fields) && $location_array[$v.caption]==$t}selected="selected"{/if}>{$t}</option>
+			{/foreach}
+		</select>
+		{/if}
+
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		</div>
+
+	{elseif $v.type=="radio" || $v.type=="multiselect" || $v.type=="checkbox_group" || $v.type=="radio_group"}
+		<div class="qsf" {if $v.fieldset!=0} id="li_{$v.caption}" style="display: none"{/if}>
+		{if $v.prefix!=""} {$v.prefix} {/if}
+		<input type="hidden" id="qs_{$v.caption}" name="qs_{$v.caption}" value="{if isset($post_array[$v.caption]) && $post_array[$v.caption]}{$post_array[$v.caption]}{/if}" />
+		<div class="checkbox-dropdown" id="qs_{$v.caption}" name="qs_{$v.caption}">
+			{$v.name}
+			<ul class="checkbox-dropdown-list shadow" id="checkbox-dropdown-list_{$v.caption}">
+				{foreach from=$v.elements_array item=t}
+				<li>
+					<label><input type="checkbox"  value="{$t}" name="ms_{$v.caption}_{$t|replace:' ':'_'}" id="ms_{$v.caption}_{$t|replace:' ':'_'}" {if isset($post_array[$v.caption]) && stristr($post_array[$v.caption], $t)}checked{/if} onclick="onMultisearch('{$v.caption}', 'ms_{$v.caption}_{$t|replace:' ':'_'}', '{$t|rawurlencode}')"/>{$t}</label>
+				</li>
+				{/foreach}
+			</ul>
+		</div>
+		
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		</div>
+
+	{elseif $v.type=="date"}
+		<div class="qsf" {if $v.fieldset!=0} id="li_{$v.caption}" style="display: none"{/if}>
+		{if $v.prefix!=""} {$v.prefix} {/if}
+
+		{if $v.search_type==2}
+
+		{include file="data/qs_date-interval.html"}
+
+		<input name="qs_{$v.caption}_low_vis" id="qs_{$v.caption}_low_vis" type="text" size="{$v.size}" placeholder="- {$lng.general.min} {$v.name} -" {if $v.fieldset!=0}disabled="disabled"{/if} />
+		&nbsp;{$lng.advanced_search.to}&nbsp;
+		<input name="qs_{$v.caption}_high_vis" id="qs_{$v.caption}_high_vis" type="text" size="{$v.size}" placeholder="- {$lng.general.max} {$v.name} -" 
+		{if $v.fieldset!=0}disabled="disabled"{/if} />
+
+		<input type="hidden" name="qs_{$v.caption}_low" id="qs_{$v.caption}_low" />
+		<input type="hidden" name="qs_{$v.caption}_high" id="qs_{$v.caption}_high" />
+		{else}
+
+		<input name="qs_{$v.caption}_vis" id="qs_{$v.caption}_vis" type="text" size="{$v.size}" placeholder="{$v.name}" {if $v.fieldset!=0}disabled="disabled"{/if} />
+
+		<input type="hidden" name="qs_{$v.caption}" id="qs_{$v.caption}" />
+		{include file="data/qs_date.html"}
+
+		{/if}
+		</div>
+
+	{elseif $v.type=="radio"}
+		<div class="qsf" {if $v.fieldset!=0} id="li_{$v.caption}" style="display: none"{/if}>
+		{foreach from=$v.elements_array item=t}
+			<input name="qs_{$v.caption}" type="radio" class="noborder" value="{$t}" {if $v.default_val!='' && $v.default_val==$t} checked="checked" {/if} />&nbsp;
+			{if $v.prefix!=""} {$v.prefix} {/if}
+			{$t}
+			{if $v.postfix!=""} {$v.postfix} {/if}
+		{/foreach}	
+		</div>
+	{elseif $v.type=="checkbox"}
+		<div class="qsf" {if $v.fieldset!=0} id="li_{$v.caption}" style="display: none"{/if}>
+		{$v.name}&nbsp;<input name="qs_{$v.caption}" type="radio" value="1" class="noborder"/>&nbsp;{$lng.general.Yes}&nbsp;&nbsp;<input name="qs_{$v.caption}" type="radio" value="0" class="noborder"/>&nbsp;{$lng.general.No}
+		</div>
+		</li>
+	{/if}
+
+	{/if}
+
+	{/foreach}
+
+	</div> {* end qs_extended *}
+
+{/if} {* end if fields count *}
+
+<div class="search-button search-button-mob qsf"><input type="submit" name="Search1" id="Search1" value="{$lng.general.search}"/></div>
+
+<div class="clearfix"></div>
+	<input type="hidden" name="order" value="date_updated" />
+	<input type="hidden" name="order_way" value="desc" />
+	
+</form>
+</div>{* end page_bounds *}
+</div>{* end quick-search *}

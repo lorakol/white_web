@@ -1,0 +1,263 @@
+
+<script>
+{literal}
+$(document).ready(function () {
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { 
+		//var queryString = $.param(formData); 
+		if($("#auto_repost").find("input[type='submit']:focus").attr("id")=="Cancel") {
+			location.href='../../useraccount.php';
+			return false;
+		}
+
+		return true;  
+	},
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1) {
+
+				// go to payment page
+				var selected_processor = $('#selected_processor').val();
+
+				$("#payment").html(ret.payment_form);
+
+				if(selected_processor=="klarna" || selected_processor=="tpay" || selected_processor=="iyzico") {
+					$("body").removeClass("loading");
+					$("#payment").slideDown();
+					$('html,body').animate({scrollTop:$("#payment").offset().top}, 'slow');
+					$(".form_footer").hide();
+					$("#payment_form").submit();
+				}
+				else if(selected_processor=="stripe") {
+					$("#Submit").attr("disabled", "disabled");
+					setTimeout(function(){ $( ".stripe-button-el" ).trigger("click"); }, 2000);
+				}
+				else 
+					$("#payment_form").submit();
+
+				return;
+			}
+
+			// response = 0 -> show the error
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+
+			$("body").removeClass("loading"); 
+
+} 
+
+//initialize the AJAX form
+ $('#auto_repost').ajaxForm(options);
+
+// *********** tax value **************
+{/literal}
+
+{if $no_processors>1 || ($no_processors==1 && $credits_allowed)}
+only_processor = 0;
+{else}
+only_processor = 1;
+{/if}
+
+{if $total}
+
+if(only_processor)
+	var processor = $('input[name=processor]').val();
+else 
+	var processor = $('input:radio[name=processor]:checked').val();		
+
+var total = $("#full_total").val();
+calculateTaxAR(processor, total);
+
+
+{/if} {* end if total *}
+
+{literal}
+
+
+$('input:radio[name=processor]').change(function() { 
+
+	processor = $('input:radio[name=processor]:checked').val();
+	calculateTaxAR(processor, $("#full_total").val());
+
+	// for embedded payments
+	$("#selected_processor").val(processor);
+	reinit();
+
+})
+
+// end tax value
+
+
+}); // end document ready
+
+{/literal}
+
+
+function calculateTaxAR(p, t) {
+	var site = "{$live_site}";
+//alert("calculate tax "+p+"  "+t+" only_pr = "+only_processor);
+	$.post(site+"/include/get_info.php?type=processor", { processor: p, total: t }, function(data){ 
+
+		var split_data=data.split("|");
+		tax = split_data[0];
+		full_total = split_data[1];
+		tax_str = split_data[2];
+
+		if(tax) {
+
+			$("#tax_info").show();
+			$("#total_with_tax_info").show();
+			$("#tax").html(tax);
+			$("#tax_str").html(tax_str);
+			$("#total_with_tax").html(full_total);
+
+		}
+
+		else {
+
+			$("#tax_info").hide();
+			$("#total_with_tax_info").hide();
+
+		}
+
+	});	
+
+}
+
+
+
+function adjustRepostsTotal(myForm, price, no_decimals) {
+
+	total = parseFloat(price) * $("#no_reposts").val();	
+	
+	$("#full_total").val(total.toFixed(no_decimals));
+	$("#total").html(total.toFixed(no_decimals));
+
+	var discount_enabled = 0;
+	if ($("#div_discount")) discount_enabled = 1;
+
+	var credits_enabled = 0;
+	if ($("#div_credits")) credits_enabled = 1;
+
+	if(total>0) { 
+		$("#div_total").show();
+		if(discount_enabled) $("#div_discount").show();
+		if(credits_enabled) $("#div_credits").show();
+	}
+	else { 
+		$("#div_total").hide();
+		if(discount_enabled) $("#div_discount").hide();
+		if(credits_enabled) $("#div_credits").hide();
+	}
+
+	getDiscount (myForm,"ads", 0, no_decimals);
+
+	if(only_processor)
+		var processor = $('input[name=processor]').val();
+	else 
+		var processor = $('input:radio[name=processor]:checked').val();
+
+	var total = $("#full_total").val();
+	calculateTaxRepost(processor, total);
+	calculateCredits(total, no_decimals);
+
+	adjustRepostsSchedule(document.forms["auto_repost"]);
+
+}
+
+function onSpecific() {
+	if($('#specific_period').is(':checked')) $("#between").slideDown();
+	else $("#between").slideUp();
+	adjustRepostsSchedule(document.forms["auto_repost"]);
+}
+
+function adjustRepostsSchedule(myForm) {
+	
+		var no_reposts = $("#no_reposts").val();
+		var price = $("#price_per_repost").val();
+		var repost_period = $("#repost_period").val();
+		var repost_period_um = $("input[name='repost_period_um']:checked").val();
+
+		var starting_hour = '';
+		var ending_hour = '';
+		if($('#specific_period').is(':checked')) {
+			starting_hour = $("#starting_hour").val();
+			ending_hour = $("#ending_hour").val();
+		}
+		
+		$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{$live_site}/modules/auto_repost/get_schedule.php?no_reposts="+no_reposts+"&repost_period="+repost_period+"&repost_period_um="+repost_period_um+"&starting_hour="+starting_hour+"&ending_hour="+ending_hour,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$("#schedule_content").html(data);
+
+			} // end data
+		});// end ajax
+
+	
+}
+
+function calculateTaxRepost(p, t) {
+//alert("calculate tax "+p+"  "+t+" only_pr = "+only_processor);
+	$.post("{$live_site}/include/get_info.php?type=processor", { processor: p, total: t }, function(data){ 
+
+		var split_data=data.split("|");
+		tax = split_data[0];
+		full_total = split_data[1];
+		tax_str = split_data[2];
+
+		if(tax) {
+
+			$("#tax_info").show();
+			$("#total_with_tax_info").show();
+			$("#tax").html(tax);
+			$("#tax_str").html(tax_str);
+			$("#total_with_tax").html(full_total);
+
+		}
+
+		else {
+
+			$("#tax_info").hide();
+			$("#total_with_tax_info").hide();
+
+		}
+
+	});	
+
+}
+
+$(document).ready(function() {
+	
+	adjustRepostsSchedule(document.forms["auto_repost"]);
+	
+	$(document).on("change", "#starting_hour", function(){ 
+		adjustRepostsSchedule(document.forms["auto_repost"]);
+	});
+	$(document).on("change", "#ending_hour", function(){ 
+		adjustRepostsSchedule(document.forms["auto_repost"]);
+	});
+	$(document).on("change", "#repost_period", function(){ 
+		adjustRepostsSchedule(document.forms["auto_repost"]);
+	});
+	//$(document).on("click", "#repost_period_um", function(){ 
+	$('input[type=radio][name=repost_period_um]').on('change', function() {
+		adjustRepostsSchedule(document.forms["auto_repost"]);
+	});
+	
+});
+
+</script>

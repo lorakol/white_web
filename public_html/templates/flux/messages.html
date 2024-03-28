@@ -1,0 +1,182 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+{include file="data/magnific-popup.html"}
+
+<form name="browse" id="browse" method="post" action="messages.php" class="main">
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng.useraccount.messages}</h1></div>
+
+<div class="tt">
+
+<div>
+	<input type="image" value="delete_selected" name="delete_selected" id="delete_selected" class="mr5 lfloat tooltip" onclick="return myConfirm('{$lng.messages.confirm_delete_all|addslashes}')" title="{$lng.general.delete_all}" src="{$template_path}/images/delete_all.png"/>
+	
+	<a href="javascript:;" onclick="toggleCheck()" id="check-uncheck" class="lfloat tooltip" title="{$lng.general.check_all}"><img src="{$template_path}/images/check_all.png" /></a>
+	
+</div>
+<div class="clearfix"></div>
+
+<div class="col-4">
+
+<div>
+
+	<a class="med-btn btn5" href="javascript:;" id="add_search">{$lng.general.search}&nbsp;<img src="{$template_path}images/gray-down-arrow.png" /></a>
+	<a class="med-btn btn5" href="javascript:;" id="remove_search" style="display: none;">{$lng.general.search}&nbsp;<img src="{$template_path}images/gray-up-arrow.png" /></a>
+
+</div>
+
+</div> {* end col-4 *}
+
+<div class="col-8 rpaginator">
+	{include file="paginator.html"}
+</div>
+
+<div class="clearfix"></div>
+
+<div id="search_box" style="display: none;">
+
+<input type="hidden" name="page" value = "{$page}" />
+<input type="hidden" name="order" value = "{$order}" />
+<input type="hidden" name="order_way" value = "{$order_way}" />
+<input type="hidden" name="no_per_page" value = "{$no_per_page}" />
+
+<input type="text" name="id" size="6" class="defaultText" title="{$lng.listings.id}" value="{if isset($post_array.id)}{$post_array.id}{/if}"/>
+
+<select name="type" id="type">
+	<option value="">{$lng.general.all}</option>
+	<option value="sent" {if isset($post_array.type) && $post_array.type=="sent"}selected="selected"{/if}>{$lng.general.sent}</option>
+	<option value="received" {if isset($post_array.type) && $post_array.type=="received"}selected="selected"{/if}>{$lng.general.received}</option>
+</select>
+
+<input type="text" name="keyword" size="15" class="defaultText" title="{$lng.advanced_search.word}" value="{if isset($post_array.keyword)}{$post_array.keyword}{/if}" />
+
+<input type="text" name="name" size="15" class="defaultText" title="{$lng.contact.name}" value="{if isset($post_array.name)}{$post_array.name}{/if}"/>
+
+<input type="text" name="email" size="15" class="defaultText" title="{$lng.contact.email}" value="{if isset($post_array.email)}{$post_array.email}{/if}"/>
+
+<input name="date_from_vis" id="date_from_vis" type="text" size="10" class="defaultText" title="{$lng.useraccount.date_start}"/>
+<input name="date_from" id="date_from" type="hidden"/>
+
+<input name="date_to_vis" id="date_to_vis" type="text" size="10" class="defaultText" title="{$lng.useraccount.date_end}" />
+<input name="date_to" id="date_to" type="hidden" />
+
+<div class="buttons"><input type="submit" class="button" name="Search" value="{$lng.general.search}" /></div>
+
+</div> {* end search box *}
+
+</div> {* end tt *}
+
+</div> {* end page_bounds *}
+
+<div class="wbg pt30">
+<div class="page_bounds">
+
+{foreach from=$messages_array item=v}
+
+<div class="item{if $v.from==$crt_usr} inactive{/if}{if !$v.read} not_read{/if}" id="message_row{$v.msg_id}">
+
+	<div class="item-top">
+	
+	<div class="lfloat mr10"><input type="checkbox" class="noborder" name="msg{$v.msg_id}" id="msg{$v.msg_id}" /></div>
+	
+	<div class="lfloat mr10">
+		{if $v.from!=$crt_usr}
+		<div class="small-btn activebutton icon">{$lng.general.received}</div>
+		{else}
+		<div class="small-btn inactivebutton icon">{$lng.general.sent}</div>
+		{/if}
+
+		{if $v.to == $crt_usr && $v.report==1}<a href="javascript:;" class="tooltip" title="{$lng.messages.reported_as_spam}"><div class="small-btn expiredbutton icon">{$lng.messages.spam}</div></a>{/if}
+
+	</div>
+	
+	<div class="item-details col-m-10">
+
+		<div class="col-m-6">
+		{if isset($v.ad_id) && $v.ad_id}{$lng.messages.started_for_listing}: <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.ad_id p2=$v.title}{else}{$live_site}/details.php?id={$v.ad_id}{/if}" target="_blank">{$v.title}</a>{/if}
+		
+		<p>{if $appearance.charset=="UTF-8"}{$v.message|strip_tags|mb_truncate:400:"...":"UTF-8"}{else}{$v.messages|strip_tags|truncate:400:"...":false}{/if}</p>
+		</div>
+
+		<div class="col-m-4">
+		
+		{$lng.listings.id}: <b>#{$v.msg_id}</b><br/>
+		{if $v.from!=$crt_usr}
+		{$lng.messages.from}: <b>{if $v.from}{$v.contact_name}, {$v.email}{else}{$v.from_email}{/if}</b> <br/>
+		{else}
+		{$lng.messages.to}: <b>{if $v.to}{$v.to_contact_name}, {$v.to_email}{else}{$v.to_email}{/if}</b> </br>
+		{/if}
+		{if $v.from_phone}{$lng.contact.phone}: <b>{$v.from_phone}</b>{/if}
+		</div>
+		
+		<div class="col-m-2">
+		<span class="small">{$v.date_nice}</span><br/>
+		</div>
+
+	</div> {* end item_details *}
+	
+	</div> {* end vcenter *}
+	
+	<div class="clearfix"></div>
+	
+	<div class="item-bottom mt10">
+		
+		<div class="item-actions">
+		
+		{if $v.to == $crt_usr}
+		<a href="{$live_site}/reply.php?id={$v.msg_id}" class="freply ubtn" id="msg{$v.msg_id}">{$lng.general.reply}</a>
+		{/if}
+
+		{if $v.to == $crt_usr && $v.report==0}<a href="javascript:;" onclick="onReportMsg('{$v.msg_id}','{$lng.messages.confirm_report_spam}');" class="ubtn delbtn">{$lng.messages.report_spam}</a>{/if}
+
+		{if $v.to == $crt_usr}
+		<a href="javascript:;" onclick="onDelete('{$v.msg_id}','{$lng.messages.confirm_delete|addslashes}', 'msg');" class="ubtn delbtn">{$lng.general.delete}</a>
+		{/if}
+
+		</div> {* end item-actions *}
+		
+		<div class="status_btns">
+		
+		{if isset($v.starting) && $v.starting}
+		<a href="message_history.php?id={$v.starting}"><div class="med-btn btn2">{$lng.messages.view_thread|replace:" ":"&nbsp;"}</div></a>
+		{/if}
+
+		<a href="{$live_site}/view_message.php?id={$v.msg_id}" class="view" id="vmsg{$v.msg_id}"><div class="med-btn btn2">{$lng.messages.view_complete_message|replace:" ":"&nbsp;"}</div></a>
+{*		
+		{if $v.read}
+		<a href="javascript:;" class="mark_unread" id="murmsg{$v.msg_id}"><div class="med-btn btn5">{$lng.messages.mark_as_not_read|replace:" ":"&nbsp;"}</div></a>
+		{else}
+		<a href="javascript:;" class="mark_read" id="mrmsg{$v.msg_id}"><div class="med-btn btn3">{$lng.messages.mark_as_read|replace:" ":"&nbsp;"}</div></a>
+		{/if}
+*}		
+		</div> {* end status_btns *}
+		
+	</div> {* end item-bottom *}
+
+</div> {* end item *}
+{/foreach}
+
+{if $no_messages}
+<div class="center">{include file="paginator.html"}</div>
+<div class="mt10 mb10 center">
+	{$lng.general.show}
+	<select name="no_per_page_sel" onchange="doSel(this);">
+		{section name=pg loop=60 start=10 step=10}
+		<option value="location.href='{$crt_page_link}&no_per_page={$smarty.section.pg.index}'" {if $no_per_page==$smarty.section.pg.index} selected="selected" {/if}>{$smarty.section.pg.index}</option>
+		{/section}
+	</select>
+	{$lng.general.on_a_page}
+</div>
+
+{else}
+<div class="info">{$lng.messages.no_messages}</div>
+{/if}
+
+</div>{* end page_bounds *}
+</div> {* end wbg *}
+</form>
+
+
+{include file="js/messages_js.html"}
+{include file="footer.html"}

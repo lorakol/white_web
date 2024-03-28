@@ -1,0 +1,248 @@
+</div>
+<div id="user_right">
+<script type="text/javascript" src="{$live_site}/libs/encodings.min.js"></script>
+
+{if $ratings_settings.html_editor && (!$ratings_settings.require_login || $logged_in)}
+<script type="text/javascript" src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+{/if}
+
+{if $ratings_settings.enable_reviews && (in_array($user.group, $ratings_settings.groups_array) || !$ratings_settings.groups)}
+<div class="box_heading">{$lng_ratings.reviews}</div>
+
+<table id="add_button">
+<tr><td><a href="javascript:;">
+	<span class="buttonwrapper">
+	<span class="button-left"><span class="button-right">
+	{$lng_ratings.add_review}
+	</span></span></span>
+</a></td></tr>
+</table>
+
+<div id="add_box" style="display: none;">
+	{if $ratings_settings.require_login && !$logged_in}
+		<p>{$lng_ratings.login_to_post|replace:'::LOGIN_LINK::':$login_link}</p>
+	{else}
+
+		<div id="alert_error" style="display: none;"></div>
+		<div id="alert_info" style="display: none;"></div>
+		<div class="info1" id="info_new" style="display: none"></div>
+
+		<input type="hidden" name="user_id" id="user_id" value="{$id}" />
+
+		<div id="comments_list">
+		<ul>
+
+		<li>
+		<label>{$lng_ratings.title}<span class="mandatory"> *</span></label>
+		<input name="comments_title" id="comments_title" type="text" size="50" />
+		</li>
+
+		<li>
+		<label>{$lng_ratings.name}<span class="mandatory"> *</span></label>
+		<input name="comments_name" id="comments_name" type="text" size="30" {if $current_user.contact_name}value="{$current_user.contact_name}"{/if} />
+		</li>
+
+		{if $ratings_settings.use_email}
+		<li>
+		<label>{$lng_ratings.email}{if $ratings_settings.use_email==1}<span class="mandatory">*</span>{/if}</label>
+		<input name="comments_email" id="comments_email" type="text" size="30" {if $current_user.email}value="{$current_user.email}"{/if} />
+		</li>
+		{/if}
+
+		{if $ratings_settings.use_website}
+		<li>
+		<label>{$lng_ratings.website}{if $ratings_settings.use_website==1}<span class="mandatory">*</span>{/if}</label>
+		<input name="comments_website" id="comments_website" type="text" size="30" {if $current_user.website}value="{$current_user.website}"{/if} />
+		</li>
+		{/if}
+
+		<li>
+		
+		<input type="hidden" name="rating" id="rating" />
+		<label style="float: left;">{$lng_ratings.rating}&nbsp;<span class="mandatory">*</span>&nbsp;&nbsp;</label>
+		<div style="padding-top: 5px;margin-top: 5px;">
+		{section name=loop start=0 loop=5 step=1}
+		<input name="star" type="radio" class="star" value="{$smarty.section.loop.index+1}"/>
+		{/section}
+		</div>
+		<div class="clearfix"></div>
+		</li>
+
+		{capture name=some_content assign=field_name}terms_{$crt_lang}{/capture}
+		{if $ratings_settings[$field_name]}<p>{$ratings_settings[$field_name]}</p>{/if}
+
+		{if $ratings_settings.captcha==1 || ($ratings_settings.captcha==2 && !$logged_in)}
+		<li>
+		<p>{$lng.users.image_verification_info}</p><br/>
+		<input name="comments_number" id="comments_number" type="text" /><br/><br/>
+		<img src="{$live_site}/include/random_image.php" alt="" /><br/>
+		</li>
+		{/if}
+
+		<li><br/><textarea name="comments_content" id="comments_content" rows="10" style="width: 430px;"></textarea></li>
+
+		</ul>
+
+		<div class="buttons" style="float: left;">
+		<strong><input type="submit" name="AddReview" id="AddReview" value="{$lng_ratings.post_review}" /></strong>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+	{/if}	
+
+		<br/>
+
+		</div>
+
+<div id="comments_container">
+
+{foreach from=$reviews_array item=v}
+{if $v.content}
+	<div class="comments">
+	<table cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+	{if $v.logo}
+	<td valign="middle" width="100"><div class="clogo">{if $v.user_id}<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=`$v.user_id` p2=`$v.contact_name`}{else}{$live_site}/user_listings.php?id={$v.user_id}{/if}">{/if}<img src="{$live_site}/uploads/{$ratings_settings.logo_field}/{$v.logo}">{if $v.user_id}</a>{/if}</div></td>{/if}
+	<td>
+	<div class="comment{$v.style}">
+		<div style="float: left;">{section name=loop start=0 loop=5 step=1}
+		<img src="{$live_site}/modules/ratings/css/images/star{if $v.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />
+		{/section}</div>
+		<div class="cname" style="float: left;">&nbsp;{$v.title} </div>
+		<div class="clearfix"></div>
+		<div class="cdetails">{$lng.general.by}&nbsp;{$v.name}&nbsp;<span class="cdate">{$lng.messages.on}&nbsp;{$v.date_nice}</span></div>
+		<p class="ccontent">{$v.content}</p>
+		{if $v.website && $ratings_settings.use_website}<div><a href="{$v.website}">{$v.website}</a></div>{/if}
+	</div>
+	</td></tr></table>
+	</div>
+{/if}
+{/foreach}	
+</div>
+</div>
+
+{literal}
+<script type="text/javascript">
+
+$('.star').rating({
+  callback: function(value, link){
+	$("#rating").val(value);
+	}
+});
+
+$(document).ready(function() {
+
+	$("#alert_error").hide();
+	$("#alert_info").hide();
+	
+	$("#add_button").click(function(){
+
+		$("#add_box").slideDown();
+		$("#add_button").slideUp();
+
+		{/literal}{if $ratings_settings.html_editor && !$ratings_settings.require_login || $logged_in}{literal}
+		myEditor = new nicEditor({iconsPath : '{/literal}{$live_site}{literal}/libs/nicEdit/nicEditorIcons.gif', buttonList : ['bold','italic','underline', 'left', 'center', 'right', 'justify', 'ul', 'ol', 'indent', 'outdent', 'forecolor', 'bgcolor', 'hr', 'fontSize', 'fontFormat']}).panelInstance('comments_content');
+		{/literal}{/if}{literal}
+
+	});
+
+	$("#AddReview").click(function(){
+
+{/literal}
+{if $same_user}alert("{$lng_ratings.you_cannot_rate_your_user}");
+{elseif $voted}alert("{$lng_ratings.you_already_rated}");
+{else}
+{if $ratings_settings.html_editor && (!$ratings_settings.require_login || $logged_in)}
+{literal}
+	for(var i=0;i<myEditor.nicInstances.length;i++){myEditor.nicInstances[i].saveContent();}
+{/literal}
+{/if}
+{literal}
+
+	if ($("#alert_email").attr("title") == $("#alert_email").attr("value")) $("#alert_email").attr("value", "");
+
+	var user_id = $("#user_id").val();
+	var ctitle = $("#comments_title").val();
+	var ctitle_enc = base64_encode(ctitle);
+	var cname = $("#comments_name").val();
+	var cname_enc = base64_encode(cname);
+	var cemail = $("#comments_email").val();
+	var cwebsite = $("#comments_website").val();
+	var content = $("#comments_content").val();
+	var content_enc = base64_encode(content);
+	var number = $("#comments_number").val();
+	var cstar = $("#rating").val();
+
+	$.post("{/literal}{$live_site}{literal}/modules/ratings/add_review.php", { name: cname_enc, title: ctitle_enc, email: cemail, content: content_enc, user_id: user_id, website: cwebsite, number: number, rating: cstar }, function(data){ 
+
+		var arr = data.split("|");
+		var error = arr[0];
+		var info = arr[1];
+		var done = arr[2];
+		if(info && !done) {
+			$("#alert_info").html(info);
+			$("#alert_info").show();
+		} else {
+			$("#alert_info").hide();
+		}
+
+		if(error) { 
+			$("#alert_error").html(error);
+			$("#alert_error").show();
+		} else {
+			if(done) { 
+				$("#info_new").html(info);
+				$("#info_new").show();
+			}
+			$("#alert_error").hide();
+			$("#comments_list").slideUp(1000);
+
+		}
+		// if added and don't have to be approved, rewrite the comments with the last one.
+		{/literal}
+
+		{if $ratings_settings.admin_verification==0 || ($ratings_settings.admin_verification==2 && $logged_in)}
+		var str='';
+
+		str+='<div class="comments"><table cellpadding="0" cellspacing="0" width="100%"><tr>';
+		{if $ratings_settings.logo_field && $current_user[$ratings_settings.logo_field]}str+='<td valign="middle" width="100"><div class="clogo"><img src="{$live_site}/uploads/{$comments_settings.logo_field}/{$current_user[$comments_settings.logo_field]}"></div></td>';{/if}
+		str+='<td><div class="comment{$v.style}"><div style="float: left;">';
+		{literal}
+		for(i=1; i<=5; i++) {
+			if(cstar>=i) str+='<img src="{/literal}{$live_site}{literal}/modules/ratings/css/images/star_on.gif" />';
+			else str+='<img src="{/literal}{$live_site}{literal}/modules/ratings/css/images/star_off.gif" />';
+		}
+		{/literal}
+		str+='</div><div class="cname" style="float: left">&nbsp;'+ctitle+'</div><div class="clearfix"></div><div class="cdetails">{$lng.general.by} '+cname+' <span class="cdate">{$lng.messages.on} {$smarty.now|date_format}</span></div><p class="ccontent">'+content.replace(/\n/g,"<br/>")+'</p>';
+		{if $ratings_settings.use_website && cwebsite}str+='<div><a href="'+cwebsite+'">'+cwebsite+'</a></div>';{/if}
+		str+='</div></td></tr></table></div>';
+		if(done>0) $("#comments_container").prepend(str);
+
+		{/if}
+	{literal}
+
+	$("a#newad").click(function () {
+
+		$("#comments_list").fadeIn(1000);
+		$("#alert_info").hide();
+		$("#info_new").hide();
+
+		// empty previous fields data
+		$("#comments_name").val("{/literal}{if $current_user.contact_name}{$current_user.contact_name}{/if}{literal}");
+		$("#comments_email").val("{/literal}{if $current_user.email}{$current_user.email}{/if}{literal}");
+		$("#comments_website").val("{/literal}{if $current_user.website}{$current_user.website}{/if}{literal}");
+		$("#comments_content").val("");
+		$("#comments_number").val("");
+
+    	});
+
+	} );
+{/literal}
+{/if}
+{literal}
+	});
+});
+</script>
+{/literal}
+	
+{/if}

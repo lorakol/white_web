@@ -1,0 +1,34 @@
+
+function init_osm_{$v.caption}{if isset($prefix)}{$prefix}{/if}() {
+//console.log("init_osm_ro");
+	old=new Array();
+	{if isset($val[$v.caption]) && $val[$v.caption]}old = splitMapsCoord('{$val[$v.caption]}');{/if}
+	
+	if (old.length>0) {
+		var lat = parseFloat(old[0]);
+		var long = parseFloat(old[1]);
+		var h = parseInt(old[2]);
+
+	} else {
+		var lat = {$settings.maps_default_lat};
+		var long = {$settings.maps_default_long};
+		var h = {$settings.maps_default_height};
+	}
+//console.log(lat+" "+long+" "+h);
+	var map_{$v.caption}{if isset($prefix)}{$prefix}{/if} = L.map("gm_{$v.caption}{if isset($prefix)}{$prefix}{/if}").setView([lat, long], h);
+ 
+     // set map tiles source
+     
+    L.tileLayer('https://tile.openstreetmap.org/{literal}{z}/{x}/{y}{/literal}.png', {
+     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+      maxZoom: 18,
+    }).addTo(map_{$v.caption}{if isset($prefix)}{$prefix}{/if});
+ 
+	
+	var osm_marker = L.marker([lat, long]).addTo(map_{$v.caption}{if isset($prefix)}{$prefix}{/if});
+
+	{if isset($v.address) && $v.address}
+		osm_marker.bindPopup("{$v.address}").openPopup();
+	{/if}
+
+} // end init_osm

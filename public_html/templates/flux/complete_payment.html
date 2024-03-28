@@ -1,0 +1,35 @@
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{if isset($error)}{$error}{/if}</p></div>
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng.order_history.complete_payment}</h1></div>
+</div>
+
+<div class="page_bounds mb40">
+
+<div class="wbg p30">
+
+	<div class="option clearfix">
+		<div class="option_left">{$lng.order_history.complete_payment_for}</div>
+		<div class="option_right">{$action.actions_str}</div>
+	</div>
+
+	<div class="option_price price top_price">
+		{$lng.listings.total}: <b>
+		<span id="total" style="border: 0px;">{$total}</span></b>
+	</div>
+
+	<div class="option hidden">{$pay_form}</div>
+
+</div> {* end wbg *}
+
+</div> {* end page_bounds *}
+
+<script type="text/javascript">
+$(document).ready(function(){ $("#payment_form").submit(); });
+</script>
+
+{include file="footer.html"}

@@ -1,0 +1,34 @@
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title p3=$post_array.search_id p4=$v.category_id p5=$v.slug}{else}{$live_site}/details.php?id={$v.id}{/if}{/capture}
+
+			<div class="box-container">
+			<div class="fbox box clearfix{if $v.highlited && $ads_settings.enable_highlited} highlited{/if}">
+
+				<a href="{$details_url}"><img id="fpic{$v.id}" src="{$live_site}/{$v.medImage}" alt="{if $v.image_id}{$v.title|strip_tags:false|substr:0:100}{/if}" /></a>
+
+				{if $v.sold}<div class="ribbon ribbon_sold"><span>{$lng.listings.sold}</span></div>{/if}
+				{if $v.rented}<div class="ribbon ribbon_rented"><span>{$lng.listings.rented}</span></div>{/if}
+
+				<div class="ltitle">{if $data_set=="cars" && ((isset($v.make) && $v.make) || (isset($v.model) && $v.model))}<a href="{$details_url}">{$v.make} {$v.model}</a>{else}<a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$v.title|mb_truncate:30:"...":"UTF-8"}{else}{$v.title|truncate:30:"...":false}{/if}</a>{/if}</div>
+
+				<div class="lloc">{$v.location_str}</div>
+
+				{if $ads_settings.enable_price}
+		
+					{if in_array("price_extra",$modules_array) && (isset($pe_settings[$v.fieldset]) || isset($pe_settings[0])) }
+	
+						{include file="modules/price_extra/gallery_listing.html" pe_listing=$v}
+	
+					{else}
+
+						{if $v.price>=0}<div class="lprice">{$v.price_curr}</div>{/if}
+ 
+					{/if}
+			
+				{/if} {* end if enable price *}
+				
+				<a href="javascript:;" class="addtofav" id="fav{$v.id}"><div class="starfav make-fav"></div></a>
+				
+				{if $v.video && $v.enable_video && $ads_settings.enable_video}<div class="clearfix"></div><div class="video-sg">{$lng.listings.short_video}</div>{/if}
+				
+			</div>
+			</div>

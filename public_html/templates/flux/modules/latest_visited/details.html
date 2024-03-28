@@ -1,0 +1,75 @@
+<section>
+{literal}
+<style type="text/css">
+.simg { max-width: 96px; max-height: 66px; }
+.smallimg { width: 100px; height: 70px; }
+.rclass { {/literal}{if $text_direction=="rtl"}margin-right: 100px;{else}margin-left: 100px;{/if}{literal}min-height: {$ads_settings.thmb_height+2}px; }
+</style>
+{/literal}
+
+	{capture name=some_content assign=title_field}title_{$crt_lang}{/capture}
+
+	<h2 class="heading">{$lv_settings[$title_field]}</h2>
+
+	<div class="light-container">
+	{foreach name=sads from=$latest_visited item=v}
+
+		{capture name=some_content assign=details_url}
+		{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title p3='' p4=$v.category_id p5=$v.slug}{else}{$live_site}/details.php?id={$v.id}{/if}
+		{/capture}
+
+		<a href="{$details_url}" name="listing{$v.id}">
+		<div class="classified pb10 {if $smarty.foreach.sads.index==$no_latest_visited-1}noborder{/if}">
+
+			<div class="lfloat gallery-img-bg smallimg sl-image">
+
+			<img class="simg" src="{$live_site}/{$v.image}" alt="{if $v.image_id}{$v.title|strip_tags:false|substr:0:100}{/if}" />
+
+			{if $v.no_pictures}<div class="images-no">{$v.no_pictures}</div>{/if}
+
+			</div> {* end picture *}
+
+			<div class="rclass fba">
+
+				<div class="fbac">
+				<div class="title">{if $appearance.charset=="UTF-8"}{$v.title|mb_truncate:100:"...":"UTF-8"}{else}{$v.title|truncate:100:"...":false}{/if}</div>
+
+				{if $v.location_str}<div class="sl-loc">{$v.location_str}</div>{/if}
+
+				<div class="small-light">{if $ads_settings.show_ad_date_for_everybody==1}{$lng.listings.added_on}&nbsp;{$v.date_nice}{else}{$lng.listings.posted}{/if}&nbsp;{$lng.general.to}&nbsp;<u>{$v.category}</u></div>
+
+				</div> {* end lfloat *}
+
+				<div class="fbav sl-right" style="align-content: stretch;"> {* rfloat *}
+
+				{if $ads_settings.enable_price}
+
+				{if in_array("price_extra",$modules_array) && (isset($pe_settings[$v.fieldset]) || isset($pe_settings[0])) }
+
+				{include file="modules/price_extra/short_listing.html"}
+
+				{else}
+
+				{if !empty($v.price) && $v.price>=0}<div class="fbavr price sl-price">{$v.price_curr}</div>{/if}
+
+				{/if}
+
+				{/if} {* end if enable price *}
+
+				<div><div class="starfav addtofav tooltip make-fav" id="fav{$v.id}" title="{$lng.listings.add_to_favourites}"></div></div>
+
+				</div> {* end rfloat *}
+
+			</div> {* end lfloat lpdiv1 rclass *}
+			<div class="clearfix"></div>
+		</div> {* end classified *}
+		</a>
+	{/foreach}
+
+	{if $no_latest_visited}
+	<div><a href="{$live_site}/modules/latest_visited/latest_visited.php"><h2 class="view_more">{$lng_lv.view_all}</h2></a></div>
+	<div class="clearfix"></div>
+	{/if}
+	
+	</div>
+</section>

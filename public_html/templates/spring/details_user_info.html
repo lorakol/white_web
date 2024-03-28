@@ -1,0 +1,71 @@
+	{if (!$listing.sold || !$ads_settings.hide_contact_when_sold) && (!$listing.rented || !$ads_settings.hide_contact_when_rented)}
+	{* contact information *}
+
+	<div class="right_box_heading">{$lng.listings.contact_info}</div>
+	
+	<div id="user_details">
+
+    {* logo *}
+    {foreach $special_user_fields.logo as $logo}
+
+    {capture name=pb assign=pb}pb_{$logo.caption}{/capture}
+    
+    {if (isset($listing.user[$logo]) && $listing.user[$logo])}
+    <div class="mb10"><img src="{$live_site}/uploads/{$logo}/{$listing.user[$logo]}" /></div>
+    {/if}
+    {/foreach}
+
+    {if isset($listing.site_url) && $listing.site_url && $ads_settings.enable_url}
+    <div class="fdesc"><span class="aw"><img src="{$template_path}images/website_url.png" /></span><span class="aw"><a href="{$listing.site_url}" class="more" target="_blank" rel="nofollow">{$listing.site_url}</a></span></div>
+    {/if}
+
+	{foreach from=$user_fields_array item=v}
+	{capture name=some_content assign=pub_field}pb_{$v.caption}{/capture}
+	{if isset($listing.user[$v.caption]) && $listing.user[$v.caption] && ($v.public==1 || ($v.public==2 && $listing.user[$pub_field]==1 )) && $v.type!="google_maps" && (($v.type!="textarea" && $v.type!="htmlarea") || $listing.user_id==0) && $v.type!="checkbox_group" && $v.type!="youtube"}
+
+	<div>
+	<span>{$v.name}:</span>
+	{if $v.type=='url'}<a href="{$listing.user[$v.caption]}" target="_blank" rel="nofollow">{/if}
+	{if $v.type=="date"}
+	{$listing.user.vis[$v.caption]}
+	{elseif $v.type=="multiselect"}
+	{$listing.user[$v.caption]|@implode:', '}
+	{elseif $v.type=="checkbox"}
+	{if $listing.user[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+	{elseif $v.type=="phone"}
+
+	<span class="aw"><img src="{$template_path}images/phone.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$listing.user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_phone}</a>
+
+	{elseif $v.type=="whatsapp"}
+
+	<span class="aw"><img src="{$template_path}images/whatsapp.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$listing.user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_whatsapp}</a>
+
+	{elseif $v.type!="file" && $v.type!="image"}
+	{$listing.user[$v.caption]}
+	
+
+	{* ------------ rating ------------ *}
+	{if in_array("ratings",$modules_array) && $ratings_settings.rate_users && $v.caption==$settings.contact_name_field}
+	&nbsp;
+	{section name=loop start=0 loop=5 step=1}
+	<img src="{$live_site}/modules/ratings/css/images/star{if $listing.user.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />
+	{/section}
+
+	{/if}
+	{* ------------ end rating ------------ *}
+
+	
+	{else}
+
+	{if $v.type=="file" && $listing.user[$v.caption]}<a href="{$live_site}/uploads/{$v.caption}/{$listing.user[$v.caption]}"><img src="{$template_path}/images/download.png" class="tooltip" alt="" title="{$lng.general.download}"/></a>{/if}
+	{if $v.type=="image" && $listing.user[$v.caption]}<a href="{$live_site}/uploads/{$v.caption}/{$listing.user[$v.caption]}" class="imgfield"><img src="{$template_path}images/camera.gif" alt="" /></a>{/if}
+
+	{/if}
+	{if $v.type=='url'}</a>{/if}
+	</div>
+	{/if}
+	{/foreach}
+	
+	</div>
+	{/if} 

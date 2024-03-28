@@ -1,0 +1,114 @@
+{if $no_showcase_ads && $user.showcase}
+<section id="showcase">
+
+	<div class="left_tabs mb0">
+		<div id="showcase_content">
+
+    		{section name=loop start=0 loop=$no_showcase_ads step=1}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$showcase_array[loop].id p2=$showcase_array[loop].title p3='' p4=$showcase_array[loop].category_id p5=$showcase_array[loop].slug}{else}{$live_site}/details.php?id={$showcase_array[loop].id}{/if}{/capture}
+
+			<div class="showcase-container">
+			<div class="small-box clearfix">
+
+				<a href="{$details_url}"><img id="fpic{$showcase_array[loop].id}" src="{$live_site}/{$showcase_array[loop].medImage}" alt="{if $showcase_array[loop].image_id}{$showcase_array[loop].title|strip_tags:false|substr:0:100}{/if}" /></a>
+
+				<h3 class="ltitle">{if $data_set=="cars" && ((isset($showcase_array[loop].make) && $showcase_array[loop].make) || (isset($showcase_array[loop].model) && $showcase_array[loop].model))}<a href="{$details_url}">{$showcase_array[loop].make} {$showcase_array[loop].model}</a>{else}<a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$showcase_array[loop].title|mb_truncate:30:"...":"UTF-8"}{else}{$showcase_array[loop].title|truncate:30:"...":false}{/if}</a>{/if}</h3>
+
+				<div class="lloc">{$showcase_array[loop].location_str}</div>
+
+				{if $ads_settings.enable_price}
+		
+					{if in_array("price_extra",$modules_array) && isset($pe_settings[$showcase_array[loop].fieldset])}
+	
+						{include file="modules/price_extra/gallery_listing.html" pe_listing=$showcase_array[loop]}
+	
+					{else}
+
+						{if $showcase_array[loop].price>=0}<div class="lprice">{$showcase_array[loop].price_curr}</div>{/if}
+
+					{/if}
+			
+				{/if} {* end if enable price *}
+				
+				<a href="javascript:;" class="addtofav" id="fav{$showcase_array[loop].id}"><div class="starfav make-fav"></div></a>
+			</div>
+			</div>
+		{/section}
+		<div class="clearfix"></div>
+
+		</div> {* end tab_content *}
+
+	</div> {* end latest_visited *}
+
+</section>
+
+
+<script>
+$(document).ready(function() {
+
+$(".ac_over").on('click',function(){
+	var acid = jQuery(this).attr("id").substr(2);
+	$("#ac"+acid).hide();
+});
+
+});
+</script>
+
+<style>
+#showcase_content {
+	/*overflow: hidden;*/
+}
+.showcase-container {	
+	width: 50%;
+	float: left;
+}
+.showcase-container h3 { 
+	font-size: 1em; 
+	font-weight: normal; 
+	line-height: 16px;
+}
+.showcase-container .lprice, .make-fav { 
+	margin-top: 0;
+}
+.showcase-container img { 
+	line-height: 18px;
+}
+#showcase_content .small-box {
+	height: 100%;
+	padding-bottom: 10px;
+}
+
+@media all and (min-width: 600px) {
+	.showcase-container {	
+		width: 25%;
+		float: left;
+		/*flex-grow: 0;
+		-webkit-flex-grow: 0;
+		-ms-flex-grow: 0;*/
+	}
+
+}
+@media all and (min-width: 900px) {
+    #showcase_content {
+	display: flex; 
+	display: -ms-flexbox; 
+	display: -webkit-flex;
+    }
+	.showcase-container {	
+		width: 20%;
+		/*flex: 1;
+		-webkit-flex: 1;
+		-ms-flex: 1;
+		-webkit-box-flex: 1;
+		flex-grow: 0;
+		-webkit-flex-grow: 0;
+		-ms-flex-grow: 0;*/
+
+	}
+	.small-box img {
+		max-height: 150px;
+	}
+}
+</style>
+{/if}

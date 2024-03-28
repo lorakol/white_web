@@ -1,0 +1,51 @@
+<script type="text/javascript">
+	var live_site = "{$live_site}";
+	var invalid_login = "{$lng_connect.invalid_login}";
+	var fb_enabled = "{$connect_settings.enable_facebook_login}";
+	var google_enabled = "{$connect_settings.enable_google_login}";
+	var oid_enabled = "{if $connect_settings.enable_openid_login}1{else}0{/if}";
+	{if $connect_settings.enable_facebook_login}
+	var appid="{$connect_settings.facebook_app_id}";
+	{/if}
+	{if $connect_settings.enable_google_login}
+	var google_client_id="{$connect_settings.google_client_id}";
+	{/if}
+	var realm="{$connect_settings.realm}";
+	var openid_identity_missing = '{$lng_connect.openid_identity_missing|addslashes}';
+</script>
+<script type="text/javascript" src="{$live_site}/modules/connect/js/auth.js"></script>
+{if $connect_settings.enable_google_login}
+<script src="https://apis.google.com/js/platform.js?onload=onGLoad" async defer></script>
+{/if}
+
+<div style="color: #777; margin: 5px 0 10px 0;">{$lng_connect.or_sign_in_using}</div>
+
+{if $connect_settings.enable_facebook_login}
+<div id="fb-root"></div>
+<script src="https://connect.facebook.net/en_US/sdk.js"></script>
+{/if}
+
+{if $connect_settings.enable_openid_login}
+<script type="text/javascript" src="{$live_site}/modules/connect/external/popuplib.js"></script>
+{/if}
+
+{literal}
+	<style type="text/css">
+	.login-button { margin: 5px 5px 5px 0; }
+	#openid_submit {border: 1px solid #ff9a00; color: #555; font-weight: bold; background: #fae5c6; line-height: 30px; height: 30px; display: inline; padding: 5px 10px 5px 10px; margin-left: 10px; }
+	#oiderror { border: 1px solid #9e0505; background: #ff4848; color: #ffffff; padding: 5px 10px 5px 10px;}
+	</style>
+{/literal}
+{if $connect_settings.enable_facebook_login}
+	<a href="javascript:;"><img src="{$template_path}modules/connect/images/facebook-login.png" class="login-button facebook" /></a>
+{/if}
+{if $connect_settings.enable_google_login}
+	<div class="lfloat login-button"><div id="google"></div></div>
+{/if}
+{if $connect_settings.enable_openid_login}
+	<a href="javascript:;"><img src="{$template_path}modules/connect/images/openid-login.png" class="login-button openid" id="openid_button" /></a>
+
+	<div id="openid_div" style="display: none; color: #777;">
+	<div id="oiderror" style="display: none;"></div>
+	<input type="text" name="openid" id="openid" style="width: 240px;" class="defaultText" title="{$lng_connect.enter_openid}"/><div id="openid_submit"/>{$lng.navbar.login}</div></div>
+{/if}

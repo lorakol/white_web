@@ -1,0 +1,24 @@
+
+<div class="bottom_notice">
+<div class="page_bounds">
+
+<div class="lfloat p10" style="width: 90%">
+{$notice|replace:"##SITE_URL##":$live_site}
+</div>
+
+<div class="rfloat mt10 mr10"><a href="javascript:;" id="eucn_close"><img src="{$template_path}images/delete.png"  alt="{$lng.general.remove}" /></a></div>
+
+</div>
+<div class="clearfix"></div>
+</div>
+
+
+<script>
+$(document).ready(function(){
+	$("#eucn_close").click(function() { 
+		// accept cookies use
+		document.cookie='eucb=1; path=/; expires='+exdate.toUTCString()+'; {if $settings.enable_locations && $settings.enable_subdomains}domain={$main_domain};{/if}';
+		$(".bottom_notice").hide();
+	});
+});
+</script>

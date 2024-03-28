@@ -1,0 +1,70 @@
+<!-- EMAIL ALERT -->
+<hr/>
+<div id="email-alert">
+<h3>{$lng.alerts.email_alert} {$lng.general.for}:</h3>
+{if $str_search}<h4>{$str_search}</h4>{else}<div class="info_message">{$lng.alerts.no_terms_searched}</div>{/if}
+
+<div id="alert_error" style="display: none;"></div>
+<div id="alert_info" style="display: none;"></div>
+
+<div>
+{$lng.alerts.send_email_alerts}&nbsp;
+<select name="alert_frequency" id="alert_frequency">
+<option value="0">{$lng.alerts.immediately}</option>
+<option value="1" selected="selected">{$lng.alerts.daily}</option>
+<option value="7">{$lng.alerts.weekly}</option>
+</select>
+</div>
+<div style="margin-top: 5px;">
+{$lng.general.to}
+&nbsp;<input type="text" size="30" name="alert_email" id="alert_email" class="defaultText" title="{$lng.alerts.your_email}" value=""/>
+<br/>
+<div class="buttons">
+	<strong><input type="submit" name="CreateAlert" id="CreateAlert" value="{$lng.alerts.create_alert}" /></strong>
+</div>
+</div>
+
+{literal}
+<script type="text/javascript">
+$(document).ready(function() {
+
+	$("#alert_error").hide();
+	$("#alert_info").hide();
+
+	$("#CreateAlert").click(function(){
+	if ($("#alert_email").attr("title") == $("#alert_email").attr("value")) $("#alert_email").attr("value", "");
+
+	var alert_email = $("#alert_email").val();
+	var alert_frequency = $("#alert_frequency").val();
+	var post_json = {/literal}'{$post_json}'{literal}
+
+	$.post("{/literal}{$live_site}{literal}/include/add_alert.php", { email: alert_email, frequency: alert_frequency, post_str: post_json }, function(data){ 
+		$("#alert_info").hide();
+		$("#alert_error").hide();
+		var arr = data.split("|");
+		var error = arr[0];
+		var info = arr[1];
+		if(info) {
+			$("#alert_info").html(info);
+			$("#alert_info").show();
+			$("#alert_form").hide();
+		}
+		if(error) { 
+			$("#alert_error").html(error);
+			$("#alert_error").show();
+		}
+	} );
+
+	if ($("#alert_email").attr("value") == "") { 
+		$("#alert_email").attr("title", "{/literal}{$lng.alerts.your_email}{literal}"); 
+		$("#alert_email").addClass("defaultTextActive");
+            	$("#alert_email").val($("#alert_email")[0].title);
+	}
+
+	});
+});
+</script>
+{/literal}
+
+</div>
+<!-- END EMAIL ALERT -->

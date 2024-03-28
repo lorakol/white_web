@@ -1,0 +1,82 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+
+<div id="heading">{$lng.useraccount.messages}</div>
+
+{foreach from=$messages_array item=v}
+
+<div class="classified_nl"{if $v.from==$crt_usr} class="light-row"{/if}>
+
+<div class="classifieds_content">
+
+#{$v.msg_id}<br/>
+
+	<div class="small">
+	{if $v.from!=$crt_usr}
+	{$lng.messages.from}: {if $v.from}{$v.contact_name}, {$v.email}{else}{$v.from_email}{/if} {$lng.messages.on}: {$v.date_nice}
+	{else}
+	{$lng.messages.to}: {if $v.to}{$v.to_contact_name}, {$v.to_email}{else}{$v.to_email}{/if} {$lng.messages.on}: {$v.date_nice}
+	{/if}
+	</div>
+
+	<p>{$v.message|truncate:100:"...":false}</p>
+
+	{if $v.ad_id}<div class="small">{$lng.messages.started_for_listing}: <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.ad_id p2=$v.title}{else}{$live_site}/details.php?id={$v.ad_id}{/if}" target="_blank">{$v.title}</a></div>{/if}
+
+
+</div>{* end classifieds_content *}
+
+<div class="clearfix"></div>
+
+<div class="class_buttons">
+
+	<div>
+	{if $v.from!=$crt_usr}
+	<div class="buttonwrapper" ><div class="activebutton"><span class="button">{$lng.general.received}</span></div></div>
+	{else}
+	<div class="buttonwrapper" ><div class="inactivebutton"><span class="button">{$lng.general.sent}</span></div></div>
+	{/if}
+	{if $v.to == $crt_usr && $v.report==1}<a href="javascript:;" class="tooltip" title="{$lng.messages.reported_as_spam}"><div class="buttonwrapper" ><div class="expiredbutton"><span class="button">{$lng.messages.spam}</span></div></div></a>{/if}
+	</div>
+
+	<div class="form_button"><strong><a href="{$live_site}/view_message.php?id={$v.msg_id}">{$lng.messages.view_complete_message}</a></strong></div>
+
+	{if $v.starting}
+	<div class="form_button"><strong><a href="message_history.php?id={$v.starting}">{$lng.messages.view_thread}</a></span></div>
+	{/if}
+
+</div>
+
+<div class="icons">
+
+		{if $v.to == $crt_usr}
+		<span><a href="{$live_site}/reply.php?id={$v.msg_id}"><img src="{$template_path}images/reply.png" class="tooltip" title="{$lng.general.reply}" alt="{$lng.general.reply}" />
+		</a></span>
+		{/if}
+
+		{if $v.to == $crt_usr && $v.report==0}<span><a href="javascript:;" onclick="onReportMsg('{$v.msg_id}','{$lng.messages.confirm_report_spam}');">
+		<img src="{$template_path}images/report.png" class="tooltip" title="{$lng.messages.report_spam}" alt="{$lng.messages.report_spam}" />
+		</a></span>{/if}
+
+		{if $v.to == $crt_usr}
+		<span><a href="javascript:;" onclick="onDelete('{$v.msg_id}','{$lng.messages.confirm_delete|addslashes}', 'msg');">
+		<img src="{$template_path}images/delete1.png" class="tooltip icon" title="{$lng.general.delete}" alt="{$lng.general.delete}" />
+		</a></span>
+		{/if}
+
+
+
+</div>
+<div class="clearfix"></div>
+
+</div> {* end classifieds_nl *}
+
+{/foreach}
+
+{if $no_messages==0}
+	{$lng.messages.no_messages}
+{/if}
+
+{if $no_pages>1}<div id="pages">{include file="paginator.html"}</div>{/if}
+
+{include file="footer.html"}

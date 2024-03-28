@@ -1,0 +1,37 @@
+{if $tmp.spam_prevention_info}
+<style>
+tr.security td { color: #453b23; background-color: #e6dcc5}
+</style>
+<tr class="security">
+	<td class="raligned">{if $tmp.spam_prevention_info.proxy}<div class="mid-btn editablebutton rfloat">{$lng_sp.proxy}</div>{else}{$lng_sp.proxy}{/if}</td>
+	<td class="laligned">
+		{if !$tmp.spam_prevention_info.proxy}<div class="mid-btn graybutton lfloat">{$lng.general.no}</div>{/if}
+		{if $tmp.spam_prevention_info.vpn}<div class="mid-btn publicbutton lfloat">{$lng_sp.vpn}</div>{/if}
+		{if $tmp.spam_prevention_info.tor}<div class="mid-btn privatebutton lfloat">{$lng_sp.tor}</div>{/if}
+	</td>
+</tr>
+<tr class="security">
+	<td class="raligned">{$lng_sp.location}</td>
+	<td class="laligned">
+		{if isset($tmp.spam_prevention_info.country_code) && $tmp.spam_prevention_info.country_code!='N/A'}
+		<img src="{$live_site}/{$admin_folder}/modules/spam_prevention/flags/{$tmp.spam_prevention_info.country_code|lower}.png" alt="{$tmp.spam_prevention_info.country_code}" title="{$tmp.spam_prevention_info.country_code}"/>
+		{/if}
+		{if isset($tmp.spam_prevention_info.region) && $tmp.spam_prevention_info.region!='N/A'}{$tmp.spam_prevention_info.region},&nbsp;{else}-{/if}{if isset($tmp.spam_prevention_info.city) && $tmp.spam_prevention_info.city!='N/A'}{$tmp.spam_prevention_info.city}{else}-{/if}
+	</td>
+</tr>
+{if isset($tmp.spam_prevention_info.isp) && $tmp.spam_prevention_info.isp}
+<tr class="security">
+	<td class="raligned">{$lng_sp.isp}</td>
+	<td class="laligned">{$tmp.spam_prevention_info.isp}</td>
+</tr>
+{/if}
+<tr class="security">
+	<td class="raligned">{$lng_sp.score}</td>
+	<td class="laligned">
+		<div class="mid-btn graybutton lfloat" style="font-size: 1.2em; font-weight: bold;">{if isset($tmp.spam_prevention_info.fraud_score) && $tmp.spam_prevention_info.fraud_score}{$tmp.spam_prevention_info.fraud_score}{else}-{/if}</div>
+		{if $tmp.spam_prevention_info.is_crawler}<div class="mid-btn publicbutton lfloat">{$lng_sp.crawler}</div>{/if}
+		{if $tmp.spam_prevention_info.mobile}<div class="mid-btn editablebutton lfloat">{$lng_sp.mobile}</div>{/if}
+		{if isset($tmp.spam_prevention_info.bot_status) && $tmp.spam_prevention_info.bot_status}<div class="mid-btn privatebutton lfloat">{$lng_sp.bot}</div>{/if}
+	</td>
+</tr>
+{/if}

@@ -1,0 +1,44 @@
+{include file="header.html"}
+
+{if $groups_array|@count>2}{assign var="rw" value="1000"}{else}{assign var="rw" value="660"}{/if}
+
+<style type="text/css">
+{literal}
+
+.regcontainer {  }
+
+@media all and (min-width: 700px)
+{
+
+.regcontainer { width: {/literal}{$rw}{literal}px; }
+
+}
+
+{/literal}
+</style>
+
+<div class="main box">
+
+<div class="pt30 centered regcontainer">
+
+{foreach name=groups from=$groups_array item=v}
+
+		<div class="regbox regbox{$smarty.foreach.groups.index} {if $smarty.foreach.groups.index%3!=2 && !($smarty.foreach.groups.index==1 && $groups_array|@count==2)}mr20{/if}">
+				<div class="btitle">{$v.name}</div>
+				<div class="rcontent">{$v.description}</div>
+				<div class="p20 pb30">
+				<form name="register" method="post" action="{$live_site}/register.php?group={$v.id}">
+				<div class="regbutton"><input type="submit" class="button" name="Register{$v.id}" value="{$lng.navbar.register}" /></div>
+				</form>
+				</div>
+
+		</div>
+
+{/foreach}
+
+<div class="clearfix"></div>
+
+</div>
+
+</div> {* end main *}
+{include file="footer.html"}

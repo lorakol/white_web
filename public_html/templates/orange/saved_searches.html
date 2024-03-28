@@ -1,0 +1,32 @@
+{include file="header.html"}
+
+<div class="clearfix"></div>
+
+	<div id="page_content">
+	<h1>{$lng.useraccount.saved_searches}</h1>
+
+	{if $searches|@count}
+	{*{include file="paginator.html"}*}
+
+	{foreach from=$searches item=v}
+		<div class="alert">
+
+		<p>{$v.search_str}</p>
+
+		<span class="small">&nbsp;{$v.date_nice}&nbsp;</span>
+		<span class="classified_links"><a href="{if $seo_settings.enable_mod_rewrite}{$v.search_sef}{else}{$live_site}/listings.php?{$v.search}{/if}">{$lng.search.view_search}</a>&nbsp;|&nbsp;<a href="javascript:;" onclick="onDeleteSavedSearch({$v.id})">{$lng.general.delete}</a></span>
+		<div class="clearfix"></div>
+
+		</div>
+	{/foreach}
+
+	{*{include file="paginator.html"}*}
+	{else}
+	<br/><br/><br/><br/>
+	<div class="info"><p>{$lng.useraccount.no_saved_searches}</p></div>
+	<br/><br/><br/><br/><br/>
+	{/if}
+
+	</div>
+
+{include file="footer.html"}

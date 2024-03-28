@@ -1,0 +1,90 @@
+<html>
+
+<head>
+{*<link href="{$template_path}invoices/style.css" rel="stylesheet" type="text/css"/>*}
+</head>
+
+<body>
+
+<style type="text/css">
+{include file="invoices/style.css"}
+</style>
+
+<table>
+<tr>
+<td align="left" width="40%"><div class="bordered">{$invoice.seller_details}</div></td>
+<td align="right">{if $invoice.invoice_logo}<img src="../images/{$invoice.invoice_logo}" />{/if}</td>
+</tr>
+</table>
+<hr/>
+<br/><br/>
+<table>
+<tr>
+<td align="left" width="40%">
+<span class="bold">{$lng.invoice.bill_to}:</span><br/>
+{$invoice.user_details}
+</td>
+<td valign="top" align="right"><span class="bold">{$lng.invoice.invoice_no}:</span> #{$id}<br/><span class="bold">{$lng.listings.date}:</span> {$invoice.date}</span></td>
+</tr>
+</table>
+<br/><br/>
+
+<table class="invtable" border=1>
+<tr class="theading">
+<th width="40%">{$lng.listings.description}</th>
+<th width="10%">{$lng.invoice.qty}</th>
+<th width="25%">{$lng.invoice.unit_price}</th>
+<th width="25%">{$lng.packages.amount}</th>
+</tr>
+
+{foreach from=$invoice.payment_details item=v}
+<tr>
+<td>{$v.description}</td>
+<td>1</td>
+<td>{$v.amount_nice}</td>
+<td>{$v.amount_nice}</td>
+</tr>
+{/foreach}
+
+{if $discount}
+<tr>
+<td colspan="2"></td>
+<td>{$lng.listings.discount}</td>
+<td>-{$discount}</td>
+</tr>
+{/if}
+
+{if $invoice.tax}
+<tr>
+<td colspan="2"></td>
+<td>{$lng.invoice.subtotal}</td>
+<td>{$invoice.subtotal_nice}</td>
+</tr>
+
+<tr>
+<td colspan="2"></td>
+<td>{$lng.invoice.sale_tax}</td>
+<td>{$invoice.tax_nice}</td>
+</tr>
+{/if}
+
+<tr class="bold white">
+<td colspan="2"></td>
+<td>{$lng.general.total}</td>
+<td>{$invoice.amount_nice}</td>
+</tr>
+
+{if $invoice_settings.show_vat}
+<tr>
+<td colspan="3" class="laligned">{$lng.invoice.price_includes_vat} {$invoice_settings.vat_percent}% {$lng.invoice.vat}</td>
+<td>{$invoice.vat_nice}</td>
+</tr>
+{/if}
+
+</table>
+
+<br/><br/><br/>
+{if $invoice.custom_text}{$invoice.custom_text}{/if}
+
+</body>
+</html>

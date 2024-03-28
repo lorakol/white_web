@@ -1,0 +1,45 @@
+<style>
+.white-popup {
+  position: relative;
+  background-color: #dc4b3e;
+  padding: 0;
+  width:auto;
+  max-width: 700px;
+  margin: 20px auto;
+}
+a.popup-modal-dismiss {
+  color: #fff;
+}
+a:hover.popup-modal-dismiss {
+  color: #fff;
+}
+</style>
+    <a href="#warning-popup" class="open-popup-link"></a>
+
+    {capture name=field_name assign=field_name}message_{$crt_lang}{/capture}
+    <div id="warning-popup" class="white-popup mfp-hide">
+      {$abd_settings[$field_name]}<br/>
+      <div class="ml20 pb20"><a class="popup-modal-dismiss" href="#">Reload</a></div>
+    </div>
+
+    <script type="text/javascript">
+
+    if(document.getElementById('OxAbD3t3ct0r')){
+    //  alert('Blocking Ads: No');
+    } else {
+    //  alert('Blocking Ads: Yes');
+	     $('.open-popup-link').magnificPopup({
+        type:'inline',
+        modal: true
+	      });
+        $(document).on('click', '.popup-modal-dismiss', function (e) {
+          e.preventDefault();
+          $.magnificPopup.close();
+          location.reload();
+        });
+	       jQuery(document).ready(function() {
+           $(".open-popup-link" ).trigger( "click" );
+	     });
+    }
+
+    </script>

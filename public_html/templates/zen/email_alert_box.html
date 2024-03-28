@@ -1,0 +1,95 @@
+<!-- EMAIL ALERT -->
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<div class="wait"></div>
+
+
+<form name="alert1" id="alert1" method="post" action="{$live_site}/include/add_alert.php?post=1">
+<input type="hidden" name="post_str" id="post_str" value='{if isset($post_json)}{$post_json}{/if}' />
+
+<div id="email-alert">
+<div class="box-top-white"><div class="box-bottom"><div class="box-left"><div class="box-right"><div class="box-bottom-left"><div class="box-bottom-right"><div class="box-top-left"><div class="box-top-right">
+
+<h3>{$lng.alerts.email_alert} {$lng.general.for}:</h3>
+{if $str_search}<h4>{$str_search}</h4>{else}<div class="info_message">{$lng.alerts.no_terms_searched}</div>{/if}
+
+<h5>{$lng.alerts.email_alert_info}</h5>
+
+<div id="alert_error" style="display: none;"></div>
+<div id="alert_info" style="display: none;"></div>
+
+<div id="alert_form">
+
+{$lng.alerts.send_email_alerts}&nbsp;
+<select name="alert_frequency" id="alert_frequency">
+<option value="0">{$lng.alerts.immediately}</option>
+<option value="1" selected="selected">{$lng.alerts.daily}</option>
+<option value="7">{$lng.alerts.weekly}</option>
+</select>
+&nbsp;
+{$lng.general.to}
+&nbsp;<input type="text" size="40" name="alert_email" id="alert_email" class="defaultText" title="{$lng.alerts.your_email}" value="{if isset($crt_usr_sett.email)}{$crt_usr_sett.email}{/if}"/>
+<br/>
+{if $settings.alerts_captcha}
+{if $settings.enable_recaptcha}
+{include file="data/recaptcha.html"}
+{else}
+{include file="data/random_image.html"}
+{/if}
+{/if}
+
+<div class="buttons">
+	<strong><input type="submit" name="CreateAlert" id="CreateAlert" value="{$lng.alerts.create_alert}" /></strong>
+</div>
+</div>
+
+</form>
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+jQuery(document).ready(function() {
+
+	$("#alert_info").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+	var ret = JSON.parse(responseText);
+
+	$("body").removeClass("loading");
+
+	if(ret.response==1) {
+
+		$("#alert_error").hide();
+		$("#alert_info").html("<p>"+ret.info+"</p>");
+		$("#alert_info").show();
+		$("#alert_form").slideUp();
+		return;
+
+	}
+
+	// response = 0 -> there are errors
+	$("#alert_error").html("<p>"+ret.error+"</p>");
+	$("#alert_error").show();
+
+} 
+
+ $('#alert1').ajaxForm(options);
+
+});
+{/literal}
+//]]>
+</script>
+
+	</div></div></div></div></div></div></div></div>
+
+</div>
+<!-- END EMAIL ALERT -->

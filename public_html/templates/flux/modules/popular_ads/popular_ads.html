@@ -1,0 +1,85 @@
+<section id="popular_ads">
+    <div class="tab_content" id="popular_tab_content">
+
+    		{section name=loop start=0 loop=$no_popular step=1}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$popular[loop].id p2=$popular[loop].title p3='' p4=$popular[loop].category_id p5=$popular[loop].slug}{else}{$live_site}/details.php?id={$popular[loop].id}{/if}{/capture}
+
+			<a href="{$details_url}">
+			<div class="box-container">
+			<div class="fbox box clearfix{*{if $v.highlited && $ads_settings.enable_highlited} highlited{/if}*}">
+
+				<img id="fpic{$popular[loop].id}" src="{$live_site}/{$popular[loop].medImage}" alt="{if $popular[loop].image_id}{$popular[loop].title|strip_tags:false|substr:0:100}{/if}" />
+
+				{if $popular[loop].sold}<div class="ribbon ribbon_sold"><span>{$lng.listings.sold}</span></div>{/if}
+				{if $popular[loop].rented}<div class="ribbon ribbon_rented"><span>{$lng.listings.rented}</span></div>{/if}
+
+				{if in_array("acategories", $modules_array) && in_array($popular[loop].category_id, $ac_settings.array_categories_list)}
+				<div id="ac{$popular[loop].id}" class="ac_over">{$lng.general.click_to_view}</div>
+				{/if}
+
+				<div class="ltitle">{if $data_set=="cars" && ((isset($popular[loop].make) && $popular[loop].make) || (isset($popular[loop].model) && $popular[loop].model))}{$popular[loop].make} {$popular[loop].model}{else}{if $appearance.charset=="UTF-8"}{$popular[loop].title|mb_truncate:30:"...":"UTF-8"}{else}{$popular[loop].title|truncate:30:"...":false}{/if}{/if}</div>
+
+				<div class="lloc">{$popular[loop].location_str}</div>
+
+				{if $ads_settings.enable_price}
+		
+					{if in_array("price_extra",$modules_array) && ( isset($pe_settings[$popular[loop].fieldset]) || isset($pe_settings[0]) )}
+	
+						{include file="modules/price_extra/gallery_listing.html" pe_listing=$popular[loop]}
+	
+					{else}
+
+						{if $popular[loop].price>=0}<div class="lprice">{$popular[loop].price_curr}</div>{/if}
+ 
+					{/if}
+			
+				{/if} {* end if enable price *}
+
+				{if !in_array($popular[loop].id, $fav_array)}
+				<div class="starfav addtofav tooltip make-fav" id="fav{$popular[loop].id}" title="{$lng.listings.add_to_favourites}"></div>
+				{else}
+				<div class="starfav remfav tooltip rem-fav" id="fav{$popular[loop].id}" title="{$lng.listings.remove_favourite}"></div>
+				{/if}
+
+{*				
+				{if $v.urgent && $ads_settings.enable_urgent}<div class="clearfix"></div><div class="mt5"><span class="urgent sq-btn sq-btn1">{$lng.listings.urgent}</span></div>{/if}
+*}
+			</div>
+			</div>
+			</a>
+		{/section}
+
+		<div class="clearfix"></div>
+
+    </div>
+    <hr/>
+</section>
+
+
+<script>
+//<![CDATA[
+jQuery(document).ready(function() {
+
+	if($('#tab_popular').is(':checked')) {
+		$('#popular_tab_content').imagesLoaded( function() {
+			startMasonryPopular();
+		});
+	}
+	
+});
+
+$('input:radio[name="tabs"]').change(function() { if ($(this).attr("id") == 'tab_popular') startMasonryPopular(); });
+
+
+function startMasonryPopular() {
+
+$('#popular_tab_content').masonry({
+  // options
+  itemSelector: '.box-container'
+});
+
+}
+
+//]]>
+</script>

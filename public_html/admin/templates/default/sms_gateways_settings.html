@@ -1,0 +1,48 @@
+{include file="header.html"}
+
+<div class="page_title">
+
+<div class="lfloat" width="200">{$lng.panel.settings} > {if isset($processor) && $processor}<a href="sms_gateways.php">{/if}{$lng.panel.sms_gateways}{if isset($processor) && $processor}</a> > {$processor_name} {$lng.panel.settings}{/if}</div>
+
+<div class="rfloat mr10">
+
+	<a href="sms_gateways.php" class="tab tab2">{$lng.panel.sms_gateways}</a>
+
+	<a href="sms_gateways_settings.php" class="tab tab1">{$lng.panel.sms_gateways_settings}</a>
+
+</div>
+
+</div>
+
+<div class="p30">
+<form name="settings" method="post" action="sms_gateways_settings.php">
+
+<div class="form_container">
+
+<div class="clearfix">
+	<div class="left_form"><img src="{$template_path}images/info.png"  class="tooltip icon" title="{$lng.settings.info.sms_content}" />&nbsp;{$lng.settings.sms_content}</div>
+	<div class="right_form">
+		<input type="textbox" name="sms_content" value="{if isset($smsg_settings.sms_content)}{$smsg_settings.sms_content}{/if}"/>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form"><img src="{$template_path}images/info.png"  class="tooltip icon" title="{$lng.settings.info.code_type}" />&nbsp;{$lng.general.type}</div>
+	<div class="right_form">
+		<input type="radio" name="type" value="1" {if $smsg_settings.type==1} checked="checked" {/if}/>&nbsp;{$lng.general.alphanumeric}&nbsp;&nbsp;
+		<input type="radio" name="type" value="2" {if $smsg_settings.type==2} checked="checked" {/if}/>&nbsp;{$lng.general.numeric}&nbsp;&nbsp;
+	</div>
+</div>
+
+<div class="form_footer">
+	<div class="buttons rfloat"  onClick='{if $demo}alert("{$lng.general.errors.demo}");return false;{/if}'>
+		<span class="positive"><input type="submit" name="Submit" id="Submit" value="{$lng.general.save_changes}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+</form>
+</div> {* p30 *}
+
+
+{include file="footer.html"}

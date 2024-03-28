@@ -1,0 +1,138 @@
+{include file="header.html"}
+
+
+<div class="main1 box">
+
+{if $action=="confirm" || $action=="unsubscribe"}
+<div class="mb300 pdiv5">
+{/if}
+
+{if isset($error) && $error}<div class="error"><p>{$error}</p></div>{/if}
+{if isset($info) && $info}<div class="info"><p>{$info}</p></div>{/if}
+
+{if $action=="confirm" || $action=="unsubscribe"}
+</div>
+{/if}
+
+{if $action=="view"}
+
+	<div class="page_title heading"><h1>{$lng.alerts.email_alert} {$lng.general.for}: {$str_search}</h1></div>
+
+	{if $no_listings>0}
+
+	{literal}
+	<style type="text/css">
+
+	.smallimg { width: {/literal}{$ads_settings.thmb_width}{literal}px; height: {/literal}{$ads_settings.thmb_height}{literal}px; }
+	.highlited { background: {/literal}{$ads_settings.highlited_color}{literal}; }
+	.rclass { {/literal}{if $text_direction=="rtl"}margin-right: {$ads_settings.thmb_width}px;{else}margin-left: {$ads_settings.thmb_width}px;{/if}{literal} }
+
+	@media all and (min-width: 801px)
+	{
+	.rclass { height: 80px; }
+
+	}
+
+	</style>
+	{/literal}
+
+	
+	{include file="paginator.html"}
+
+	{foreach name="listings" from=$listings_array item=v}
+		{include file="short_listing.html"}
+		{if !$v.featured && !$v.highlited}<hr/>{/if}
+	{/foreach}
+
+	{include file="js/listings_js.html"}
+
+	{* if listings_compare *}
+	{if in_array("listings_compare", $modules_array)}
+	{include file="modules/listings_compare/cmp_js.html"}
+	{/if}
+
+	<div class="clearfix"></div>
+	{include file="paginator.html"}
+	{else}
+	<div class="info"><p>{$lng.alerts.no_listings}</p></div>
+	{/if}
+
+{/if}
+
+{if $action=="user"}
+
+	<div class="page_title heading"><h1>{$lng.alerts.email_alerts}</h1></div>
+
+
+	<div class="pdiv5">
+
+	<form name="searches" id="searches" method="post" action="alerts.php?action=user">
+	<div class="lfloat">
+		<span><input type="image" value="delete_selected" name="delete_selected" id="delete_selected" src="{$template_path}images/delete_all.gif" onclick="return myConfirm('{$lng.confirm_delete_all|addslashes}')" style="border: 0px;" class="tooltip" title="{$lng.general.delete_all}"/></span>
+	</div>
+	<div class="clearfix"></div>
+	<table cellpadding="0" cellspacing="0" align="center" width="100%" class="datatable">
+	<tr id="theading">
+		<th width="30" class="hleft"><input type="checkbox" class="noborder" name="check_all" id="check_all" /></th>
+		<th class="laligned">{$lng.general.search}</th>
+		<th width= "150">{$lng.alerts.frequency}</th>
+		<th width= "100"></th>
+		<th width= "100">{$lng.listings.date}</th>
+		<th width="50" class="hright">{$lng.general.action}</th>
+	</tr>
+
+	{foreach from=$alerts item=v}
+	<tr>
+		<td><input type="checkbox" class="noborder" name="alert{$v.id}" id="alert{$v.id}" /></td>
+		<td class="laligned">{$v.search_str}</td>
+		<td>{if $v.frequency==0}{$lng.alerts.immediately}{elseif $v.frequency==1}{$lng.alerts.daily}{else}{$lng.alerts.weekly}{/if}</td>
+		<td>
+		{if $v.active}
+		<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+		<div class="small-btn inactivebutton icon">{$lng.listings.inactive}</div>
+		{/if}
+		</td>
+		<td>{$v.date_nice}</td>
+		
+		<td>
+
+			<span><a href="javascript:;" onclick="onDeleteAlert({$v.id})">
+			<img src="{$template_path}images/delete.png" class="tooltip icon" title="{$lng.general.delete}" alt="Delete" />
+			</a></span>
+		</td>
+	</tr>
+	{/foreach}
+
+	{if $alerts|@count==0}
+		<tr><td colspan="10" align="center">{$lng.alerts.no_alerts}</td></tr>
+	{/if}
+	</table>
+	</form>
+	</div>
+
+{literal}
+<script type="text/javascript">
+	$(document).ready(function() {
+		
+		$("#check_all").click(function()
+		{
+
+			if ($('#check_all').is(':checked')) checkAll(document);
+			else uncheckAll(document);
+
+		});
+
+		$('.tooltip').powerTip({
+			placement: 'n'
+		});
+
+	});
+</script>
+{/literal}
+
+
+{/if}
+
+</div>
+{include file="footer.html"}

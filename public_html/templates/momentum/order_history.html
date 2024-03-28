@@ -1,0 +1,122 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+
+
+<div class="main1 box">
+<div class="page_title heading"><h1>{$lng.useraccount.order_history}</h1></div>
+
+<div class="p30">
+<form name="search" method="post" action="{$self}?no_per_page={$no_per_page}">
+	<input type="hidden" name="page_hidden" value="{$page}" />
+	<input type="hidden" name="search_hidden" value="{if isset($search)}{$search}{/if}" />
+	<input type="hidden" name="order_hidden" value="{$order}" />
+	<input type="hidden" name="order_way_hidden" value="{$order_way}" />
+	<input type="hidden" name="no_per_page" value = "{$no_per_page}" />
+
+<div class="lfloat col-8 min600">
+
+<div class="lfloat mr10">
+	<select name="order_Sel" onchange="doSel(this);">
+		<option value="location.href='{$order_by_link|replace:'##order##':'date'}'" {if $order=='date'}selected="selected"{/if}>
+		{$lng.order_history.order_by_date}</option>
+		<option value="location.href='{$order_by_link|replace:'##order##':'amount'}'" {if $order=='amount'}selected="selected"{/if}>
+		{$lng.order_history.order_by_amount}</option>
+		<option value="location.href='{$order_by_link|replace:'##order##':'processor'}'" {if $order=='processor'}selected="selected"{/if}>
+		{$lng.order_history.order_by_processor}</option>
+
+	</select>
+</div>
+
+<div class="lfloat mr10">
+
+	<select name="order_way_sel" onchange="doSel(this);">
+
+		<option value="location.href='{$order_way_link|replace:'##order_way##':'desc'}'" {if $order_way=='desc'}selected="selected"{/if}>{$lng.general.desc}</option>
+		<option value="location.href='{$order_way_link|replace:'##order_way##':'asc'}'" {if $order_way=='asc'}selected="selected"{/if}>{$lng.general.asc}</option>
+
+	</select>
+
+</div>
+
+
+<div class="lfloat" style="margin-top: -2px;">
+	<input type="text" name="id" size="6" value="{$lng.listings.id}" onfocus="if(this.value=='{$lng.listings.id}') this.value=''" onblur="if(this.value=='') this.value='{$lng.listings.id}'">
+
+	<div class="buttons">
+		<input type="submit" class="button" name="Search" value="{$lng.general.search}" />
+	</div>
+
+</div>
+
+</div> {* end lfloat *}
+
+<div class="col-4">
+{include file="paginator.html"}
+</div>
+<div class="clearfix"></div>
+
+
+
+<table cellpadding="0" cellspacing="0" align="center" width="100%" class="datatable">
+<tr id="theading">
+
+	<th width="20" class="hleft">{$lng.listings.id}</th>
+	<th>{$lng.order_history.processor}</th>
+	<th>{$lng.order_history.amount}</th>
+	<th>{$lng.order_history.completed}</th>
+	{if $invoice_settings.enable_invoices}
+	<th width="30">{$lng.invoice.invoice}</th>
+	{/if}
+	<th>{$lng.order_history.details}</th>
+	<th class="hright">{$lng.order_history.date}</th>
+
+</tr>
+
+{foreach from=$actions_array item=v}
+<tr {if !$v.completed}class="inactive"{/if}>
+	<td>#{$v.invoice}</td>
+	<td class="bold">{$v.processor_title}</td>
+	<td class="price">{$v.amount_nice}</td>
+	<td>{if $v.completed}{$lng.order_history.completed}{else}{$lng.order_history.not_completed}{/if}{if !$v.completed && $v.processor!='manual'}&nbsp;<a href="complete_payment.php?id={$v.invoice}">[ {$lng.order_history.complete_payment} ]</a>{/if}</td>
+	{if $invoice_settings.enable_invoices}
+	<td>{if $v.invoice_id}<a href="{$live_site}/include/generate_invoice.php?id={$v.invoice_id}"><img src="{$template_path}images/download.png" /></a>{/if}</td>
+	{/if}
+	<td>{$v.action_str}</td>
+	<td>{$v.date_nice}</td>
+</tr>
+{/foreach}
+
+{if $no_actions==0}
+	<tr><td colspan="6" align="center">{$lng.order_history.no_actions}</td></tr>
+{/if}
+</table>
+
+{if $no_actions}<div class="rfloat">{include file="paginator.html"}</div>{/if}
+
+<div class="mt10">
+	{$lng.general.show}
+	<select name="no_per_page_sel" onchange="doSel(this);">
+		{section name=pg loop=60 start=10 step=10}
+		<option value="location.href='{$crt_page_link}&no_per_page={$smarty.section.pg.index}'" {if $no_per_page==$smarty.section.pg.index} selected="selected" {/if}>{$smarty.section.pg.index}</option>
+		{/section}
+	</select>
+	{$lng.general.on_a_page}
+</div>
+
+</form>
+</div>{* end p30 *}
+</div> {* end main1 *}
+
+{literal}
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		$('.tooltip').powerTip({
+			placement: 'n'
+		});
+
+	});
+</script>
+{/literal}
+
+{include file="footer.html"}

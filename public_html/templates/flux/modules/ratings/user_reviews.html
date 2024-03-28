@@ -1,0 +1,34 @@
+<section id="user-reviews" class="hidden dark-bg">
+
+<div class="page_bounds">
+
+{if !isset($jqform_included) || !$jqform_included}
+<div class="wait"></div>
+{assign var="jqform_included" value="1"}
+{/if}
+
+<script type="text/javascript" src="{$live_site}/modules/ratings/js/jquery.rating.min.js"></script>
+<link href="{$template_path}modules/ratings/css/rating{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+
+<h2 class="heading"><span id="no_reviews">{$no_reviews}</span> {if $no_reviews!=1}{$lng_ratings.sreviews}{else}{$lng_ratings.sreview}{/if} {$lng.general.on} {$user[$settings.contact_name_field]}</h2>
+
+<div id="reviews_container">
+
+	{include file="modules/ratings/add_user_review.html"}
+
+	{foreach from=$reviews_array item=v name=rloop}
+	{include file="modules/ratings/review.html" prefix=""}
+	{/foreach}	
+
+	{if $ur_no_pages>1}
+	{include file="modules/ratings/ur_paginator.html"}
+	{/if}
+
+	<div class="clearfix"></div>
+	
+</div> {* end reviews_container *}
+
+<div class="clearfix"></div>
+</div> {* end page_bounds *}
+
+</section>

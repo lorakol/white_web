@@ -1,0 +1,31 @@
+{literal}
+<style type="text/css">
+[id^=___plusone] { width:60px !important; }
+</style>
+{/literal}
+{if $sn_settings.enable_gplus_button}
+<div class="gp-container">
+<g:plusone size="{$sn_settings.gplus_size}"></g:plusone>
+</div>
+{/if}
+{if $sn_settings.enable_fb_like_button}
+<div class="fbl-container">
+<div class="fb-like" data-href="" data-width="{$sn_settings.fb_lb_width}" data-height="{$sn_settings.fb_lb_height}" data-colorscheme="{$sn_settings.fb_lb_color}" data-layout="{$sn_settings.fb_lb_layout}" data-action="{$sn_settings.fb_lb_action}" data-show-faces="{if $sn_settings.fb_lb_show_faces}true{else}false{/if}" data-send="false" show_faces="{if $sn_settings.fb_lb_show_faces}true{else}false{/if}"></div>
+</div>
+{/if}
+
+{capture name=some_content assign=details_url}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id p2=$listing.title}{else}{$live_site}/details.php?id={$id}{/if}
+{/capture}
+
+{if $sn_settings.enable_fb_share_button}
+<div class="fbs-container">
+<div class="fb-share-button" data-href="{$details_url}" data-layout="button_count"></div>
+</div>
+{/if}
+
+{if $sn_settings.enable_tweet_button}
+<div class="tweet-container">
+<a href="https://twitter.com/share" class="twitter-share-button" data-text="{$sn_settings.tw_data_text|replace:'##TITLE##':$listing.title}" data-count="{$sn_settings.tw_data_count}" data-via="{$sn_settings.twitter_account}">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+</div>
+{/if}

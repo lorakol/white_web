@@ -1,0 +1,176 @@
+<div class="form_container">
+
+{if $error != ""}<div class="error">{$error}</div>{/if}
+{if $info != ""}<div class="info">{$info}</div>{/if}
+
+<div class="clearfix">
+	<div class="left_form">Store id *</div>
+	<div class="right_form"><input type="text" name="store_id" id="store_id" size="70" value="{if isset($processor_settings.store_id) && $processor_settings.store_id}{$processor_settings.store_id}{/if}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Signature key *</div>
+	<div class="right_form"><input type="text" name="signature_key" id="signature_key" size="70" value="{if isset($processor_settings.signature_key) && $processor_settings.signature_key}{$processor_settings.signature_key}{/if}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Description *</div>
+	<div class="right_form"><input type="text" name="desc" id="desc" size="70" value="{if isset($processor_settings.desc) && $processor_settings.desc}{$processor_settings.desc}{/if}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.epay_currency} *</div>
+	<div class="right_form">
+		<select name="currency" id="currency">
+		<option value="EUR" {if $processor_settings.currency=='EUR'} selected="selected" {/if}>EUR</option>
+		<option value="BDT" {if $processor_settings.currency=='BDT'} selected="selected" {/if}>BDT</option>
+		<option value="USD" {if $processor_settings.currency=='USD'} selected="selected" {/if}>USD</option>
+		</select>
+	</div>
+</div>
+  
+<div class="clearfix">
+	<div class="left_form">Phone field</div>
+	<div class="right_form">
+		<select name="phone_field" id="phone_field">
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.phone_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+<div class="clearfix">
+	<div class="left_form">Address field</div>
+	<div class="right_form">
+		<select name="address_field" id="address_field">
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.address_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+<div class="clearfix">
+	<div class="left_form">City field</div>
+	<div class="right_form">
+		<select name="city_field" id="city_field">
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.city_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+<div class="clearfix">
+	<div class="left_form">State field</div>
+	<div class="right_form">
+		<select name="state_field" id="state_field">
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.state_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+<div class="clearfix">
+	<div class="left_form">Postcode field</div>
+	<div class="right_form">
+		<select name="postcode_field" id="postcode_field">
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.postcode_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+<div class="clearfix">
+	<div class="left_form">Country field</div>
+	<div class="right_form">
+		<select name="country_field" id="country_field">
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.country_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+{if $settings.nologin_enabled}
+
+<div class="clearfix">
+	<div class="left_form">Not logged in guest phone field</div>
+	<div class="right_form">
+		<select name="nologin_phone_field" id="nologin_phone_field">
+		{foreach from=$nologin_fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.nologin_phone_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Not logged in guest address field</div>
+	<div class="right_form">
+		<select name="nologin_address_field" id="nologin_address_field">
+		{foreach from=$nologin_fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.nologin_address_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Not logged in guest city field</div>
+	<div class="right_form">
+		<select name="nologin_city_field" id="nologin_city_field">
+		{foreach from=$nologin_fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.nologin_city_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Not logged in guest state field</div>
+	<div class="right_form">
+		<select name="nologin_state_field" id="nologin_state_field">
+		{foreach from=$nologin_fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.nologin_state_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Not logged in guest postcode field</div>
+	<div class="right_form">
+		<select name="nologin_ostcode_field" id="nologin_postcode_field">
+		{foreach from=$nologin_fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.nologin_postcode_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Not logged in guest country field</div>
+	<div class="right_form">
+		<select name="nologin_country_field" id="nologin_country_field">
+		{foreach from=$nologin_fields item=v}
+			<option value="{$v.caption}" {if $processor_settings.nologin_country_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+{/if}
+
+<div class="clearfix">
+	<div class="left_form">Test mode</div>
+	<div class="right_form"><input type="checkbox" name="test" id="test" {if $processor_settings.test==1} checked="checked"{/if} /></div>
+</div>
+
+
+<div class="form_footer">
+	<div class="buttons rfloat" {if $demo}onClick="alert('{$lng.general.errors.demo}');return false;"{/if}>
+		<span class="positive"><input type="submit" name="Submit_aamarpay" value="{$lng.general.submit}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+</div> {* end form_container *}

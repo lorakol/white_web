@@ -1,0 +1,86 @@
+
+{literal}
+<script>
+
+// check if the selected template has colorschemes, dark_mode and first_page_type
+// has_colorschemes|has_dark_mode|has_first_page_type|colorschemes(comma separated)
+function makeTplChecks() {
+	var selected_colorscheme="{/literal}{$th_settings.template_colorscheme}{literal}";
+	var tpl = $("#template").val();
+	$.ajax({
+	type		: "GET",
+	cache		: false,
+	url		: "{/literal}{$live_site}{literal}/modules/change_fg_theme/get_info.php?type=template&template_code="+tpl,
+	data		: $(this).serializeArray(),
+	success: function(data) {
+
+			var arr = data.split('|');
+			var has_colorschemes = arr[0];
+			var has_dark_mode = arr[1];
+			var has_first_page_type = arr[2];
+			var colorschemes_array = arr[3].split(",");
+
+
+			if(has_colorschemes==1) {
+					$("#template_colorscheme").empty();
+					for (var j=0;j<colorschemes_array.length;j++) {
+						option = $('<option></option>').attr("value", colorschemes_array[j]).text(colorschemes_array[j]);
+						$("#template_colorscheme").append(option);
+
+					}
+					$("#div_colorscheme").show();
+					$("#template_colorscheme option[value="+selected_colorscheme+"]").prop("selected", "selected");
+			}
+			else $("#div_colorscheme").hide();
+
+			if(has_dark_mode==1) $("#div_dark_mode").show();
+			else $("#div_dark_mode").hide();
+
+			if(has_first_page_type==1) $("#div_fp_type").show();
+			else $("#div_fp_type").hide();
+
+		} // end data
+	});// end ajax
+
+} // end makeTplChecks
+
+function setDarkMode() {
+	var tpl = $("#template").val();
+	$.ajax({
+	type		: "GET",
+	cache		: false,
+	url		: "{/literal}{$live_site}{literal}/modules/change_fg_theme/get_info.php?type=dark_mode&template_code="+tpl,
+	data		: $(this).serializeArray(),
+	success: function(data) {
+
+		$("#template_colorscheme").val(data);
+
+		} // end data
+	});// end ajax
+
+} // end makeTplChecks
+
+//<![CDATA[
+
+$(document).ready(function() {
+
+	makeTplChecks();
+
+	$( "#template" ).change(function() {
+  	makeTplChecks();
+		$( "#dark_mode" ).prop( "checked", false );
+	});
+
+	$( "#template_colorscheme" ).change(function() {
+		$( "#dark_mode" ).prop( "checked", false );
+	});
+
+	$( "#dark_mode" ).change(function() {
+  	setDarkMode();
+	});
+
+
+});
+//]]>
+</script>
+{/literal}

@@ -1,0 +1,73 @@
+<div class="form_container">
+
+{if $error != ""}<div class="error">{$error}</div>{/if}
+{if $info != ""}<div class="info">{$info}</div>{/if}
+
+<div class="clearfix">
+	<div class="left_form">Master Key<span class="mandatory">*</span></div>
+	<div class="right_form"><input type="text" maxlength="100" size="40" name="paydunya_master_key" id="paydunya_master_key" value="{$processor_settings.master_key}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Public Key<span class="mandatory">*</span></div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_public_key" id="paydunya_public_key" value="{$processor_settings.public_key}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Private Key<span class="mandatory">*</span></div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_private_key" id="paydunya_private_key" value="{$processor_settings.private_key}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Token<span class="mandatory">*</span></div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_token" id="paydunya_token" value="{$processor_settings.token}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Item name<span class="mandatory">*</span></div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_item_name" id="paydunya_item_name" value="{$processor_settings.item_name}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Company name<span class="mandatory">*</span></div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_company_name" id="paydunya_company_name" value="{$processor_settings.company_name}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Tagline</div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_tagline" id="paydunya_tagline" value="{$processor_settings.tagline}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Company phone</div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_company_phone" id="paydunya_company_phone" value="{$processor_settings.company_phone}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Company address</div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_company_address" id="paydunya_company_address" value="{$processor_settings.company_address}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Website</div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_website" id="paydunya_website" value="{$processor_settings.website}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Logo URL</div>
+	<div class="right_form"><input type="text" maxlength="200" size="40" name="paydunya_logo_url" id="paydunya_logo_url" value="{$processor_settings.logo_url}" /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">Test mode</div>
+	<div class="right_form"><input type="checkbox" name="paydunya_test" id="paydunya_test" {if $processor_settings.test==1} checked="checked"{/if} /></div>
+</div>
+
+<div class="form_footer">
+	<div class="buttons rfloat" {if $demo}onClick="alert('{$lng.general.errors.demo}');return false;"{/if}>
+		<span class="positive"><input type="submit" name="Submit_paydunya" value="{$lng.general.submit}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+</div> {* end form_container *}

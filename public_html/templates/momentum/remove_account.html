@@ -1,0 +1,16 @@
+{include file="header.html"}
+
+<div class="main1 box">
+<div class="page_title heading"><h1>{$lng.useraccount.request_removal}</h1></div>
+
+<div class="pdiv5">
+
+{if isset($error) && $error}<div class="error"><p>{$error}</p></div>{/if}
+
+{if isset($info) && $info}<div class="info">{$info}</div>{/if}
+
+</div> {* end pdiv5 *}
+
+</div>{* end main1 *}
+
+{include file="footer.html"}

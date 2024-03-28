@@ -1,0 +1,21 @@
+	<div>
+
+	{if isset($crt_usr) && $crt_usr!=$listing.user_id}
+	<a href="javascript:;" id="place_bid"><div class="btn6 details-price-col nmr">{$lng.useraccount.place_bid|replace:" ":"&nbsp;"}</div></a>
+	{/if}
+
+	<div class="details-price-col">
+	{if isset($crt_usr) && $crt_usr==$listing.user_id}<a href="javascript:;" id="show_bids">{/if}<div class="{if isset($crt_usr)}btn5 {/if}{if !isset($crt_usr) || $crt_usr==$listing.user_id}nmr{/if}"><span class="heavy{if !isset($crt_usr)} pendingbutton plr5{/if}">{$lng.useraccount.auction}</span><span class="small">{if $listing.auction.max_bid}&nbsp;|&nbsp;{$lng.useraccount.max_bid|replace:" ":"&nbsp;"}:&nbsp;<span id="max_bid">{$listing.auction.max_bid_nice|replace:" ":"&nbsp;"}</span>,{/if}&nbsp;|&nbsp;{$lng.useraccount.starts_at|replace:" ":"&nbsp;"}:&nbsp;{$listing.auction.starting_price|replace:" ":"&nbsp;"}</span></div>{if isset($crt_usr) && $crt_usr==$listing.user_id}</a>{/if}
+	{if !isset($crt_usr) || !$crt_usr || $crt_usr==$listing.user_id}
+	<div class="raligned">{$lng.listings.login_to_bid|replace:'::LOGIN_LINK::':$login_link}</div>
+	{/if}
+	</div>
+	<div class="clearfix"></div>
+	
+	
+	
+	
+	
+	
+	</div>
+

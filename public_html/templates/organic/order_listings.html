@@ -1,0 +1,33 @@
+<div class="order">
+<select id="order" name="order" onchange="doSel(this)">
+	<option value="location.href='{$order_by_link|replace:'##order##':'date_updated'}'" {if $order=='date_updated'}selected="selected"{/if}>
+	{$lng.order.date}</option>
+	{if $ads_settings.enable_price}<option value="location.href='{$order_by_link|replace:'##order##':'price'}'" {if $order=='price'}selected="selected"{/if}>
+	{$lng.order.price}</option>{/if}
+	<option value="location.href='{$order_by_link|replace:'##order##':'title'}'" {if $order=='title'}selected="selected"{/if}>
+	{$lng.order.title}</option>
+</select>
+<select id="order_way" name="order_way" onchange="doSel(this)">
+	<option value="location.href='{$order_way_link|replace:'##order_way##':'desc'}'" {if $order_way=='desc'}selected="selected"{/if}>{$lng.general.desc}</option>
+	<option value="location.href='{$order_way_link|replace:'##order_way##':'asc'}'" {if $order_way=='asc'}selected="selected"{/if}>{$lng.general.asc}</option>
+</select>
+
+	{* -------- multicurrency ---------- *}
+	{if in_array("multicurrency", $modules_array) && $self_noext=="listings"}
+	{include file="modules/multicurrency/search_currencies.html"}
+	{/if}
+	{* -------- end multicurrency ---------- *}
+
+
+{if $self_noext=="listings"}
+{if $ads_settings.enable_map_search}
+<div id="showMap" {if $ads_settings.map_visible}style="display: none;"{/if}>{$lng.listings.show_map}</div>
+<div id="hideMap" {if !$ads_settings.map_visible}style="display: none;"{/if}>{$lng.listings.hide_map}</div>
+{/if}
+
+<div id="show">
+	{if $post_array.show=="list"}<a href="{$show_link|replace:'##show##':'gallery'}">{/if}{$lng.listings.gallery}{if $post_array.show=="list"}</a>{/if}&nbsp;&middot;&nbsp;
+	{if $post_array.show=="gallery"}<a href="{$show_link|replace:'##show##':'list'}">{/if}{$lng.listings.list}{if $post_array.show=="gallery"}</a>{/if}
+</div>
+{/if}
+</div>

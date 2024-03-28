@@ -1,0 +1,123 @@
+{include file="header.html"}
+
+<div class="heading"><h1>{$lng.useraccount.statistics}</h1></div>
+
+<div id="account">
+      <div id="auth_left">
+        <div id="left_content" class="clearfix"> 
+        
+	{if $crt_usr_sett.post_ads}
+		<h2>{$lng.stats.listings}</h2>
+		<table class="stat" width="100%">
+			<tr><td>{$lng.useraccount.total_listings}</td><td class="tright">{$no_listings}</td></tr>
+			<tr><td>{$lng.useraccount.active_listings}</td><td class="tright">{$no_active_listings}</td></tr>
+			<tr><td>{$lng.useraccount.pending_listings}</td><td class="tright">{$no_pending_listings}</td></tr>
+			<tr><td>{$lng.useraccount.expired_listings}</td><td class="tright">{$no_expired_listings}</td></tr>
+			<tr><td>{$lng.useraccount.unfinished_listings}</td><td class="tright">{$no_unfinished_listings}</td></tr>
+		</table>
+	{/if} {* end if post ads *}
+
+	{if $crt_usr_sett.post_ads}
+	{if $subscription_exists}
+		<h2>{$lng.useraccount.subscriptions}</h2>
+		<table class="stat" width="100%">
+		{if $subscriptions|@count>1}
+		<tr><td>{$lng.general.active}</td><td class="tright">{$active_subscriptions}&nbsp;<a href="subscriptions.php">[ {$lng.general.view} ]</a></td></tr>
+		{if $pending_subscriptions}<tr><td>{$lng.general.pending}</td><td class="tright">{$pending_subscriptions}&nbsp;<a href="subscriptions.php">[ {$lng.general.view} ]</a></td></tr>{/if}
+		{if $expired_subscriptions}<tr><td>{$lng.listings.expired}</td><td class="tright">{$expired_subscriptions}&nbsp;<a href="subscriptions.php">[ {$lng.general.view} ]</a></td></tr>{/if}
+		{if $inactive_subscriptions}<tr><td>{$lng.general.inactive}</td><td class="tright">{$inactive_subscriptions}&nbsp;<a href="subscriptions.php">[ {$lng.general.view} ]</a></td></tr>{/if}
+		{elseif $subscriptions|@count==1}
+		<tr><td>{$subscription.package_name}</td><td class="tright">{$subscription.state}{if $subscription.recurring}, {$lng.useraccount.recurring}{/if}
+		{if !$subscription.active && !$subscription.pending && !$subscription.fixed}&nbsp;<a href="useraccount.php?removesub={$subscription.id}" onclick="return myConfirm('{$lng.useraccount.confirm_delete_subscription|addslashes}')">[ {$lng.general.remove} ]</a>
+		{if $subscription.expired && !$subscription.recurring && !$subscription.fixed}&nbsp;<a href="subscribe.php?id={$subscription.id}&renew=1">[ {$lng.listings.renew} ]</a>{/if}{/if}
+		</td></tr>
+		{if $subscription.user_approved}
+		<tr><td>{$lng.useraccount.date_start}</td><td class="tright">{$subscription.date_start_nice}</td></tr>
+		{if $subscription.date_renew_nice}<tr><td>{$lng.useraccount.date_renew}</td><td class="tright">{$subscription.date_renew_nice}</td></tr>{/if}
+		{if $subscription.date_end_nice}<tr><td>{$lng.useraccount.date_end}</td><td class="tright">{$subscription.date_end_nice}</td></tr>{/if}
+		<tr><td>{$lng.useraccount.remaining_ads}</td><td class="tright">{if $subscription.ads_left==-1}{$lng.general.unlimited}{else}{$subscription.ads_left}{/if}</td></tr>
+		{/if}
+		{/if}
+
+		<tr><td><form name="subscriptions" method="post" action="subscribe.php"><div class="buttons"><strong style="margin: 0 0 0 -2px"><input type="submit" name="Subscribe" id="Subscribe" value="{$lng.useraccount.buy_package}" /></strong></div></form></td><td class="tright"></td></tr>
+
+		</table>
+	<br/>
+	{/if}
+	{/if} {* end if post ads *}
+
+	{if $crt_usr_sett.post_ads && $credits_allowed}
+		<h2>{$lng.credits.credits}</h2>
+		<table class="stat" width="100%">
+			<tr><td>{$lng.credits.current_credits}</td><td class="tright">{$no_credits} {if $no_credits==1}{$lng.credits.credit}{else}{$lng.credits.credits}{/if}</td></tr>
+			{if $pending_credits}<tr><td>{$lng.credits.pending_credits}</td><td class="tright">{$pending_credits} {if $no_credits==1}{$lng.credits.credit}{else}{$lng.credits.credits}{/if}</td></tr>{/if}
+			{if $credits_settings.unit!=1}
+			<tr><td>{$lng.credits.one_credit_equals}</td><td class="tright">{$credits_settings.unit_curr}</td></tr>
+			{/if}
+			{if $no_credits}<tr><td>{$lng.credits.credits_amount}</td><td class="tright">{$credits_amount}</td></tr>{/if}
+			{if $no_processors>0}
+			<tr><td><form name="credits" method="post" action="buy_credits.php"><div class="buttons"><strong style="margin: 0 0 0 -2px"><input type="submit" name="Buy_credits" id="Buy_credits" value="{$lng.credits.buy_extra_credits}" /></strong></div></form></td><td class="tright"></td></tr>
+			{/if}
+		</table>
+	<br/>
+	{/if}
+
+        </div>
+      </div>
+      <!-- end: #left_col -->
+      <!-- begin: #right_col -->
+      <div id="auth_right">
+        <div id="right_content" class="clearfix"> 
+
+	<h2>{$lng.stats.general}</h2>
+	<table class="stat" width="100%">
+		{if $no_groups>1}
+		<tr><td>{$lng.useraccount.account_type}</td><td class="tright">{$group.name}</td></tr>
+		{/if}
+		{if $crt_usr_sett.post_ads}
+		<tr><td>{$lng.useraccount.total_views}</td><td class="tright">{$total_views}</td></tr>
+		{/if}
+		<tr><td>{$lng.useraccount.last_login}</td><td class="tright">{if $last_login.date_login_nice}{$last_login.date_login_nice}{else}-{/if}</td></tr>
+		<tr><td>{$lng.useraccount.last_login_ip}</td><td class="tright">{if $last_login.ip}{$last_login.ip}{else}-{/if}</td></tr>
+	</table>
+	<br/>
+	
+	{if $crt_usr_sett.affiliate}
+        <div id="left_content" class="clearfix"> 
+		<h2>{$lng.users.affiliate}</h2>
+		<table class="stat" width="100%">
+			<tr><td>{$lng.users.affiliate_link}</td><td class="tright"><a href="{$user.affiliate_link}" target="_blank">{$user.affiliate_link}</a></td></tr>
+			<tr><td>{$lng.affiliates.last_payment}</td><td class="tright">{if isset($last_payment.amount) && $last_payment.amount}{$last_payment.amount}{else}-{/if}</td></tr>
+			<tr><td>{$lng.affiliates.last_payment_date}</td><td class="tright">{if isset($last_payment.date) && $last_payment.date}{$last_payment.date}{else}-{/if}</td></tr>
+			<tr><td>{$lng.affiliates.next_payment_date}</td><td class="tright">{if isset($next_payment_date) && $next_payment_date}{$next_payment_date}{else}-{/if}</td></tr>
+
+			<tr><td>{$lng.affiliates.total_due}</td><td class="tright">{$total_due}&nbsp;&nbsp;<div class="form_button"><strong><a href="affiliate_revenue.php">{$lng.affiliates.revenue_history}</a></strong></div></td></tr>
+
+			<tr><td>{$lng.affiliates.total_payments}</td><td class="tright">{$total_payments}&nbsp;&nbsp;<div class="form_button"><strong><a href="affiliate_payments_history.php">{$lng.affiliates.payments_history}</a></strong></div></td></tr>
+
+			{if isset($pending_payment) && $pending_payment}
+			<tr><td>{$lng.affiliates.pending_payment}</td><td class="tright">{$pending_payment}</td></tr>
+			{/if}
+		</table>
+
+	{/if}
+
+	{if $crt_usr_sett.post_ads && $group.store>0}
+	<h2>{$lng.users.store}</h2>
+	<table class="stat" width="100%">
+		<tr><td>{$lng.general.status}</td><td class="tright">{if $user.store}[ {$lng.general.active} ]{elseif isset($user.store_pending) && $user.store_pending}[ {$lng.general.pending} ]{else}[ {$lng.general.inactive} ]&nbsp;&nbsp;<a href="{$live_site}/buy_store.php">[ {$lng.useraccount.buy_store} ]</a>{/if}</td></tr>
+		{if $user.store}<tr><td>{$lng.general.expires}</td><td class="tright">{if $user.store_expires_nice}{$user.store_expires_nice}{else}{$lng.general.never}{/if}</td></tr>{/if}
+		{if $user.store}<tr><td>{$lng.general.link}</td><td class="tright"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$user.id p2=$user[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$user.id}{/if}" target='_blank'>{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$user.id p2=$user[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$user.id}{/if}</a></td></tr>{/if}
+	</table>
+	<br/>
+	{/if}
+
+    {if in_array("showcase",$modules_array)}
+	{include file="modules/showcase/useraccount.html"}
+    {/if}
+
+	</div>
+      </div>
+</div>
+
+{include file="footer.html"}

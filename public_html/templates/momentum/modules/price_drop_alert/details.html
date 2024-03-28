@@ -1,0 +1,17 @@
+{if !$has_alert}<div class="details-price_alert-col"><a href="{$live_site}/modules/price_drop_alert/add_alert.php?id={$id}" id="add_price_drop_alert"><div class="small-btn3 redbutton">{$lng_price_drop_alert.add_alert}</div></a></div>
+
+<script type="text/javascript">
+
+	$('#add_price_drop_alert').magnificPopup({
+	type: 'ajax',
+	showCloseBtn: true,
+	closeBtnInside:true,
+	callbacks: {
+	close: function() {
+	
+	}
+	}
+	});
+
+</script>
+{/if}

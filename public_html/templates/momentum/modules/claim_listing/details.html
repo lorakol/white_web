@@ -1,0 +1,120 @@
+	<a href="javascript:;" id="claim_listing" class="cf"><div class="button positive center mb20 mt20">{$lng_claim_listing.claim_listing}</div></a>
+
+	<form name="claim_details" id="claim_details" method="post" action="{$live_site}/modules/claim_listing/claim.php?id={$listing.id}">
+
+	<div id="claim_form" class="form2">
+
+	<div id="claim_info" class="info" style="display: none;">
+		<span class="closebtn" onclick='$("#claim_info").hide();'>&times;</span>
+		<span class="content"></span>
+	</div>
+
+	<div id="claim" class="hidden cf_form">
+	<ul>
+	<li>
+	<label for="claim_email">{$lng_claim_listing.email}<span class="mandatory">*</span></label>
+	<input type="text" id="claim_email" name="claim_email" value="" />
+	</li>
+	</ul>
+
+	{if $settings.contact_captcha}
+	{if $settings.enable_recaptcha}
+	<div class="mb20">
+	{include file="data/recaptcha.html" extension="_claim"}
+	</div>
+	{else}
+	{include file="data/random_image.html"}
+	{/if}
+	{/if}
+
+	<div class="buttons">
+	<input type="submit" class="button" name="ClaimListing" id="ClaimListing" value="{$lng_claim_listing.claim}" />
+	</div>
+	</div> {* end claim *}
+
+	</div> {* end claim_form *}
+	</form>
+
+	<script>
+{literal}	
+$(document).ready(function() {
+
+var claimOptions = { 
+
+		beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+		beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+		success:       claimSuccessResponse 
+ 
+   }; 
+
+function claimSuccessResponse(responseText, statusText, xhr, $form)  { 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$("#claim_info").find("span.content").html("<p>"+ret.info+"</p>");
+				$("#claim_info").show();
+				$("#claim").slideUp();
+				$('html,body').animate({scrollTop:$("#claim_info").offset().top}, 'slow');
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			{/literal}{if $settings.contact_captcha && $settings.enable_recaptcha}
+			// reload recaptcha
+			gReCaptchaReset("_claim");
+			{/if}{literal}
+
+
+}
+
+ $('#claim_details').ajaxForm(claimOptions);
+ 
+  $("#claim_listing").click(function(){ 
+ 
+	$(".cf_form").not("#claim").slideUp();
+
+	if($("#claim").is(":visible")) {
+		$("#claim").slideUp();
+	}	
+	else { 
+		$("#claim").slideDown();
+		
+		{/literal}
+		{if $settings.contact_captcha && $settings.enable_recaptcha}
+			onloadRCCallback("_claim");
+		{/if}
+		{literal}
+		
+	}
+ });
+ }); // end document ready
+ {/literal}
+	</script>
+	

@@ -1,0 +1,60 @@
+<section>
+<div class="button wide_button ha800 mb20" id="view_reviews">{$no_reviews} {if $no_reviews!=1}{$lng_ratings.sreviews}{else}{$lng_ratings.sreview}{/if}</div>
+<div class="button wide_button ha800 mb20" id="hide_reviews" style="display: none;">{$lng.general.hide}</div>
+
+{if !isset($jqform_included) || !$jqform_included}
+<div class="wait"></div>
+{assign var="jqform_included" value="1"}
+{/if}
+
+<script src="{$live_site}/modules/ratings/js/jquery.rating.min.js"></script>
+<link href="{$template_path}modules/ratings/css/rating{if $text_direction=="rtl"}-rtl{/if}.css" rel="stylesheet" type="text/css"/>
+
+<div class="hb800 mb20" id="reviews">
+
+<h2 class="heading"><span id="no_reviews">{$no_reviews}</span> {if $no_reviews!=1}{$lng_ratings.sreviews}{else}{$lng_ratings.sreview}{/if} {$lng.general.on} {$listing.title}</h2>
+
+<div class="light-container" id="reviews_container">
+
+	{include file="modules/ratings/add_listing_review.html"}
+
+	{foreach from=$reviews_array item=v name=rloop}
+	{include file="modules/ratings/review.html" prefix="lr_"}
+	{/foreach}	
+
+	{if $lr_no_pages>1}
+	{include file="modules/ratings/lr_paginator.html"}
+	{/if}
+
+	<div class="clearfix"></div>
+
+</div> {* end reviews_container *}
+
+<div class="clearfix"></div>
+
+</div>
+
+<script type = "text/javascript">
+jQuery(document).ready(function() {
+	
+	$("#view_reviews").click(function(){ 
+ 
+		$("#reviews").slideDown();
+		$("#hide_reviews").slideDown();
+		$("#view_reviews").slideUp();
+		
+		loadReviewsEditor();
+	
+	});
+ 
+	$("#hide_reviews").click(function(){ 
+ 
+		$("#reviews").slideUp();
+		$("#view_reviews").slideDown();
+		$("#hide_reviews").slideUp();
+	
+	});
+
+});
+</script>
+</section>

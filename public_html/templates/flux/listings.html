@@ -1,0 +1,180 @@
+{include file="header.html"}
+
+{if $no_listings>0}
+
+<style type="text/css">
+@media all and (min-width: 800px) {
+	.classified .smallimg { width: {$ads_settings.thmb_width+2}px; height: {$ads_settings.thmb_height+2}px; }
+	.rclass { {if $text_direction=="rtl"}margin-right: {$ads_settings.thmb_width+10}px;{else}margin-left: {$ads_settings.thmb_width+10}px;{/if} min-height: {$ads_settings.thmb_height+2}px;}
+}
+.rclass { min-height: {$ads_settings.thmb_height+2}px;}
+.highlited { background: {$ads_settings.highlited_color}; }
+</style>
+
+{/if}
+
+<div class="page_bounds pb30 relative">
+
+<div class="top_search fbc">
+
+<h1 class="total_results fb">{$total_items|number_format:0:"`$appearance.number_format_point`":"`$appearance.number_format_separator`"} {if $total_items==1}{$lng.listings.result}{else}{$lng.listings.ads}{/if}
+{if isset($post_array[$keyword_name]) && $post_array[$keyword_name]}&nbsp;{$lng.general.for}&nbsp;{$post_array[$keyword_name]}{/if}
+{if isset($post_array.category) && $post_array.category}&nbsp;{$lng.general.in}&nbsp;{$category_name}{/if}
+{if isset($post_array.location) && $post_array.location}{if isset($post_array.dist) && $post_array.dist}&nbsp;{$lng.general.at} {$post_array.dist}{$ads_settings.ds_measuring_unit} {$lng.general.distance_from}{else}&nbsp;{$lng.general.in}{/if}&nbsp;{$post_array.location|capitalize}{/if}
+</h1>
+
+<div class="display_mode{if $ads_settings.enable_map_search && $no_listings}_map{/if} fb">{if $no_listings}{if $ads_settings.enable_map_search}<a href="javascript:;" id="showMap" class="map_btn" {if $ads_settings.map_visible}style="display: none;"{/if}>{$lng.listings.show_map}</a><a href="javascript:;" id="hideMap" class="map_btn" {if !$ads_settings.map_visible}style="display: none;"{/if}>{$lng.listings.hide_map}</a>{/if}{/if}<span>{$lng.general.view}:</span>&nbsp;&nbsp;&nbsp;{if $post_array.show!="list"}<a href="{$show_link|replace:'##show##':'list'}">{/if}{$lng.listings.list}{if $post_array.show!="list"}</a>{/if}&nbsp;&nbsp;&nbsp;{if $post_array.show=="list"}<a href="{$show_link|replace:'##show##':'gallery'}">{/if}{$lng.listings.gallery}{if $post_array.show=="list"}</a>{/if}</div> {* end display_mode *}
+
+</div> {* end top_search *}
+<div class="clearfix"></div>
+
+<section>
+<h2 class="show_refine{if $ads_settings.search_by_account_type}{/if}">{$lng.search.refine_your_search}</h2>
+<div class="hide_refine hidden">{$lng.search.hide_refine}</div>
+<div class="clearfix"></div>
+<div class="search_left">
+
+{* ----------  refine search ------------- *}
+{include file="refine.html"}
+
+{* ------ listings1 banners ------- *}
+{if in_array('listings1',$banners_positions)}
+{banner->getTemplateBanners p1='listings1' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{foreach from=$array_banners item=v}
+<div class="vert_banners">{include file="banner.html" bclass="btype_refine"}</div><div class="clearfix"></div>
+{/foreach}
+{/if}
+{* ------- end listings1 banners ------- *}
+</div> {* end search-left *}
+</section>
+
+{* ----------  search results ------------- *}
+<section class="search_right">
+
+	{include file="order_listings.html"}
+
+	<div class="search_res">
+	
+	{if $no_listings>0 && $ads_settings.enable_map_search}
+	{include file="listings_map.html"}
+	{/if} {* end if no listings *}
+
+	{* ------ listings2 banners ------- *}
+	{if in_array('listings2',$banners_positions)}
+	{banner->getTemplateBanners p1='listings2' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{foreach from=$array_banners item=v}
+	<div class="center mt10">{include file="banner.html" bclass="btypelp_rc"}</div><div class="clearfix"></div>
+	{/foreach}
+	<div class="clearfix"></div>
+	{/if}
+	{* ------- end listings2 banners ------- *}
+
+	{if $no_listings>0}
+	
+		{if $post_array.show=="list"}
+		
+		{foreach name="listings" from=$listings_array item=v}
+			{include file="short_listing.html"}
+
+			{if ($smarty.foreach.listings.index+1)==floor($appearance.ads_per_page/2) && $smarty.foreach.listings.index!=$listings_array|@count-1}
+			{* ------ listings4 banners ------- *}
+			{if in_array('listings4',$banners_positions)}
+			{banner->getTemplateBanners p1='listings4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+			{if $array_banners|@count}<div class="clearfix mt10 mb10"></div><div class="dcenter">{/if}
+			{foreach from=$array_banners item=v}
+			<div class="center">{include file="banner.html" bclass="btypelp_rc"}</div><div class="clearfix"></div>
+			{/foreach}
+			{if $array_banners|@count}</div>{/if}{/if}
+			{* ------- end listings4 banners ------- *}
+			{/if}
+
+		{/foreach}
+		
+		{else}
+
+		<div id="listings_gallery">
+		{foreach name="listings" from=$listings_array item=v}
+		
+			{include file="short_listing_gallery.html"}
+			
+		{/foreach}
+		</div>
+		<div class="clearfix"></div>
+		
+		<script>
+		//<![CDATA[
+		jQuery(document).ready(function() {
+
+		$('#listings_gallery').imagesLoaded( function() {
+			startMasonryGallery();
+		});
+	
+		});
+
+		function startMasonryGallery() {
+
+			$('#listings_gallery').masonry({
+			// options
+			itemSelector: '.box-container'
+			});
+
+		}
+
+		//]]>
+		</script>
+
+		{/if} {* end if gallery *}
+
+		{* ------ listings3 banners ------- *}
+		{if in_array('listings3',$banners_positions)}
+		{banner->getTemplateBanners p1='listings3' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+		{foreach from=$array_banners item=v}
+		<div class="center mt10">{include file="banner.html" bclass="btypelp_rc"}</div><div class="clearfix"></div>
+		{/foreach}
+		<div class="clearfix"></div>
+		{/if}
+		{* ------- end listings3 banners ------- *}
+		
+	{else}
+	<div class="xsize mt20 mb40">{$lng.advanced_search.no_results}</div>
+	{/if} {* end if no_listings *}
+	
+	</div> {* end search_res *}
+	
+	{if $no_listings>0}
+	<div class="center mt10 mb10">
+	{include file="paginator.html"}
+	</div>
+	{/if}
+
+	{if $ads_settings.saved_searches_enabled || $ads_settings.alerts_enabled}
+	<div class="save_search center {if !$no_listings}mt20{/if}">
+	{$lng.search.save_your_search2}
+	<a href="javascript:;" class="button outline ml10" id="show_save_search">{$lng.search.save_search}</a>
+	</div>
+	{/if}
+
+</section> {* end search_right *}
+{* ---------- end search results ------------- *}
+<div class="clearfix"></div>
+
+
+{if in_array("latest_visited", $modules_array) && $no_latest_visited}
+{include file="modules/latest_visited/listings.html"}
+{/if}
+
+</div> {* end page_bounds *}
+
+{if $ads_settings.saved_searches_enabled  || $ads_settings.alerts_enabled}
+{include file="save_search.html"}
+{/if}
+
+{if isset($listings_bottom_inclusions)}
+{foreach from=$listings_bottom_inclusions item=v}
+{include file="$v"}
+{/foreach}
+{/if}
+
+{include file="js/listings_js.html"}
+
+{include file="footer.html"}

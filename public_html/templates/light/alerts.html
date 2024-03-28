@@ -1,0 +1,74 @@
+{include file="header.html"}
+
+<div class="clearfix"></div>
+
+{if $action=="confirm" || $action=="unsubscribe"}
+<br/><br/><br/><br/><br/><br/>
+{/if}
+{if isset($error) && $error}<div class="error"><p>{$error}</p></div>{/if}
+{if isset($info) && $info}<div class="info"><p>{$info}</p></div>{/if}
+
+{if $action=="confirm" || $action=="unsubscribe"}
+<br/><br/><br/><br/><br/><br/><br/>
+{/if}
+
+{if $action=="view"}
+
+	<div id="page_content">
+	<h1>{$lng.alerts.email_alert} {$lng.general.for}: {$str_search}</h1>
+	{if $no_listings>0}
+
+	{include file="paginator.html"}
+
+	{foreach name="listings" from=$listings_array item=v}
+		{include file="short_listing.html"}
+		{if !$v.featured && !$v.highlited}<hr/>{/if}
+	{/foreach}
+
+	{include file="data/fancybox.html"}
+	{include file="listings_js.html"}
+
+	{* if listings_compare *}
+	{if in_array("listings_compare", $modules_array)}
+	{include file="modules/listings_compare/cmp_js.html"}
+	{/if}
+
+	<div class="clearfix"></div>
+	{include file="paginator.html"}
+	{else}
+	<div class="info"><p>{$lng.alerts.no_listings}</p></div>
+	{/if}
+	</div>
+
+{/if}
+
+{if $action=="user"}
+
+	<div id="page_content">
+	<h1>{$lng.alerts.email_alerts}</h1>
+
+	{if $alerts|@count}
+	{*{include file="paginator.html"}*}
+
+	{foreach from=$alerts item=v}
+		<div class="alert">
+
+		<p>{$v.search_str}</p>
+
+		<span class="small">{$lng.alerts.frequency}: {if $v.frequency==0}{$lng.alerts.immediately}{elseif $v.frequency==1}{$lng.alerts.daily}{else}{$lng.alerts.weekly}{/if}&nbsp;|&nbsp;{$lng.alerts.started_on}:&nbsp;{$v.date_nice}&nbsp;|&nbsp;{if $v.active}{$lng.listings.active}{else}{$lng.listings.inactive}{/if}</span>
+		<span class="classified_links"><a href="javascript:;" onclick="onDeleteAlert({$v.id})">{$lng.general.delete}</a></span>
+		<div class="clearfix"></div>
+		</div>
+	{/foreach}
+
+	{*{include file="paginator.html"}*}
+	{else}
+	<br/><br/><br/><br/>
+	<div class="info"><p>{$lng.alerts.no_alerts}</p></div>
+	<br/><br/><br/><br/><br/>
+	{/if}
+
+	</div>
+
+{/if}
+{include file="footer.html"}

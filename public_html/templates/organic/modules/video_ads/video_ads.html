@@ -1,0 +1,74 @@
+<!-- VIDEO ADS -->
+<div id="video">
+	{capture name=some_content assign=title_field}title_{$crt_lang}{/capture}
+	<div class="box-heading top-box-text"><div class="box-heading-left"><div class="box-heading-right">{$video_ads[$title_field]}</div></div></div>
+	<div class="box2-bottom-gray"><div class="box-left"><div class="box-right"><div class="box-bottom-left"><div class="box2-bottom-right">
+                    <div class="vert-box"> 
+			{if $no_video}
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                      {section name=loop start=0 loop=$no_video step=1}
+			{capture name=some_content assign=details_url}
+			{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$video[loop].id p2=$video[loop].title p3='' p4=$video[loop].category_id p5=$video[loop].slug}{else}{$live_site}/details.php?id={$video[loop].id}{/if}
+			{/capture}
+                        <tr> 
+                          <td valign="middle" class="last-image"><div class="box-image">
+				<a href="{$details_url}"><img class="pic" id="lpic{$video[loop].id}" src="{$live_site}/{$video[loop].image}" alt="{if $video[loop].image_id}{$video[loop].title|strip_tags:false|substr:0:100}{/if}" /></a>
+				{if $video[loop].rented && $ads_settings.enable_rented}<div class="rented" id="prented{$video[loop].id}" style="display: none;"></div>{elseif $video[loop].sold && $ads_settings.enable_sold}<div class="sold" id="psold{$video[loop].id}" style="display: none;"></div>{/if}
+				</div></td>
+			<td valign="middle">
+			{if $data_set=="cars" && ($video[loop].make || $video[loop].model)}
+			<h3><a href="{$details_url}">{$video[loop].make} {$video[loop].model}</a></h3>
+			{else}
+			<h3><a href="{$details_url}">{if $appearance.charset=="UTF-8"}{$video[loop].title|mb_truncate:40:"...":"UTF-8"}{else}{$video[loop].title|truncate:40:"...":false}{/if}</a></h3>
+			{/if}
+			{$video[loop].location_str}
+			{if $ads_settings.enable_price}
+		
+			{if in_array("price_extra",$modules_array) && isset($pe_settings[$video[loop].fieldset])}
+
+			{include file="modules/price_extra/video.html"}
+	
+			{else}
+
+			{if $video[loop].price>=0}<div class="price">{$video[loop].price_curr}</div>{/if}
+ 
+			{/if}
+			
+			{/if} {* end if enable price *}
+
+			<div class="date">{$video[loop].date_nice}</div>
+			</td></tr>
+                        {if $smarty.section.loop.index<$no_video-1}
+                        <tr>
+                          <td colspan="2"><div class="vert-separator"></div></td>
+                        </tr>
+                        {/if}
+                      {/section}
+                      </table>
+			{/if}
+                    </div>
+	</div></div></div></div></div>
+</div>
+<!-- END video ADS -->
+
+<script type="text/javascript">
+{literal}
+$(window).load(function(){
+{/literal}
+{foreach from = $video item=v}
+	{if $v.rented}
+	{literal}
+		$("#prented{/literal}{$v.id}{literal}").show();
+		$("#prented{/literal}{$v.id}{literal}").css({ top: $("#lpic{/literal}{$v.id}{literal}").position().top-8, left: $("#lpic{/literal}{$v.id}{literal}").position().left+ $("#lpic{/literal}{$v.id}{literal}").width()-57});
+	{/literal}
+	{elseif $v.sold}
+	{literal}
+		$("#psold{/literal}{$v.id}{literal}").show();
+		$("#psold{/literal}{$v.id}{literal}").css({ top: $("#lpic{/literal}{$v.id}{literal}").position().top-8, left: $("#lpic{/literal}{$v.id}{literal}").position().left+ $("#lpic{/literal}{$v.id}{literal}").width()-57});
+	{/literal}
+	{/if}
+{/foreach}
+{literal}
+});
+{/literal}
+</script>

@@ -1,0 +1,69 @@
+{include file="header.html"}
+
+<div class="main1 box">
+
+	<div class="page_title heading"><h1>{$lng.useraccount.saved_searches}</h1></div>
+
+<div class="pdiv5">
+
+<form name="searches" id="searches" method="post" action="saved_searches.php">
+<div class="lfloat">
+	<span><input type="image" value="delete_selected" name="delete_selected" id="delete_selected" src="{$template_path}images/delete_all.gif" onclick="return myConfirm('{$lng.confirm_delete_all|addslashes}')" style="border: 0px;" class="tooltip" title="{$lng.general.delete_all}"/></span>
+</div>
+<div class="clearfix"></div>
+<table cellpadding="0" cellspacing="0" align="center" width="100%" class="datatable">
+<tr id="theading">
+	<th width="30" class="hleft"><input type="checkbox" class="noborder" name="check_all" id="check_all" /></th>
+	<th class="laligned">{$lng.general.search}</th>
+	<th width= "100">{$lng.listings.date}</th>
+	<th width="50" class="hright">{$lng.general.action}</th>
+</tr>
+
+{foreach from=$searches item=v}
+<tr>
+	<td><input type="checkbox" class="noborder" name="search{$v.id}" id="search{$v.id}" /></td>
+	<td class="laligned">{$v.search_str}</td>
+	<td>{$v.date_nice}</td>
+	<td class="laligned">
+		<span><a href="{if $seo_settings.enable_mod_rewrite}{$v.search_sef}{else}{$live_site}/listings.php?{$v.search}{/if}">
+		<img src="{$template_path}images/view.png" class="tooltip icon" title="{$lng.general.view}" alt="" />
+		</a></span>
+
+		<span><a href="javascript:;" onclick="onDeleteSavedSearch({$v.id})">
+		<img src="{$template_path}images/delete.png" class="tooltip icon" title="{$lng.general.delete}" alt="Delete" />
+		</a></span>
+	</td>
+
+</tr>
+{/foreach}
+
+{if $searches|@count==0}
+	<tr><td colspan="10" align="center">{$lng.useraccount.no_saved_searches}</td></tr>
+{/if}
+</table>
+</form>
+</div>
+
+</div> {* end main1 *}
+
+{literal}
+<script type="text/javascript">
+	$(document).ready(function() {
+		
+		$("#check_all").click(function()
+		{
+
+			if ($('#check_all').is(':checked')) checkAll(document);
+			else uncheckAll(document);
+
+		});
+
+		$('.tooltip').powerTip({
+			placement: 'n'
+		});
+
+	});
+</script>
+{/literal}
+
+{include file="footer.html"}

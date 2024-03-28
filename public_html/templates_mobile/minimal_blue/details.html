@@ -1,0 +1,563 @@
+{include file="header.html"}
+
+{if !$info}
+<div id="heading">{$listing.title|wordwrap:40:" ":true}</div>
+
+
+
+<div>
+<ul class="details_list">
+
+	{if $ads_settings.enable_auctions && $listing.auction.active}
+
+	{include file="auction.html"}
+
+	{elseif $ads_settings.enable_price}
+
+	{if in_array("price_extra",$modules_array) && isset($pe_settings[$listing.fieldset])}
+	
+	{include file="modules/price_extra/details.html"}
+	
+	{else}
+
+ 	{if $listing.price>=0}<li class="heading"><div class="price">{$listing.price_curr}</div></li>{/if}
+ 
+	{/if}
+
+	{* price drop alert *}
+	{if in_array("price_drop_alert",$modules_array) && $listing.price>0}
+	
+		{include file="modules/price_drop_alert/details.html"}
+	
+	{/if}
+	{* end price drop alert *}
+
+	{/if} {* end elseif enable_price *}
+
+	{if $ads_settings.enable_auctions && $listing.auction.active}
+
+		{include file="bid-btn.html"}
+		{include file="auction-details.html"}
+			
+	{/if}
+
+	{if $data_set=="cars" && ((isset($listing.make) && $listing.make) || (isset($listing.model) && $listing.model))}<li><h2>{$listing.make} {$listing.model}</h2></li>{/if}
+
+	<li><div class="small">{if $ads_settings.show_ad_date_for_everybody==1}{$lng.listings.added_on}&nbsp;{$listing.date_nice} | {/if}{$lng.listings.views}: {$listing.viewed} {if $ads_settings.enable_stock==1}| {$lng.listings.stock_no}: #{$listing.stock}{/if}</div>
+	</li>
+
+    <div class="details-sn-col">
+    {* -------- social networks ---------- *}
+    {if in_array("social_networks", $modules_array)}
+    <li>
+    {include file="modules/social_networks/sn_details.html"}
+    </li>
+    {/if}
+    {* -------- end social networks ---------- *}
+    </div>
+
+
+{if $listing.images|@count>0}
+	<script type="text/javascript">
+	PreloadImages("{$listing.preload_images}");
+	var arr_images = new Array();
+	{assign var="i" value="0"}
+	{foreach from=$listing.images item=v}
+	arr_images[{$i}] = "{if $v.folder}{$v.folder}/mobile_bigThmb/{/if}{$v.picture}";
+	{assign var="i" value="`$i+1`"}
+	{/foreach}
+	var no_images={$listing.images|@count};
+	</script>
+	<li class="images_gallery">
+
+	<div class="gallery">
+
+	<div id="bigImg">
+	<img src="{$live_site}/images/listings/{if $listing.images[0].folder}{$listing.images[0].folder}/{/if}mobile_bigThmb/{$listing.images[0].picture}" class="pic" alt="{$listing.title|strip_tags:false|substr:100}" width="250" />
+	</div>
+
+
+	<div class="no_images">{$listing.images|@count}&nbsp;{$lng.listings.photos}</div>
+	<input type="hidden" name="crtImage" id="crtImage" value="0" />
+
+	<a id="backward" class="bw">&nbsp;</a>
+	<a id="forward" class="fw">&nbsp;</a>
+
+	</div>
+
+	</li>
+	<script type="text/javascript">
+	{literal}
+	$(document).ready(function() {
+
+		$("#backward").click(function () { 
+			crtImg = parseInt($("#crtImage").val());
+			if(crtImg>0)
+				new_image = crtImg-1;
+			else
+				new_image = no_images-1;
+			$("#crtImage").val(new_image);
+			$("#bigImg").attr("src", arr_images[new_image]);
+			str = '<img src="{/literal}{$live_site}{literal}/images/listings/'+arr_images[new_image]+'" class="pic" alt="{/literal}{$listing.title|strip_tags:false|substr:100}{literal}" width="250" />';
+			$('#bigImg').html(str);
+		});
+
+		$("#forward").click(function () { 
+			crtImg = parseInt($("#crtImage").val());
+			if(crtImg<no_images-1) 
+				new_image = crtImg+1;
+			else
+				new_image = 0;
+
+			$("#crtImage").val(new_image);
+			$("#bigImg").attr("src", arr_images[new_image]);
+			str = '<img src="{/literal}{$live_site}{literal}/images/listings/'+arr_images[new_image]+'" class="pic" alt="{/literal}{$listing.title|strip_tags:false|substr:100}{literal}" width="250" />';
+			$('#bigImg').html(str);
+		});
+
+	});
+	{/literal}
+	</script>
+{else}
+	<div class="gallery">
+	<div id="bigImg">
+	<img src="{$live_site}/images/{$mobile_settings.mobile_big_nopic}" class="pic" alt="{$listing.title|strip_tags:false|substr:100}" />
+	</div>
+	</div>
+{/if}
+
+
+	{* ----------- nologin ad owner info ------------- *}
+	{if isset($key) && $key}
+
+	{if $settings.nologin_allow_edit || $settings.nologin_allow_delete || $settings.nologin_extra_options}
+	<div class="details_icons">
+
+	{if $settings.nologin_allow_edit}
+		<a href="{$live_site}/edit_listing.php?id={$listing.id}&key={$key}" class="img_href"><img src="{$template_path}images/edit.gif" alt="" 	/></a>&nbsp;
+		<a href="{$live_site}/edit_listing.php?id={$listing.id}&key={$key}">{$lng.general.edit}</a>&nbsp;&nbsp;
+
+		<a href="{$live_site}/edit_photos.php?id={$listing.id}&key={$key}" class="img_href"><img src="{$template_path}images/edit_photos.jpg" alt="" /></a>&nbsp;
+		<a href="{$live_site}/edit_photos.php?id={$listing.id}&key={$key}">{$lng.listings.edit_photos}</a>&nbsp;&nbsp;
+	{/if}
+
+	{if $settings.nologin_allow_delete}
+		<a href="{$live_site}/details.php?id={$listing.id}&key={$key}&delete=1" onclick="return myConfirm('{$lng.listings.confirm_delete|addslashes}')" class="img_href"><img src="{$template_path}images/delete1.png" alt="" /></a>&nbsp;
+		<a href="{$live_site}/details.php?id={$listing.id}&key={$key}&delete=1">{$lng.general.delete}</a>&nbsp;&nbsp;
+	{/if}
+
+	{if $settings.nologin_extra_options}
+		<a href="{$live_site}/edit_options.php?id={$listing.id}&key={$key}" class="img_href"><img src="{$template_path}images/edit-options.gif" alt="" /></a>&nbsp;
+		<a href="{$live_site}/edit_options.php?id={$listing.id}&key={$key}">{$lng.listings.edit_options}</a>&nbsp;&nbsp;
+	{/if}
+	</div>
+	{/if}
+
+	<div id="owner_details">
+	<div>
+		<span>{$lng.general.status}:</span>&nbsp;&nbsp;
+		{if $listing.pending}{$lng.listings.waiting_admin_approval}{elseif $listing.active}{$lng.listings.active}{else}{$lng.listings.inactive}{/if}
+	</div>
+
+	{if $ad_options.pending_featured}
+	<div>
+		<span></span>&nbsp;&nbsp;
+		{$lng.listings.pending_featured}
+	</div>
+	{/if}
+
+	{if $ad_options.pending_highlited}
+	<div>
+		<span></span>&nbsp;&nbsp;
+		{$lng.listings.pending_highlited}
+	</div>
+	{/if}
+
+	{if $ad_options.pending_priority}
+	<div>
+		<span></span>&nbsp;&nbsp;
+		{$lng.listings.pending_priority}:&nbsp;{$ad_options.pending_priority_name}
+	</div>
+	{/if}
+
+	{if $ad_options.pending_video}
+	<div>
+		<span></span>&nbsp;&nbsp;
+		{$lng.listings.pending_video}
+	</div>
+	{/if}
+
+	<div>
+		<span>{$lng.listings.added_on}:</span>&nbsp;&nbsp;
+		{$listing.date_nice}
+	</div>
+
+	<div>
+		<span>{$lng.general.expires}:</span>&nbsp;&nbsp;
+		{if $listing.date_expires_nice}{$listing.date_expires_nice}{else}{$lng.general.never}{/if}
+	</div>
+
+	</div>
+
+	{/if}
+	{* ----------- end nologin ad owner info ------------- *}
+
+    {* logo *}
+    {foreach $special_listing_fields.logo as $logo}
+    {if (isset($listing[$logo.caption]) && $listing[$logo.caption])}
+    <div class="mb10"><img src="{$live_site}/uploads/{$logo.caption}/{$listing[$logo.caption]}" /></div>
+    {/if}
+    {/foreach}
+
+{foreach from=$fields_array item=v}
+{if ((isset($listing[$v.caption]) && $listing[$v.caption]) || $v.type=="checkbox" || (isset($listing[$v.depending.caption1]) && $listing[$v.depending.caption1]) || (isset($listing[$v.depending.caption2]) && $listing[$v.depending.caption2]) || (isset($listing[$v.depending.caption3]) && $listing[$v.depending.caption3]) || (isset($listing[$v.depending.caption4]) && $listing[$v.depending.caption4]) ) && $v.type!='price' && $v.type!='checkbox_group' && $v.type!='youtube' && $v.type!='htmlarea' && $v.type!='textarea' && $v.type!='google_maps' && $v.type!='logo' && (($v.caption!='make' && $v.caption!='model') || $data_set!="cars")}
+<li>
+	{if $v.type=="depending"}
+	<span>{$v.depending.name1}:</span>&nbsp;&nbsp;
+	{else}
+	<span>{$v.name}:</span>&nbsp;&nbsp;
+	{/if}
+
+	{if $v.type=='url'}<a href="{$listing[$v.caption]}" target="_blank" rel="nofollow">{/if}
+	{if $v.prefix}{$v.prefix}{/if}
+
+	{if $v.type=="date"}
+	{$listing.vis[$v.caption]}
+
+	{elseif $v.validation_type=="numeric" || $v.is_numeric}
+	{$listing.formatted[$v.caption]}
+
+	{elseif $v.type=="textarea"}
+	{$listing.formatted[$v.caption]}
+
+	{elseif $v.type=="file"}
+	{if isset($listing[$v.caption]) && $listing[$v.caption]}<a href="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}"><img src="{$template_path}/images/download.png" alt="" name="{$lng.general.download}"/></a>{/if}
+
+	{elseif $v.type=="image"}
+	{if isset($listing[$v.caption]) && $listing[$v.caption]}<a href="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}"><img src="{$template_path}images/camera.gif" alt="" /></a>{/if}
+
+	{elseif $v.type=="phone"}
+
+	<span><img src="{$template_path}images/phone.png" /></span><span class="bold dark" id="span_{$v.caption}">{$listing[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more_lf" id="show_{$v.caption}">{$lng.listings.show_phone}</a>
+
+	{elseif $v.type=="whatsapp"}
+
+	<span><img src="{$template_path}images/whatsapp.png" /></span><span class="bold dark" id="span_{$v.caption}">{$listing[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more_lf" id="show_{$v.caption}">{$lng.listings.show_whatsapp}</a>
+
+	{elseif $v.type=="multiselect"}
+	{$listing[$v.caption]|@implode:', '}
+
+	{elseif $v.type=="checkbox"}
+	{if isset($listing[$v.caption]) && $listing[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+	{elseif $v.type=="depending"} {* ------- depending -------- *}
+
+	{if $listing[$v.depending.caption1]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.depending.caption1]}
+	{/if}
+
+	{if isset($listing[$v.depending.caption2]) && $listing[$v.depending.caption2]}
+</li>
+
+<li>
+	<span>{$v.depending.name2}:</span>&nbsp;&nbsp;
+
+	{if $listing[$v.depending.caption2]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.depending.caption2]}
+	{/if}
+	
+	{/if}
+
+	{if isset($listing[$v.depending.caption3]) && $listing[$v.depending.caption3]}
+</li>
+
+<li>
+	<span>{$v.depending.name3}:</span>&nbsp;&nbsp;
+
+	{if $listing[$v.depending.caption3]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.depending.caption3]}
+	{/if}
+
+	{/if}
+
+	{if isset($listing[$v.depending.caption4]) && $listing[$v.depending.caption4]}
+</li>
+
+<li>
+	<span>{$v.depending.name4}:</span>&nbsp;&nbsp;
+	
+	{if $listing[$v.depending.caption4]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.depending.caption4]}
+	{/if}
+
+	{/if}
+
+ 	{* ------- end depending -------- *}
+
+	{elseif $v.type=="price"} {* ------- price -------- *}
+
+	{$listing.price_curr}
+
+	{else}
+	
+	{if $v.type=="menu" && $v.all_val && $listing[$v.caption]=="all"}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.caption]}
+	{/if}
+	
+	{/if}
+	{if $v.postfix}{$v.postfix}{/if}
+	{if $v.type=='url'}</a>{/if}
+</li>
+{/if}
+{/foreach}
+
+	{* ------ special fields ------- *}
+	{foreach from=$fields_array item=v}
+
+	{if isset($listing[$v.caption]) && $listing[$v.caption] && $v.type=='checkbox_group'}
+	<li class="txt"><span>{$v.name}:</span>&nbsp;&nbsp;{foreach from=$listing[$v.caption] item=t name=check}{$t}{if $smarty.foreach.check.index!=$listing[$v.caption]|@count-1}, {/if}{/foreach}</li>
+
+	{elseif isset($listing[$v.caption]) && $listing[$v.caption] && ( $v.type=='htmlarea' || $v.type=='textarea' )}
+	<li class="txt"><span>{$v.name}:</span>&nbsp;&nbsp;{$listing[$v.caption]}</li>
+
+	{/if}
+
+	{/foreach}
+
+
+	<li class="txt">
+	<div id="pdescription">
+	{$listing.description_formatted|wordwrap:60:" ":true}
+	</div>
+	</li>
+
+	
+	{if $listing.video}<li>{$listing.video}</li>{/if}
+
+	{if $listing.has_video}
+
+	{foreach from=$fields_array item=v name=foo}
+
+		{if $v.type=="youtube" && $listing[$v.caption]}
+		<li>{$listing[$v.caption]}</li>
+		{/if}
+
+	{/foreach}
+
+	{/if}
+
+	
+</ul>
+
+	
+	{if $listing.sold==1 || $listing.rented==1 || $listing.featured==1 || (isset($listing.priority_name) && $listing.priority_name) || ($listing.video && $listing.enable_video)}
+	<div style="padding: 10px;">
+	
+	{if $listing.urgent && $ads_settings.enable_urgent}<div class="urgent_button">{$lng.listings.urgent}</div>{/if}
+	
+	{if $listing.sold && $ads_settings.enable_sold}
+	<div class="buttonwrapper"><div class="sold-left"><div class="sold-right">{$lng.listings.sold}</div></div></div>
+	{/if}
+
+	{if $listing.rented && $ads_settings.enable_rented}
+	<div class="buttonwrapper"><div class="rented-left"><div class="rented-right">{$lng.listings.rented}</div></div></div>
+	{/if}
+
+	{if $listing.featured && $ads_settings.enable_featured}
+	<div class="buttonwrapper"><div class="featured-left"><div class="featured-right">{$lng.listings.featured}</div></div></div>
+	{/if}
+
+	{if isset($listing.priority_name) && $listing.priority_name && $ads_settings.enable_priorities}
+	<div class="buttonwrapper"><div class="priority-left"><div class="priority-right">{$listing.priority_name}</div></div></div>
+	{/if}
+
+	{if $listing.video && $listing.enable_video && $ads_settings.enable_video}
+	<div class="buttonwrapper"><div class="video-left"><div class="video-right">{$lng.listings.short_video}</div></div></div>
+	{/if}
+	</div>
+	<div class="clearfix"></div>
+	{/if}
+
+	{if !$logged_in && !$is_admin && $ads_settings.hide_contact_when_not_logged}
+	{capture name=login_link assign=login_link}{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.login}?loc=details.php?id={$listing.id}{else}login.php?loc=details.php?id={$listing.id}{/if}{/capture}
+	<br/>
+	<div class="info"><p>{$lng.listing.login_to_view_contact|replace:'::LOGIN_LINK::':$login_link}</p></div>
+	<br/>
+	{elseif !$listing.user_id}
+
+	{include file="details_user_contact.html"}
+
+	{/if}
+
+
+	{if $logged_in || $is_admin || !$ads_settings.hide_contact_when_not_logged}
+ 	<div class="dcenter button1"><a href="{$live_site}/mailto.php?{if $listing.user_id}id={$listing.user_id}&amp;{/if}aid={$listing.id}">{$lng.listings.email_seller}</a></div>
+
+
+	{if $listing.user_id}
+	{assign var="contact_name" value=$listing.user[$settings.contact_name_field]}
+
+ 	<div class="dcenter button1"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeUserDetailLink p1=$listing.user_id   p2=$listing.user[$settings.contact_name_field]}{else}{$live_site}/contact_details.php?{if $listing.user_id}id={$listing.user_id}{else}ad_id={$listing.id}{/if}{/if}">{$lng.listings.user_details}</a></div>
+	{/if}
+
+	{/if}
+
+ 	<div class="dcenter button2"><a href="{$live_site}/recommend.php?id={$listing.id}">{$lng.listings.recommend_this}</a></div>
+ 	<div class="dcenter button2"><a href="{$live_site}/report.php?id={$listing.id}">{$lng.listings.report_ad}</a></div>
+<br/>
+
+
+{if in_array("social_networks", $modules_array)}
+{include file="modules/social_networks/sn_fb_comments.html"}
+{/if}
+
+	</div>
+        <!-- End: IE Column Clearing -->
+{if in_array("similar_ads", $modules_array)}
+{include file="modules/similar_ads/similar_ads.html"}
+{/if}
+
+</div>
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function() {
+
+$("a.more_lf").click(function(event){
+
+	event.preventDefault();
+	var field = jQuery(this).attr("id").substr(5);
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/get_phone.php?aid={$listing.id}&type=listing&field={literal}"+field,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$("#span_"+field).html(data);
+				$("#show_"+field).hide();
+				
+
+			} // end data
+		});// end ajax
+
+});
+
+{/literal}
+{if $ads_settings.enable_auctions && $listing.auction.active}
+{literal}
+
+$(".bid_info").hide();
+
+var bid_options = { 
+
+		beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       bidSuccessResponse 
+ 
+   }; 
+
+function bidSuccessResponse(responseText, statusText, xhr, $form)  { 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$(".bid_info").find("span.content").html("<p>"+ret.info+"</p>");
+				$(".bid_info").show();
+				$(".form2").slideUp();
+
+				if(ret.new_max_bid != '0')
+					$("#max_bid").html(ret.new_max_bid);
+
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+//			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+} 
+
+$('#bid_form').ajaxForm(bid_options);
+
+{/literal}
+{/if}
+{literal} 
+ 
+$("#place_bid").click(function () { 
+
+	{/literal}
+	{if !isset($crt_usr)}
+	alert("{$lng.useraccount.login_to_bid}");
+	return 0;
+	{/if}
+	{literal}
+
+	if($(".auction-details").is(":visible"))
+		$(".auction-details").slideUp();
+	else $(".auction-details").slideDown();
+
+});
+
+$("#show_bids").click(function () { 
+
+	if($(".auction-details").is(":visible"))
+		$(".auction-details").slideUp();
+	else $(".auction-details").slideDown();
+
+});
+
+
+});
+{/literal}
+</script>
+
+{else}
+<div id="page_content">
+<br/>
+<div class="info"><p>{$info}</p></div>
+<br/><br/><br/>
+</div>
+{/if}
+
+{if isset($details_bottom_inclusions)}
+{foreach from=$details_bottom_inclusions item=v}
+{include file="$v"}
+{/foreach}
+{/if}
+
+{include file="footer.html"}

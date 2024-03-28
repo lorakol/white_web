@@ -1,0 +1,1015 @@
+{include file="header.html"}
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/powertip/jquery.powertip.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{$live_site}/libs/jQuery/plugins/powertip/css/jquery.powertip.min.css" />
+<link rel="stylesheet" href="{$live_site}/libs/leaflet/leaflet.min.css"/>
+<script src="{$live_site}/libs/leaflet/leaflet.js"></script>
+
+{if !$info}
+{include file="data/fancybox.html"}
+
+<div>
+      <!-- begin: #details_left -->
+      <div id="details_left">
+        <div id="left_content" class="clearfix">
+	<div class="category_path">
+	<a href="{$live_site}/">{$lng.navbar.home}</a>
+	{section name=catpath loop=$category_path step=-1}
+	&nbsp;&raquo;
+	<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$category_path[catpath].id p2=$category_path[catpath].name}{else}{$live_site}/listings.php?category={$category_path[catpath].id}{/if}">{$category_path[catpath].name}</a>
+	{/section}
+	</div>
+	<div class="clearfix">
+	<h1 style="display: inline-block;">{$listing.title}</h1>
+	{if $listing.urgent && $ads_settings.enable_urgent}<div class="urgent_button">{$lng.listings.urgent}</div>{/if}
+	</div>
+	<div class="small">{if $ads_settings.show_ad_date_for_everybody==1}{$lng.listings.added_on}&nbsp;{$listing.date_nice} | {/if}{$lng.listings.views}: {$listing.viewed} {if $ads_settings.enable_stock==1}| {$lng.listings.stock_no}: #{$listing.stock}{/if}</div>
+
+	{if in_array("ratings",$modules_array) && $ratings_settings.rate_listings}
+	{include file="modules/ratings/rating.html"}
+	{/if}
+
+	{if $ads_settings.enable_auctions && $listing.auction.active}
+
+	{include file="auction-buttons.html"}
+
+	{elseif $ads_settings.enable_price}
+
+	{if in_array("price_extra",$modules_array) && isset($pe_settings[$listing.fieldset])}
+	
+	{include file="modules/price_extra/details.html"}
+	
+		{if $listing.negotiable==1}
+
+			{include file="modules/price_extra/make_offer.html"}
+		
+		{/if}
+
+	{else}
+
+ 	{if $listing.price>=0}<h2>{if in_array("multicurrency",$modules_array)}{include file="modules/multicurrency/details-price.html"}{else}{$listing.price_curr}{/if}</h2>{/if}
+ 
+	{/if}
+	
+	{* price drop alert *}
+	{if in_array("price_drop_alert",$modules_array) && $listing.price>0 && !($ads_settings.enable_auctions && $listing.auction.active)}
+	
+		{include file="modules/price_drop_alert/details.html"}
+	
+	{/if}
+	{* end price drop alert *}
+
+	{/if} {* end elseif enable_price *}
+	
+
+	{if $ads_settings.enable_auctions && $listing.auction.active}
+
+	{include file="auction-details.html"}
+
+	{/if}
+
+	
+	{if $data_set=="cars" && ($listing.make || $listing.model)}<h3>{$listing.make} {$listing.model}</h3>{/if}
+
+
+	{* ----------- nologin ad owner info ------------- *}
+	{if isset($key) && $key}
+
+	{if $settings.nologin_allow_edit || $settings.nologin_allow_delete || $settings.nologin_extra_options}
+	<div class="details_icons">
+
+	{if $settings.nologin_allow_edit}
+		<a href="{$live_site}/edit_listing.php?id={$listing.id}&key={$key}" class="img_href"><img src="{$template_path}images/edit-gray.gif" alt="" 	/></a>&nbsp;
+		<a href="{$live_site}/edit_listing.php?id={$listing.id}&key={$key}">{$lng.general.edit}</a>&nbsp;&nbsp;
+
+		<a href="{$live_site}/edit_photos.php?id={$listing.id}&key={$key}" class="img_href"><img src="{$template_path}images/edit_photos.gif" alt="" /></a>&nbsp;
+		<a href="{$live_site}/edit_photos.php?id={$listing.id}&key={$key}">{$lng.listings.edit_photos}</a>&nbsp;&nbsp;
+	{/if}
+
+	{if $settings.nologin_allow_delete}
+		<a href="{$live_site}/details.php?id={$listing.id}&key={$key}&delete=1" onclick="return myConfirm('{$lng.listings.confirm_delete|addslashes}')" class="img_href"><img src="{$template_path}images/delete-gray.gif" alt="" /></a>&nbsp;
+		<a href="{$live_site}/details.php?id={$listing.id}&key={$key}&delete=1">{$lng.general.delete}</a>&nbsp;&nbsp;
+	{/if}
+
+	{if $settings.nologin_extra_options}
+		<a href="{$live_site}/edit_options.php?id={$listing.id}&key={$key}" class="img_href"><img src="{$template_path}images/edit-options.gif" alt="" /></a>&nbsp;
+		<a href="{$live_site}/edit_options.php?id={$listing.id}&key={$key}">{$lng.listings.edit_options}</a>&nbsp;&nbsp;
+	{/if}
+	</div>
+	{/if}
+
+	<div id="owner_details">
+	<div>
+		<span>{$lng.general.status}:</span>&nbsp;&nbsp;
+		{if $listing.pending}{$lng.listings.waiting_admin_approval}{elseif $listing.active}{$lng.listings.active}{else}{$lng.listings.inactive}{/if}
+	</div>
+
+	{if $ad_options.pending_featured}
+	<div>
+		<span></span>&nbsp;&nbsp;
+		{$lng.listings.pending_featured}
+	</div>
+	{/if}
+
+	{if $ad_options.pending_highlited}
+	<div>
+		<span></span>&nbsp;&nbsp;
+		{$lng.listings.pending_highlited}
+	</div>
+	{/if}
+
+	{if $ad_options.pending_priority}
+	<div>
+		<span></span>&nbsp;&nbsp;
+		{$lng.listings.pending_priority}:&nbsp;{$ad_options.pending_priority_name}
+	</div>
+	{/if}
+
+	{if $ad_options.pending_video}
+	<div>
+		<span></span>&nbsp;&nbsp;
+		{$lng.listings.pending_video}
+	</div>
+	{/if}
+
+	<div>
+		<span>{$lng.listings.added_on}:</span>&nbsp;&nbsp;
+		{$listing.date_nice}
+	</div>
+
+	<div>
+		<span>{$lng.general.expires}:</span>&nbsp;&nbsp;
+		{if $listing.date_expires_nice}{$listing.date_expires_nice}{else}{$lng.general.never}{/if}
+	</div>
+
+	</div>
+
+	{/if}
+	{* ----------- end nologin ad owner info ------------- *}
+
+
+	<div class="details_icons">
+
+	<a href="javascript:;" class="img_href fshare"><img src="{$template_path}images/share.gif" alt="" /></a>
+	<a href="javascript:;" class="fshare">{$lng.listings.recommend_this}</a>&nbsp;&nbsp;
+
+	
+	<a href="javascript:;" class="img_href addtofav"><img src="{$template_path}images/add_to_favorites.gif" alt="" /></a>
+	<a href="javascript:;" class="addtofav">{$lng.listings.add_to_favourites}</a>&nbsp;&nbsp;
+
+	<a href="javascript:;" class="img_href remfav"><img src="{$template_path}images/add_to_favorites.gif" alt="" /></a>
+	<a href="javascript:;" class="remfav">{$lng.listings.remove_favourite}</a>&nbsp;&nbsp;
+
+
+	<a href="javascript:window.print();" class="img_href"><img src="{$template_path}images/print.gif" alt="" /></a>
+	<a href="javascript:window.print();">{$lng.listings.print_page}</a>&nbsp;&nbsp;
+
+	<a href="javascript:;" class="img_href freport"><img src="{$template_path}images/report.gif" alt="" /></a>
+	<a href="javascript:;" class="freport">{$lng.listings.report_ad}</a>&nbsp;&nbsp;
+
+	</div>
+
+	{* -------- social networks ---------- *}
+	{if in_array("social_networks", $modules_array)}
+	{include file="modules/social_networks/sn_details.html"}
+	{/if}
+	{* -------- end social networks ---------- *}
+
+	{* bump ad button *}
+	{if $crt_usr==$listing.user_id && in_array("bump",$modules_array) && $listing.active && $listing.priority!=100}
+	{include file="modules/bump/details.html"}
+	{/if}
+
+	{* repost ad button *}
+	{if $crt_usr==$listing.user_id && in_array("auto_repost",$modules_array) && $listing.active}
+		{include file="modules/auto_repost/details.html"}
+	{/if}
+
+
+<div id="details">
+
+	{* logo *}
+	{foreach $special_listing_fields.logo as $logo}
+	{if (isset($listing[$logo.caption]) && $listing[$logo.caption])}
+	<div class="mb10"><img src="{$live_site}/uploads/{$logo.caption}/{$listing[$logo.caption]}" /></div>
+	{/if}
+	{/foreach}
+
+{foreach from=$fields_array item=v}
+{if ((isset($listing[$v.caption]) && $listing[$v.caption]) || $v.type=="checkbox" || ( isset($listing[$v.depending.caption1]) && $listing[$v.depending.caption1]) || ( isset($listing[$v.depending.caption2]) && $listing[$v.depending.caption2]) || (isset($listing[$v.depending.caption3]) && $listing[$v.depending.caption3]) || (isset($listing[$v.depending.caption4]) && $listing[$v.depending.caption4] ) ) && $v.type!='price' && $v.type!='checkbox_group' && $v.type!='youtube' && $v.type!='htmlarea' && $v.type!='textarea' && $v.type!='google_maps' && $v.type!='video' && $v.type!='audio' && $v.type!='logo' && (($v.caption!='make' && $v.caption!='model') || $data_set!="cars")}
+
+<div>
+	{if $v.type=="depending"}
+	<span>{$v.depending.name1}:</span>&nbsp;&nbsp;
+	{else}
+	<span>{$v.name}:</span>&nbsp;&nbsp;
+	{/if}
+
+	{if $v.type=='url'}<a href="{$listing[$v.caption]}" target="_blank" rel="nofollow">{/if}
+	{if $v.prefix}{$v.prefix}{/if}
+
+	{if $v.type=="date"}
+	{$listing.vis[$v.caption]}
+
+	{elseif $v.type=="textarea"}
+	{$listing.formatted[$v.caption]}
+
+	{elseif $v.type=="file"}
+	{if $listing[$v.caption]}<a href="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}"><img src="{$template_path}/images/download.png" class="tooltip" alt="" title="{$lng.general.download}"/></a>{/if}
+
+	{elseif $v.type=="image"}
+	{if $listing[$v.caption]}<a href="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}" class="imgfield"><img src="{$template_path}images/camera.gif" alt="" /></a>{/if}
+
+	{elseif $v.type=="phone"}
+
+	<span class="aw"><img src="{$template_path}images/phone.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$listing[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more_lf" id="show_{$v.caption}">{$lng.listings.show_phone}</a>
+
+	{elseif $v.type=="whatsapp"}
+
+	<span class="aw"><img src="{$template_path}images/whatsapp.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$listing[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more_lf" id="show_{$v.caption}">{$lng.listings.show_whatsapp}</a>
+
+	
+	{elseif $v.type=="multiselect"}
+	{$listing[$v.caption]|@implode:', '}
+
+	{elseif $v.type=="checkbox"}
+	{if $listing[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+	{elseif $v.type=="depending"} {* ------- depending -------- *}
+
+	{if $listing[$v.depending.caption1]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.depending.caption1]}
+	{/if}
+	
+	{if isset($listing[$v.depending.caption2]) && $listing[$v.depending.caption2]}
+</div>
+
+<div>
+	<span>{$v.depending.name2}:</span>&nbsp;&nbsp;
+	{if $listing[$v.depending.caption2]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.depending.caption2]}
+	{/if}
+	
+	{/if}
+
+	{if isset($listing[$v.depending.caption3]) && $listing[$v.depending.caption3]}
+</div>
+
+<div>
+	<span>{$v.depending.name3}:</span>&nbsp;&nbsp;
+
+	{if $listing[$v.depending.caption3]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.depending.caption3]}
+	{/if}
+	
+	{/if}
+
+	{if isset($listing[$v.depending.caption4]) && $listing[$v.depending.caption4]}
+</div>
+
+<div>
+	<span>{$v.depending.name4}:</span>&nbsp;&nbsp;
+	
+	{if $listing[$v.depending.caption4]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.depending.caption4]}
+	{/if}
+	
+	{/if}
+
+ 	{* ------- end depending -------- *}
+
+	{elseif $v.type=="price"} {* ------- price -------- *}
+
+	{$listing.price_curr}
+
+	{else}
+
+	{if $v.type=="menu" && $v.all_val && $listing[$v.caption]=="all"}
+	{$lng.general.all}
+	{else}
+	{$listing[$v.caption]}
+	{/if}
+	
+	{/if}
+	{if $v.postfix}{$v.postfix}{/if}
+	{if $v.type=='url'}</a>{/if}
+</div>
+{/if}
+{/foreach}
+</div>
+	
+	{if $listing.sold==1 || $listing.rented==1 || $listing.featured==1 || (isset($listing.priority_name) && $listing.priority_name) || ($listing.video && $listing.enable_video)}
+	<br/>
+	<table cellpadding="0" cellspacing="0" class="details-buttons"><tr>
+	{if $listing.sold && $ads_settings.enable_sold}
+	<td>&nbsp;</td><td>
+	<div class="buttonwrapper"><div class="sold-left"><div class="sold-right">{$lng.listings.sold}</div></div></div>
+	</td>
+	{/if}
+
+	{if $listing.rented && $ads_settings.enable_rented}
+	<td>&nbsp;</td><td>
+	<div class="buttonwrapper"><div class="rented-left"><div class="rented-right">{$lng.listings.rented}</div></div></div>
+	</td>
+	{/if}
+
+	{if $listing.featured && $ads_settings.enable_featured}
+	<td>&nbsp;</td><td>
+	<div class="buttonwrapper"><div class="featured-left"><div class="featured-right">{$lng.listings.featured}</div></div></div>
+	</td>
+	{/if}
+
+	{if isset($listing.priority_name) && $listing.priority_name && $ads_settings.enable_priorities}
+	<td>&nbsp;</td><td>
+	<div class="buttonwrapper"><div class="priority-left"><div class="priority-right">{$listing.priority_name}</div></div></div>
+	</td>
+	{/if}
+
+	{if $listing.video && $listing.enable_video && $ads_settings.enable_video}
+	<td>&nbsp;</td><td>
+	<div class="buttonwrapper"><div class="video-left"><div class="video-right">{$lng.listings.short_video}</div></div></div>
+	</td>
+	{/if}
+	</tr></table>
+	{/if}
+
+	<div id="description">
+	<p id="pdescription">
+	{$listing.description_formatted}
+	</p>
+	</div>
+
+	{* ------ special fields ------- *}
+	{foreach from=$fields_array item=v}
+
+	{if isset($listing[$v.caption]) && $listing[$v.caption] && $v.type=='checkbox_group'}
+
+	<div class="box_heading">{$v.name}</div>
+	<table cellpadding="3" cellspacing="3" width="100%">
+	<tr>
+
+	{foreach from=$listing[$v.caption] item=t name=check}
+		<td class="options" width="33%"><img src="{$template_path}images/checkbox_on.png" alt="" />&nbsp;&nbsp;{$t}</td>
+		{if $smarty.foreach.check.index!=0 && $smarty.foreach.check.index%3==2 && $smarty.foreach.check.index!=$listing[$v.caption]|@count-1}</tr><tr>{/if}
+	{/foreach}
+	{*  uncomment the following to show all options  *}
+{*	{foreach from=$v.extra_elements_array item=t name=check}
+		<td class="options" width="33%">{if in_array($t.name, $listing[$v.caption])}<img src="{$template_path}images/checkbox_on.png" alt="" />{else}<img src="{$template_path}images/checkbox_off.png" alt="" />{/if}&nbsp;&nbsp;{$t.name}</td>
+		{if $smarty.foreach.check.index!=0 && $smarty.foreach.check.index%3==2}</tr><tr>{/if}
+	{/foreach}
+*}
+	</tr></table>
+
+	{elseif isset($listing[$v.caption]) && $listing[$v.caption] && ( $v.type=='htmlarea' || $v.type=='textarea' )}
+	<div class="box_heading">{$v.name}</div>
+	<p>{$listing[$v.caption]}</p>
+
+	{elseif isset($listing[$v.caption]) && $listing[$v.caption] && $v.type=='youtube'}
+	<div class="box_heading">{$v.name}</div>
+	<div style="text-align: center; ">{$listing[$v.caption]|regex_replace:'/ width="[0-9]+"/':" width='$ads_settings.big_thmb_width'"|regex_replace:'/ height="[0-9]+"/':" height='388'"}</div>{* limit video width *}
+
+	{elseif isset($listing[$v.caption]) && $listing[$v.caption]  && $v.type=='google_maps'}
+	<div class="box_heading">{$v.name}</div>
+	<div id="gm_{$v.caption}" class="bordered_map"></div>
+	
+	{elseif isset($listing[$v.caption]) && $listing[$v.caption]  && $v.type=='video'}
+	<div class="box_heading">{$v.name}</div>
+	<div class="vf"><video controls>
+	<source src="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}" type="video/mp4">
+	Your browser does not support the video tag.
+	</video>
+	</div>
+	<div class="clearfix"></div>
+
+	{elseif isset($listing[$v.caption]) && $listing[$v.caption]  && $v.type=='audio'}
+	<div class="box_heading">{$v.name}</div>
+	<div class="vf"><audio controls>
+	<source src="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}" type="audio/mpeg">
+	Your browser does not support the audio element.
+	</audio></div>
+	<div class="clearfix"></div>
+	
+	{/if}
+
+	{if !in_array($v.type, $default_fields_types) && in_array($v.type, $modules_array)}
+	{include file="modules/`$v.type`/details.html"}
+	{/if}
+
+	{/foreach}
+
+	<div class="form_button back">
+		<strong><a class="back" href="javascript:;" onclick="history.back(); return false;">{$lng.general.back}</a></strong>
+	</div>
+	<div class="clearfix"></div>
+
+	{* ------ details1 banners ------- *}
+	{if in_array('details1',$banners_positions)}
+	{banner->getTemplateBanners p1='details1' p2=$section p3=$listing.category_id p4=$bloc assign='array_banners'}
+	{if $array_banners|@count}<div class="dcenter">{/if}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners">{include file="banner.html"}</div>
+	{/foreach}
+	{if $array_banners|@count}</div>{/if}{/if}
+	{* ------- end details1 banners ------- *}
+
+
+
+	{* -------- loan calculator ---------- *}
+
+	{if in_array("loancalc",$modules_array)}
+	{include file="modules/loancalc/loancalc.html"}
+	{/if}
+
+	{if $ratings_settings.rate_listings && $ratings_settings.ar_enable_reviews}
+
+	{include file="modules/ratings/listing_reviews.html"}
+
+	{/if}
+
+
+	{* -------- comments ---------- *}
+
+	{if in_array("comments", $modules_array)}
+	{include file="modules/comments/comments_js.html"}
+	{include file="modules/comments/comments.html"}
+	{/if}
+
+	{if in_array("social_networks", $modules_array)}
+	{include file="modules/social_networks/sn_fb_comments.html"}
+	{/if}
+
+        </div>
+      </div>
+      <!-- end: #left_col -->
+      <!-- begin: #right_col -->
+      <div id="details_right">
+        <div id="right_content"> 
+
+	{* start image gallery *}
+
+	<script type="text/javascript">
+	PreloadImages("{$listing.preload_images}");
+	</script>
+
+	<div id="gallery">
+
+	{if ($ads_settings.enable_video && $listing.enable_video && $listing.video) || $listing.images|@count>0}
+	<table cellpadding="0" cellspacing="2" width="100%" style="table-layout: fixed">
+	<tr><td colspan="4" valign="middle" align="center" height="{$listing.max_height+10}">
+	<div id="galleryVideo">
+	{/if}
+
+	{if $ads_settings.enable_video && $listing.enable_video && $listing.video}
+
+	{$listing.video|regex_replace:'/ width="[0-9]+"/':" width='$ads_settings.big_thmb_width'"|regex_replace:'/ height="[0-9]+"/':' height="388"'} {* limit video width *}
+	{/if}
+
+	{if ($ads_settings.enable_video && $listing.enable_video && $listing.video) || $listing.images|@count>0}
+	</div>
+	{/if}
+
+	{if $listing.images|@count>0}
+	<div id="bigImg" {if $ads_settings.enable_video && $listing.enable_video && $listing.video}style="display: none;"{/if}>
+	<img src="{$live_site}/images/listings/{if $listing.images[0].folder}{$listing.images[0].folder}/{/if}bigThmb/{$listing.images[0].picture}" class="pic" alt="{$listing.title|strip_tags:false|substr:0:100}" />
+	</div>
+	{/if}
+
+	{if ($ads_settings.enable_video && $listing.enable_video && $listing.video) || $listing.images|@count>0}
+	</td></tr>
+	{/if}
+
+	{if !(($ads_settings.enable_video && $listing.enable_video && $listing.video) || $listing.images|@count>0)}
+	<img id="bigImage" name="bigImage" src="{$live_site}{$listing.big_nopic}" class="pic" alt="" />
+	{/if}
+
+	{capture name=some_content assign=video}{if $ads_settings.enable_video && $listing.enable_video && $listing.video}1{else}0{/if}{/capture}
+
+	{foreach from=$listing.images item=v name=foo}
+	{if (!$video && $smarty.foreach.foo.index%4==0) || ($video && ($smarty.foreach.foo.index==0 || $smarty.foreach.foo.index%4==3))}<tr>{/if}
+
+	{if $smarty.foreach.foo.index==0 && $video}
+	<td valign="top" align="center" width="25%">
+		<img src="{$template_path}/images/watch-video.jpg" onclick='SwapToVideo()' class="pic" />
+	</td>
+	{/if}
+
+	<td valign="top" align="center" width="25%">
+		<a href="{$live_site}/images/listings/{if $v.folder}{$v.folder}/{/if}{$v.picture}" class="fimage" rel="image_gallery">
+		<img src="{$live_site}/images/listings/{if $v.folder}{$v.folder}/{/if}thmb/{$v.picture}" 
+		onclick='SwapImagesThick("&lt;img src=\"{$live_site}/images/listings/{if $v.folder}{$v.folder}/{/if}bigThmb/{$v.picture}\" class=\"pic\" alt=\"\" /&gt;");' class="pic" alt="{$listing.title|strip_tags:false|substr:0:100}" /></a>
+	</td>
+
+	{if !$video}
+	{if $smarty.foreach.foo.index==$listing.images|@count-1 && $listing.images|@count<4}
+	{section name=loop start=$listing.images|@count loop=4-$listing.images|@count step=1}
+	<td width="25%">&nbsp;</td>
+	{/section}
+	{/if}
+	{if $smarty.foreach.foo.index%4==3 && $smarty.foreach.foo.index!=$listing.images|@count-1}</tr>{/if}
+
+	{else}
+
+	{if $smarty.foreach.foo.index==$listing.images|@count-1 && $listing.images|@count<4}
+	{section name=loop start=$listing.images|@count loop=3-$listing.images|@count step=1}
+	<td width="25%">&nbsp;</td>
+	{/section}
+	{/if}
+	{if $smarty.foreach.foo.index%4==2 && $smarty.foreach.foo.index!=$listing.images|@count-1}</tr>{/if}
+	{/if}
+
+	{if $smarty.foreach.foo.index>=$listing.images|@count-1}</tr>{/if}
+	{/foreach}
+
+	{if ($ads_settings.enable_video && $listing.enable_video && $listing.video) || $listing.images|@count>0}
+	</table>
+	{/if}
+
+	</div> 
+	{* end image gallery *}
+
+	{* if listings_compare *}
+	{if in_array("listings_compare", $modules_array)}
+	<link href="{$template_path}modules/listings_compare/style.css" rel="stylesheet" type="text/css"/>
+
+	{include file="modules/listings_compare/cmp_js.html"}
+
+	<br/>
+	<div id="add_compare">
+
+	<a href="javascript:;" class="addcmpwin" id="cmp{$listing.id}" {if isset($cmp) && in_array($listing.id, $cmp)}style="display: none;"{/if}><img src="{$template_path}/modules/listings_compare/images/add_compare.png" id="cmi{$listing.id}" style="margin-bottom: -10px;" alt="{$lng_compare.add_to_compare}" />&nbsp;{$lng_compare.add_to_compare}</a>&nbsp;
+
+	<a href="javascript:;" class="remcmpwin" id="remcmp{$listing.id}" {if isset($cmp) && !in_array($listing.id, $cmp)}style="display: none;"{/if}><img src="{$template_path}/modules/listings_compare/images/remove_compare.png" id="remcmi{$listing.id}" style="margin-bottom: -7px;" alt="{$lng_compare.rem_compare}" />&nbsp;{$lng_compare.rem_compare}</a>
+
+	</div>
+
+
+	{if isset($no_compare) && $no_compare}
+	{include file="modules/listings_compare/compare_box.html"}
+	<div class="clearfix"></div>
+	{/if}
+
+	{/if}
+	{* end if listings_compare *}
+
+	{if $logged_in || $is_admin || !$ads_settings.hide_contact_when_not_logged}
+	{include file="details_user_info.html"}
+	{/if}
+
+	{if !$logged_in && !$is_admin && $ads_settings.hide_contact_when_not_logged}
+	<div>{$lng.listing.login_to_view_contact|replace:'::LOGIN_LINK::':$login_link}</div>
+	{/if}
+
+
+	{if $listing.user_id && ($logged_in || $is_admin || !$ads_settings.hide_contact_when_not_logged) && (!$listing.sold || !$ads_settings.hide_contact_when_sold) && (!$listing.rented || !$ads_settings.hide_contact_when_rented)}
+
+	{* -------- dealer page -------- *}
+	{if $listing.user.store>0}
+	<a class="user_listings" href="{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$listing.user_id p2=$listing.user[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$listing.user_id}{/if}">
+
+	<div class="user_listings">
+	{$lng.listings.view_store}
+	</div></a>
+
+	{* -------- more listings --------- *}
+	{elseif $ads_settings.show_more_link && (!$listing.sold || !$ads_settings.hide_contact_when_sold) && (!$listing.rented || !$ads_settings.hide_contact_when_rented)}
+
+	<a class="user_listings" href="{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=$listing.user_id p2=$listing.user.url_name p3=1}{else}{$live_site}/user_listings.php?id={$listing.user_id}&page=1{/if}">
+	<div class="user_listings">{$lng.listings.more_listings}</div>
+	</a>
+	{/if} 
+	{* end if user_id *}
+
+	{/if} {* end if not hide contacts *}
+
+	{* -------- claim_listing ---------- *}
+	{if !$logged_in && !$listing.user_id && in_array("claim_listing", $modules_array)}
+	{include file="modules/claim_listing/details.html"}
+	{/if}
+	{* -------- end claim_listing ---------- *}
+
+	{* -------- qrcode ---------- *}
+	{if in_array("qrcode", $modules_array)}
+	{include file="modules/qrcode/details.html"}
+	{/if}
+	{* -------- end qrcode ---------- *}
+
+	{* ------ details2 banners ------- *}
+	{if in_array('details2',$banners_positions)}
+	{banner->getTemplateBanners p1='details2' p2=$section p3=$listing.category_id p4=$bloc assign='array_banners'}
+	{if $array_banners|@count}<div class="dcenter">{/if}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners">{include file="banner.html"}</div>
+	{/foreach}
+	{if $array_banners|@count}</div>{/if}{/if}
+	{* ------- end details2 banners ------- *}
+
+
+	{* contact form *}
+
+	{if !$ads_settings.hide_contact_button && ($logged_in || $is_admin || !$ads_settings.hide_contact_when_not_logged) && (!$listing.sold || !$ads_settings.hide_contact_when_sold) && (!$listing.rented || !$ads_settings.hide_contact_when_rented)}
+
+	{include file="details_user_contact.html"}
+
+	{/if} {* end contact form *}
+
+	<div class="clearfix"></div>
+
+	{* ------ details3 banners ------- *}
+	{if in_array('details3',$banners_positions)}
+	{banner->getTemplateBanners p1='details3' p2=$section p3=$listing.category_id p4=$bloc assign='array_banners'}
+	{if $array_banners|@count}<div class="dcenter">{/if}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners">{include file="banner.html"}</div>
+	{/foreach}
+	{if $array_banners|@count}</div><div class="clearfix"></div>{/if}{/if}
+	{* ------- end details3 banners ------- *}
+
+
+{if $ads_settings.enable_auctions && $listing.auction.active}
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+jQuery(document).ready(function() {
+
+	$(".bid_info").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$(".bid_info").html("<p>"+ret.info+"</p>");
+				$(".bid_info").show();
+				$(".form2").slideUp();
+
+				// refresh
+				location.reload(true);
+				//if(ret.new_max_bid != '0')
+				//	$("#max_bid").html(ret.new_max_bid);
+
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				if(err_field=="alert_window") { alert(err_string); $('input[type="submit"]').prop('disabled', true); break; }
+				$("#"+err_field).addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+//			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+} 
+
+ $('#bid_form').ajaxForm(options);
+
+
+});
+{/literal}
+//]]>
+</script>
+
+
+{/if}
+
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+{/literal}
+
+	{foreach from=$gmaps item=v}
+		{if isset($listing[$v.caption]) && $listing[$v.caption]}
+			{include file="data/map-ro.html"}
+		{/if}
+	{/foreach}
+
+	// maps for nologin users
+	{foreach from=$user_gmaps item=v}
+		{if isset($listing.user[$v.caption]) && $listing.user[$v.caption]}
+			{include file="data/map-ro.html" tmp=$listing.user}
+		{/if}
+	{/foreach}
+
+
+{literal}
+
+function init_gmap() {
+
+{/literal}
+	{foreach from=$fields_array item=v}
+		{if $v.type=="google_maps" && isset($listing[$v.caption]) && $listing[$v.caption]}
+			init_gmap_{$v.caption}();
+		{/if}
+	{/foreach}
+
+	{foreach from=$user_gmaps item=v}
+		{if isset($listing.user[$v.caption]) && $listing.user[$v.caption]}
+			init_gmap_{$v.caption}();
+		{/if}
+	{/foreach}
+
+{literal}
+
+	}
+
+function init_osm() {
+
+{/literal}
+	{foreach from=$fields_array item=v}
+		{if $v.type=="google_maps" && isset($listing[$v.caption]) && $listing[$v.caption]}
+			init_osm_{$v.caption}();
+		{/if}
+	{/foreach}
+
+	{foreach from=$user_gmaps item=v}
+		{if isset($listing.user[$v.caption]) && $listing.user[$v.caption]}
+			init_osm_{$v.caption}();
+		{/if}
+	{/foreach}
+
+{literal}
+
+	}
+
+jQuery(document).ready(function() {
+
+	$("a.imgfield").fancybox();
+
+	{/literal}
+
+	var gmaps_on = {if $gmaps_value_exists || $user_gmaps_value_exists}1{else}0{/if};
+	// initialize google maps
+	{if $settings.map_type=="gmaps"}
+ 	load_gmaps();
+	{else}
+	init_osm();
+	{/if}
+
+	{literal}
+
+$("a.fshare").fancybox({
+	'width'         		: 630,
+	'height'        		: 700,
+	'transitionIn'		: 'none',
+	'transitionOut'		: 'none',
+	'margin'		: '0',
+	'padding'		: '0',
+	'titleShow'		: false,
+	//'type'			: 'iframe',
+	'href'			: '{/literal}{$live_site}/recommend.php?id={$listing.id}{literal}&extension=_share',
+	'onComplete'	: function() { onloadRCCallback("_share") }
+});
+
+$("a.freport").fancybox({
+	'width'         		: 650,
+	'height'        		: 700,
+	'transitionIn'		: 'none',
+	'transitionOut'		: 'none',
+	'margin'		: '0',
+	'padding'		: '0',
+	'titleShow'		: false,
+	//'type'			: 'iframe',
+	'href'			: '{/literal}{$live_site}/report.php?id={$listing.id}{literal}&extension=_report',
+	'onComplete'	: function() { onloadRCCallback("_report") }
+});
+
+
+{/literal}
+{if !in_array($listing.id, $fav_array)}
+	$("a.addtofav").show();
+	$("a.remfav").hide();
+{else}
+	$(".addtofav").hide();
+	$(".remfav").show();
+{/if}
+{literal}
+
+});// end document ready
+
+$("a.addtofav").click(function () { 
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/add_favorite.php?id={$listing.id}&logged_in={$logged_in}{literal}",
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$.fancybox(data, { 'autoDimensions'	: false,
+					'width'         		: 630,
+					'height'        		: 'auto',
+					'transitionIn'		: 'none',
+					'transitionOut'		: 'none',
+					'margin'		: '0',
+					'padding'		: '0'
+				});// end fancybox
+
+				$(".addtofav").hide();
+				$(".remfav").show();
+
+			} // end data
+		});// end ajax
+
+ })
+
+$("a.remfav").click(function () { 
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/remove_favorite.php?id={$listing.id}{literal}",
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$.fancybox(data, { 'autoDimensions'	: false,
+					'width'         		: 630,
+					'height'        		: 'auto',
+					'transitionIn'		: 'none',
+					'transitionOut'		: 'none',
+					'margin'		: '0',
+					'padding'		: '0'
+				});// end fancybox
+
+				$(".addtofav").show();
+				$(".remfav").hide();
+
+			} // end data
+		});// end ajax
+ })
+
+
+$("#bigImg").click(function () { 
+	$("a.fimage:first").trigger('click');
+});
+
+$("a.fimage").fancybox({
+		'transitionIn'		: 'elastic',
+		'transitionOut'		: 'elastic',
+		'titlePosition' 	: 'over',
+		'titleFormat'       : function(title, currentArray, currentIndex, currentOpts) {
+		    return '<span id="fancybox-title-over">{/literal}{$lng.listings.image}{literal} ' +  (currentIndex + 1) + ' / ' + currentArray.length +'</span>';
+		}
+	});
+
+
+$("#place_bid").click(function () { 
+
+	{/literal}
+	{if !isset($crt_usr)}
+	alert("{$lng.useraccount.login_to_bid}");
+	return 0;
+	{/if}
+	{literal}
+
+	if($(".auction-details").is(":visible"))
+		$(".auction-details").slideUp();
+	else $(".auction-details").slideDown();
+
+});
+
+$("#show_bids").click(function () { 
+
+	if($(".auction-details").is(":visible"))
+		$(".auction-details").slideUp();
+	else $(".auction-details").slideDown();
+
+});
+
+$("a.bmailto").click(function(event){
+	var nr = jQuery(this).attr("id").substr(7);
+
+	var arr = nr.split("_");
+	var user_id = arr[0];
+	var listing_id = arr[1];
+
+	$.fancybox({
+		'width'         		: 600,
+		'height'        		: 650,
+		'margin'		: '0',
+		'padding'		: '0',
+		'titleShow'		: false,
+		'type'			: 'iframe',
+		'href'			: '{/literal}{$live_site}{literal}/mailto.php?id='+user_id+'&amp;aid='+listing_id
+	});
+});
+
+
+$("a.more").click(function(event){
+
+	var field = jQuery(this).attr("id").substr(5);
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/get_phone.php?aid={$listing.id}&{if $listing.user_id}id={$listing.user_id}{/if}&field={literal}"+field,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$("#span_"+field).html(data);
+				$("#show_"+field).hide();
+
+			} // end data
+		});// end ajax
+
+});
+
+$("a.more_lf").click(function(event){
+
+	var field = jQuery(this).attr("id").substr(5);
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/get_phone.php?aid={$listing.id}&type=listing&field={literal}"+field,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$("#span_"+field).html(data);
+				$("#show_"+field).hide();
+
+			} // end data
+		});// end ajax
+
+});
+
+$('.tooltip').powerTip({
+	placement: 'n'
+});
+
+{/literal}
+//]]>
+
+</script>
+
+
+        </div>
+        <div class="ie_clearing">&nbsp;</div>
+        <!-- End: IE Column Clearing -->
+      </div>
+      <!-- end: #right_col -->
+
+
+{if in_array("similar_ads", $modules_array)}
+<!-- SIMILAR ADS -->
+{include file="modules/similar_ads/similar_ads.html"}
+<!-- END SIMILAR ADS -->
+{/if}
+
+{if in_array("latest_visited", $modules_array) && $no_latest_visited}
+{include file="modules/latest_visited/details.html"}
+{/if}
+
+
+</div>
+{else}
+<div id="page_content">
+<br/>
+<div class="info"><p>{$info}</p></div>
+<br/><br/><br/>
+</div>
+{/if}
+
+{if isset($details_bottom_inclusions)}
+{foreach from=$details_bottom_inclusions item=v}
+{include file="$v"}
+{/foreach}
+{/if}
+
+{include file="footer.html"}

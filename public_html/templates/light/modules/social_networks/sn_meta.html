@@ -1,0 +1,20 @@
+{if $sn_settings.enable_fb_like_button}
+<meta property="og:title" content="{$listing.title}" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$listing.id p2=$listing.title}{else}{$live_site}/details.php?id={$listing.id}{/if}" />
+{if $listing.images|@count>0}
+<meta property="og:image" content="{$live_site}/images/listings/{if $listing.images[0].folder}{$listing.images[0].folder}/{/if}bigThmb/{$listing.images[0].picture}"/> 
+{/if}
+<meta property="og:site_name" content="{$settings.site_name}" />
+<meta property="og:description" content="{$page_info.meta_description}"/>
+{/if}
+
+{if $sn_settings.tweet_ads}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@{$sn_settings.twitter_account}" />
+<meta name="twitter:title" content="{$listing.title}" />
+<meta name="twitter:description" content="{$listing.category} / {$listing.description|truncate:200:"...":false}" />
+{if $listing.images|@count>0}
+<meta name="twitter:image" content="{$live_site}/images/listings/{if $listing.images[0].folder}{$listing.images[0].folder}/{/if}{$listing.images[0].picture}" />
+{/if}
+{/if}

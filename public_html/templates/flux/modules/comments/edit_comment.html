@@ -1,0 +1,151 @@
+{if $comments_settings.html_editor}
+
+<script>
+var ceditor=1;
+{literal}
+	function loadCommentsEditor() {
+	myNicEditor = new nicEditor({iconsPath : '{/literal}{$live_site}{literal}/libs/nicEdit/nicEditorIcons.gif', buttonList : ['bold','italic','underline', 'left', 'center', 'right', 'justify', 'ul', 'ol', 'indent', 'outdent', 'forecolor', 'bgcolor', 'hr']}).panelInstance('comments_content_edit');
+	}
+{/literal}
+</script>
+{else}
+<script>
+var ceditor=0;
+</script>
+{/if}
+
+		<form name="comments_form_edit" id="comments_form_edit" method="post" action="{$live_site}/modules/comments/edit_comment.php?id={$id}&lid={$lid}">
+
+		<div id="edit_comments_div" class="form2 mb20">
+		<ul>
+
+		{if $comments_settings.use_name}
+		<li>
+		<label for="comments_name_edit">{$lng_comments.name}{if $comments_settings.use_name==1}<span class="mandatory"> *</span>{/if}</label>
+		<input name="comments_name_edit" id="comments_name_edit" type="text" value="{$comment.name}" />
+		</li>
+		{/if}
+
+		{if $comments_settings.use_email}
+		<li>
+		<label for="comments_email_edit">{$lng_comments.email}{if $comments_settings.use_email==1}<span class="mandatory">*</span>{/if}</label>
+		<input name="comments_email_edit" id="comments_email_edit" type="text" value="{$comment.email}" />
+		</li>
+		{/if}
+
+		{if $comments_settings.use_website}
+		<li>
+		<label for="comments_website_edit">{$lng_comments.website}{if $comments_settings.use_website==1}<span class="mandatory">*</span>{/if}</label>
+		<input name="comments_website_edit" id="comments_website_edit" type="text" value="{$comment.website}" />
+		</li>
+		{/if}
+		
+		<li><br/><textarea name="comments_content_edit" id="comments_content_edit" rows="5" >{$comment.content}</textarea></li>
+
+		</ul>
+		<br/>
+
+		<div class="buttons">
+		<input type="submit" class="button" name="EditComment" id="EditComment" value="{$lng_comments.edit_comment}" />
+		</div>
+
+		</div>
+		</form>
+
+
+{literal}
+<script>
+//<![CDATA[
+
+jQuery(document).ready(function() {
+
+	if(ceditor) loadCommentsEditor();
+
+var options = { 
+
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function beforeSerialize(jqForm, options) {
+
+	$("body").addClass("loading");
+
+	{/literal}{if $comments_settings.html_editor}{literal}
+	// capturing nicEditor content
+	for(var i=0;i<myNicEditor.nicInstances.length;i++){myNicEditor.nicInstances[i].saveContent();}
+	{/literal}{/if}{literal}
+
+	// return false to cancel submit
+
+}
+
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$("#comment"+ret.comment_id).html(ret.comment);
+				
+				$('html,body').animate({scrollTop:$("#comment"+ret.comment_id).offset().top}, 'slow');
+				
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			$("#comments_info").hide();
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				
+				if(err_field=="alert_window") { alert(err_string); $('input[type="submit"]').prop('disabled', true); break; }
+				
+				$("#"+err_field).addClass("err");
+
+				{/literal}{if $comments_settings.html_editor}{literal}
+				// nicEditor fix
+				if(err_field=="comments_content") { 
+					$("#comments_content_elm").addClass("err");
+					$("#"+err_field).closest( "li" ).prepend('<label class="err_label">'+err_string+'</label>');
+				}
+				else 
+				{/literal}{/if}{literal}
+					$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			{/literal}{if  $settings.enable_recaptcha && ($comments_settings.captcha==1 || ($comments_settings.captcha==2 && !$logged_in))}
+			// reload recaptcha
+			gReCaptchaReset("_comm");
+			{/if}{literal}
+
+
+} 
+
+ $('#comments_form_edit').ajaxForm(options);
+
+});
+
+//]]>
+</script>
+{/literal}

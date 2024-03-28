@@ -1,0 +1,3 @@
+{if $v.rating>0}
+	{section name=loop start=0 loop=5 step=1}<img src="{$template_path}modules/ratings/css/images/star{if $v.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />{/section}
+{/if}

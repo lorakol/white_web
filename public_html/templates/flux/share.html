@@ -1,0 +1,57 @@
+
+	<form name="share_form" id="share_form" method="post" action="{$live_site}/recommend.php?post=1&id={$id}">
+
+	<div class="form2 mt20">
+
+	<div id="share_info" class="info" style="display: none;">
+		<span class="closebtn" onclick='$("#share_info").hide();'>&times;</span>
+		<span class="content"></span>
+	</div>
+
+	<div id="share" class="hidden cf_form">
+
+	<div class="heading">{$lng.recommend.recommend_ad}</div>
+	<ul>
+		<li>
+			<label for="your_name">{$lng.recommend.your_name}<span class="mandatory"> *</span></label>
+			<input type="text" name="your_name" id="your_name" value="{if isset($crt_usr_sett[$settings.contact_name_field])}{$crt_usr_sett[$settings.contact_name_field]}{/if}"  />
+		</li>
+
+		<li>
+			<label for="your_email">{$lng.recommend.your_email}<span class="mandatory"> *</span></label>
+			<input type="text" name="your_email" id="your_email" value="{if isset($crt_usr_sett.email)}{$crt_usr_sett.email}{/if}" />
+		</li>
+
+		<li>
+			<label for="friend_name">{$lng.recommend.friend_name}<span class="mandatory"> *</span></label>
+			<input type="text" name="friend_name" id="friend_name" value="" />
+		</li>
+
+		<li>
+			<label for="friend_email">{$lng.recommend.friend_email}<span class="mandatory"> *</span></label>
+			<input type="text" name="friend_email" id="friend_email" value="" />
+		</li>
+
+		<li>
+			<label for="message">{$lng.recommend.message}</label>
+			<textarea name="message" id="message" rows="3"></textarea>
+		</li>
+	</ul>
+
+	{if $settings.contact_captcha}
+	{if $settings.enable_recaptcha}
+	<div class="mb20">
+	{include file="data/recaptcha.html" extension="_share"}
+	</div>
+	{else}
+	{include file="data/random_image.html"}
+	{/if}
+	{/if}
+
+	<div class="buttons">
+	<input type="submit" class="button" name="Submit" id="Send" value="{$lng.general.send}" />
+	</div>
+	</div> {* end share *}
+
+	</div>
+	</form>

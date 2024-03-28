@@ -1,0 +1,122 @@
+{if $step==1}
+{include file="header.html"}
+{include file="data/magnific-popup.html"}
+{include file="js/register_js.html" step=1}
+
+<div class="wait"></div>
+
+<script src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<script src="{$live_site}/libs/jQuery/plugins/jquery.number.min.js"></script>
+
+<link rel="stylesheet" href="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.css">
+<script src="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.min.js"></script>
+
+<div class="wait"></div>
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng.navbar.register}</h1></div>
+</div>
+
+<div class="page_bounds form_container mb40">
+
+<form name="users_form" id="users_form" method="post" action="register.php?step=3" enctype="multipart/form-data">
+
+<input type="hidden" name="group" id="group" value="{if isset($only_group) && $only_group}{$only_group}{/if}" />
+
+{if $no_groups>1 && !$only_group}
+<div class="heading form_heading">{$lng.register.group}</div>
+
+<div class="wbg p30 mb40" id="select_group">
+
+{foreach name=groups from=$groups_array item=v}
+
+	<div class="plan">
+
+		<div class="plan_title plan_title{$smarty.foreach.plan.index}">{$v.name}</div>
+		
+		<div class="plan_body">
+		
+		<div class="plan_details">
+
+		<div>{$v.description}</div>
+		
+		</div>
+
+		</div> {* end plan_body *}
+
+		<div class="plan_bottom"><a href="javascript:;" class="plan_button select_group" id="select_group{$v.id}" alt="{$v.id}^{$v.name}">{$lng.register.select_group}</a></div>
+
+	</div> {* end plan *}	
+
+{/foreach}
+
+<div class="clearfix"></div>
+
+</div> {* end select_group *}
+
+<div id="group_selected" class="wbg p30 mb40" style="display: none;" >
+
+	<div class="current_selection"><span class="tag"></span></div>
+	<div class="change_selection"><a href="javascript:;" class="button mtm10" id="change_group">{$lng.register.change_group}</a></div>
+	<div class="clearfix"></div>
+
+</div> {* end group_selected *}
+
+{/if}
+
+<div id="register_form"></div>
+
+</form>
+
+<div id="registered" class="wbg p30 mb40" style="display: none">
+<div class="info"><p>{if isset($info)}{$info}{/if}</p></div>
+</div> {* end registered *}
+
+</div> {* end page_bounds form_container *}
+
+{include file="footer.html"}
+{/if} {* end if step==1 *}
+
+{if $step==2}
+
+<input type="hidden" name="access" id="access" />
+
+<div class="heading form_heading">{$lng.navbar.register} {$lng.general.as} {$group_settings.name}</div>
+
+<div class="wbg p30">
+
+{include file="data/form_includes.html" fields_array=$user_fields user_fields=[]}
+
+{if $group_settings.affiliates}
+<div class="fel">
+	<label for="affiliate_paypal_email">{$lng.users.affiliate_paypal_email}<span class="mandatory"> *</span><a href="javascript:;" class="info_icon tooltip" title="{$lng.users.info.affiliate_paypal_email}">i</a></label>
+	<input type="text" size="30" name="affiliate_paypal_email" id="affiliate_paypal_email"  value="{if isset($tmp.affiliate_paypal_email)}{$tmp.affiliate_paypal_email}{/if}" />
+</div>
+{/if}
+
+{include file="custom_fields_form.html" fields_array=$user_fields user_fields=[] type="user"}
+
+{if $group_settings.store == 2}
+<div class="fel">
+	<label for="store_banner">{$lng.users.store_banner}</label>
+	<input type="file" name="store_banner"/>&nbsp;<span class="info_message">{$lng.users.info.store_banner}</span>
+</div>
+{/if}
+
+{if $settings.register_captcha}
+{if $settings.enable_recaptcha}
+{include file="data/recaptcha.html"}
+{else}
+{include file="data/random_image.html"}
+{/if}
+{/if}
+
+</div>{* end wbg *}
+
+<div class="form_footer mb40">
+	<input type="submit" class="button wide_button positive" name="Submit" id="Submit" value="{$lng.navbar.register}" />
+<div class="clearfix"></div>
+</div>
+
+{/if} {* end if step=2 *}

@@ -1,0 +1,637 @@
+{if !isset($step) || !$step}
+{include file="header.html"}
+{include file="data/fancybox.html"}
+
+<div class="wait"></div>
+
+<script type="text/javascript" src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/textcounter.min.js"></script>
+
+<link rel="stylesheet" href="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.css">
+<script src="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.min.js"></script>
+<link rel="stylesheet" href="{$live_site}/libs/leaflet/leaflet.min.css"/>
+<script src="{$live_site}/libs/leaflet/leaflet.js"></script>
+
+<div id="form_container">
+<h1>{$lng.navbar.editad} <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id}{else}{$live_site}/details.php?id={$id}{/if}"> #{$id}</a></h1>
+
+<div class="form_content">
+
+{if $pending_edited}
+<div class="info"><p>{$lng.listings.info.listing_pending_edited}</p></div>
+{/if}
+
+{* ---------------- ad details after saving ------------------  *}
+<div id="ad_details" style="display: none;" ></div>
+
+
+{* -------------------- edit ad form ------------------------ *}
+<div id="editad_form">
+<form name="newad" id="newad" method="post" enctype="multipart/form-data" action="edit_listing.php?id={$id}&step=2{if isset($key) && $key}&key={$key}{/if}">
+
+{if $no_words}<input name="no_words" type="hidden" value="{$no_words}">{/if}
+
+<h2>{$lng.listings.ad_description}</h2>
+
+{if $languages|@count>1 && $ads_settings.translate_title_description==1}
+
+{foreach from=$languages item=v}
+
+	{capture name=some_content assign=title_field}title_{$v.id}{/capture}
+	{capture name=some_content assign=desc_field}description_{$v.id}{/capture}
+
+	<label>{$lng.listings.title}<span class="mandatory"> *</span></label>
+	<input type="text" id="title_{$v.id}" name="title_{$v.id}" size="40" value="{$tmp.$title_field}" maxlength="150" />
+	&nbsp;{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />{else}{$v.name}{/if}
+
+<!-- DESCRIPTION -->
+
+	<label>{$lng.listings.description}<span class="mandatory"> *</span></label>
+	<textarea name="description_{$v.id}" cols="75" rows="10" id="description_{$v.id}" {if $no_words}class="counter"{/if}> {$tmp.$desc_field}</textarea>
+	&nbsp;{if $v.image}<img src="{$live_site}/images/languages/{$v.image}" alt="" />{else}{$v.name}{/if}
+
+{/foreach}
+
+{else}
+<!--  TITLE -->
+
+	<label>{$lng.listings.title}<span class="mandatory"> *</span></label>
+	<input type="text" name="title" id="title" size="40" value="{$tmp.title}" maxlength="150" />
+
+<!-- DESCRIPTION -->
+
+	<label>{$lng.listings.description}<span class="mandatory"> *</span></label>
+	<textarea name="description" cols="75" rows="10" id="description" {if $no_words}class="counter"{/if}>{$tmp.description}</textarea>
+
+<!-- COUNT WORDS -->
+{if $no_words}
+
+	<br/>
+	<input readonly name="count" id="count" type="text" size="5" value="{$no_words}" />
+	{$lng.listings.words_left}
+
+<script type="text/javascript">
+	CountTextLeft('description', 'count');
+</script>
+{/if}
+
+{/if}
+
+
+<h2>{$lng.listings.ad_information}</h2>
+
+{include file="data/description_editor.html"}
+{include file="data/form_includes.html" fields_array=$fields}
+{include file="custom_fields_form.html" fields_array=$fields type="listing"}
+
+<br/><br/>
+
+{if $ads_settings.enable_url && $tmp.enable_url}
+<h2>{$lng.listings.url}</h2>
+	<label>{$lng.listings.site_url}</label>
+	<input name="site_url" id="site_url" size="70" value="{if isset($tmp.site_url)}{$tmp.site_url}{/if}" />
+{/if}
+
+{if $ads_settings.enable_video && $tmp.enable_video}
+<h2>{$lng.listings.video}</h2>
+	<label>{$lng.listings.video_code}</label>
+	<textarea name="video_code" id="video_code" cols="55" rows="10">{if isset($tmp.video)}{$tmp.video}{/if}</textarea>
+{/if}
+
+{if $ads_settings.add_meta_with_listings}
+<h2>{$lng.listings.meta_info}</h2>
+
+{* -------------------- META_KEYWORDS --------------------- *}
+	<label>{$lng.listings.meta_keywords}</label>
+	<textarea id="meta_keywords" name="meta_keywords" cols="50" rows="3">{if isset($tmp.meta_keywords)}{$tmp.meta_keywords}{/if}</textarea>
+
+{* -------------------- META_DESCRIPTION --------------------- *}
+	<label>{$lng.listings.meta_description}</label>
+	<textarea id="meta_description" name="meta_description" cols="50" rows="3">{if isset($tmp.meta_description)}{$tmp.meta_description}{/if}</textarea>
+{/if}
+
+{if $settings.nologin_enabled && (!isset($crt_usr) || !$crt_usr)}
+<h2>{$lng.listings.your_info}</h2>
+
+{include file="custom_fields_form.html" fields_array=$user_fields type="user" tmp=$tmp.user}
+
+	{if $settings.nologin_image_verification}
+		<br/>
+		{if $settings.enable_recaptcha}
+		{include file="data/recaptcha.html"}
+		{else}
+		{include file="data/random_image.html"}
+		{/if}
+
+	{/if}
+
+{/if}
+<br/><br/>
+	<div class="buttons">
+	<span class="positive"><input type="submit" name="Submit" value="{$lng.general.save}" /></span>
+	</div>
+	<div class="clearfix"></div>
+
+</form>
+</div>
+</div> {* end editad_form *}
+</div>
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+$(document).ready(function() {
+
+$("a.imgfield").fancybox();
+
+{/literal}{if $no_words}{literal}
+
+$('.counter').textcounter({
+	type: "word",
+	max: {/literal}{$no_words}{literal},
+	stopInputAtMaximum       : true,
+	countDown: true,
+	countDownText: "%d {/literal} {$lng.listings.words_left}{literal}"
+});
+	
+{/literal}  
+{/if}
+
+var gmaps_on = {if (isset($gmaps) && $gmaps) || ( isset($user_gmaps) && $user_gmaps )}1{else}0{/if}
+// initialize google maps
+if (gmaps_on) {
+	{if $settings.map_type=="gmaps"}
+	if(!places && !dsearch)load_gmaps();
+	{else}
+	init_osm();
+	{/if}
+}
+
+
+{literal}
+
+var options = { 
+
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  beforeSubmit,  // pre-submit callback 
+        success:       successResponse  // post-submit callback 
+
+};
+
+function beforeSerialize(jqForm, options) {
+
+	$("body").addClass("loading"); 
+
+	// capturing nicEditor content
+	if (typeof myNicEditor !== 'undefined')
+	for(var i=0;i<myNicEditor.nicInstances.length;i++){myNicEditor.nicInstances[i].saveContent();}
+	
+	if (typeof data_htmlarea !== 'undefined')
+	for(var i=0;i<data_htmlarea.nicInstances.length;i++){ data_htmlarea.nicInstances[i].saveContent(); }
+
+	// international phones errors
+	var extra_phone_error = recheckIntlPhone();
+	if(extra_phone_error.length>0) {
+
+		// clean all fields possible err class
+		$(".err").removeClass("err");
+		// remove all err_labels
+		$(".err_label").remove();
+			
+		for (var i = 0, len = extra_phone_error.length; i < len; i++) {
+
+			$("#"+extra_phone_error[i]).addClass("err");
+			// add as child to first right_form
+			$("#"+extra_phone_error[i]).before('<label class="err_label">{/literal}{$lng.listings.errors.invalid_phone}{literal}</label>');
+
+		}
+
+		$("body").removeClass("loading"); 
+
+		// move the page to the first err_label element
+		$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+		return false;
+			
+	} // end international phone error
+
+	// return false to cancel submit
+
+}
+
+// pre-submit callback 
+function beforeSubmit(formData, jqForm, options) { 
+
+    var queryString = $.param(formData); 
+    return true; 
+
+} 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading"); 
+
+			if(ret.response==1) {
+
+				$.ajax({
+					type		: "GET",
+					cache		: false,
+					url		: "{/literal}{$live_site}{literal}/edit_listing.php?id={/literal}{$id}{if isset($key) && $key}&key={$key}{/if}{literal}&step=3",
+					data		: $(this).serializeArray(),
+					success: function(data) {
+
+					$("#ad_details").html(data);
+
+					//hide editad form
+					$("#editad_form").html("");
+					$("#editad_form").slideUp();
+					// show ad details
+					$("#ad_details").slideDown();
+
+					}// end data
+				}); // end ajax
+
+				return;
+
+			}
+
+			// response = 0 -> there are errors in submit ad process 
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+
+				// nicEditor fix
+				if(err_field.match("description[a-z0-9_]*")) $("#"+err_field+"_elm").addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			{/literal}{if $settings.nologin_image_verification && $settings.enable_recaptcha && (!isset($crt_usr) || !$crt_usr)}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+//initialize the AJAX form for submit ad
+ $('#newad').ajaxForm(options);
+
+$(document).on("click", "#editad", function(){ 
+
+	//show editad form
+	$("#editad_form").slideDown();
+	// hide ad details
+	$("#ad_details").slideUp();
+
+}); // end click editad
+
+}); // end document.ready
+
+function onVideo() {
+	if($('#video').is(':checked')) $("#video_div").slideDown();
+	else $("#video_div").slideUp();
+}
+
+//]]>
+
+</script>
+{/literal}
+
+{include file="footer.html"}
+{/if}
+
+{if isset($step) && $step==3}
+<div class="newad-details">
+<h2>{$lng.listings.ad_details}</h2>
+<br/>
+<table cellpadding="0" cellspacing="0" width="100%">
+
+<tr><td class="left_form">{$lng.listings.category}:</td> <td class="right_form">&nbsp;{$tmp.category}</td></tr>
+
+<tr><td class="left_form">{$lng.listings.title}:</td> <td class="right_form">&nbsp;{$tmp.title|wordwrap:70:" ":true}</td></tr>
+
+<tr><td class="left_form">{$lng.listings.description}:</td> <td class="right_form">&nbsp;{$tmp.description_formatted|wordwrap:70:" ":true}</td></tr>
+
+<tr><td>
+<script type="text/javascript">
+//<![CDATA[
+{if isset($gmaps)}
+{foreach from=$gmaps item=v}
+	{if isset($tmp[$v.caption]) && $tmp[$v.caption]}
+		{include file="data/map-ro.html" prefix="_ro"}
+	{/if}
+{/foreach}
+{/if}
+
+{if isset($user_gmaps)}
+{foreach from=$user_gmaps item=v}
+	{if isset($tmp.user[$v.caption]) && $tmp.user[$v.caption]}
+		{include file="data/map-ro.html" tmp=$tmp.user prefix="_ro"}
+	{/if}
+{/foreach}
+{/if}
+
+{literal}
+function init_map_ro() {
+
+{/literal}
+	{if isset($gmaps)}
+	{foreach from=$gmaps item=v}
+		{if isset($tmp[$v.caption]) && $tmp[$v.caption]}
+			{include file="data/init_map.html" prefix="_ro"}
+		{/if}
+	{/foreach}
+	{/if}
+
+	{if isset($user_gmaps)}
+	{foreach from=$user_gmaps item=v}
+		{if isset($tmp.user[$v.caption]) && $tmp.user[$v.caption]}
+			{include file="data/init_map.html" tmp=$tmp.user prefix="_ro"}
+		{/if}
+	{/foreach}
+	{/if}
+{literal}
+
+	}
+
+$(document).ready(function() {
+
+{/literal}
+
+	var gmaps_on = {if (isset($gmaps) && $gmaps) || ( isset($user_gmaps) && $user_gmaps )}1{else}0{/if};
+	// initialize google maps
+	if (gmaps_on) setTimeout(() => { init_map_ro();}, 1000);
+{literal}
+
+});
+{/literal}
+
+//]]>
+</script>
+</td></tr>
+
+{foreach from=$fields_array item=v}
+
+{if $v.type=="price" && $ads_settings.enable_price}
+
+{if in_array("price_extra", $modules_array) && isset($pe_settings[$fieldset])}
+
+{include file="modules/price_extra/custom_fields_form_list.html" fields_array=$fields_array values_array=$tmp}
+
+{else}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if $tmp.price>=0}{$tmp.price_curr}{/if}</td></tr>
+
+{/if}
+
+{elseif $v.type=="image"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.caption]) && $tmp[$v.caption]}
+<a href="{$live_site}/uploads/{$v.caption}/{$tmp[$v.caption]}" class="imgfield"><img src="{$template_path}images/camera.gif"></a>{/if}
+</td></tr>
+
+{elseif $v.type=="file"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.caption]) && $tmp[$v.caption]}
+<a href="{$live_site}/uploads/{$v.caption}/{$tmp[$v.caption]}"><img src="{$template_path}/images/download.png" class="tooltip" alt="" title="{$lng.general.download}"/></a>{/if}
+</td></tr>
+
+{elseif $v.type=="video"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.caption]) && $tmp[$v.caption]}
+	<video controls width="350px">
+	<source src="{$live_site}/uploads/{$v.caption}/{$values_array[$v.caption]}" type="video/mp4">
+	Your browser does not support the video tag.
+	</video>
+{/if}
+</td></tr>
+
+{elseif $v.type=="audio"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.caption]) && $tmp[$v.caption]}
+	<audio controls>
+	<source src="{$live_site}/uploads/{$v.caption}/{$values_array[$v.caption]}" type="audio/mpeg">
+	Your browser does not support the audio element.
+	</audio>
+{/if}
+</td></tr>
+
+{elseif $v.type=="multiselect"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;
+{if isset($tmp[$v.caption]) && $tmp[$v.caption]}{$tmp[$v.caption]|@implode:', '}{else}-{/if}
+</td></tr>
+
+{elseif $v.type=="google_maps"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form"> {if $tmp[$v.caption]}
+<input type="hidden" name="{$v.caption}" id="{$v.caption}" value="{if isset($tmp[$v.caption])}{$tmp[$v.caption]}{/if}">
+<div id="gm_{$v.caption}_ro" style="width: 450px; height: 400px"></div>
+
+{/if}
+
+</td></tr>
+
+{elseif $v.type=='checkbox_group'}
+
+<tr>
+<td class="left_form">{$v.name}</td>
+<td class="right_form">
+<table cellpaccing=0 cellspacing=0 width="100%">
+	<tr>
+	{foreach from=$v.extra_elements_array item=t name=check}
+		<td width="30%" height=25>
+		{if isset($tmp[$v.caption]) && in_array($t.name, $tmp[$v.caption])}<img src="{$template_path}images/checkbox_on.png">{else}<img src="{$template_path}images/checkbox_off.png">{/if}&nbsp;
+		{if $v.prefix!=""} {$v.prefix} {/if}
+		{$t.name}
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		</td>
+		{if $smarty.foreach.check.index!=0 && $smarty.foreach.check.index%3==2}</tr><tr>{/if}
+	{/foreach}
+</tr>
+</table>
+</td></tr>
+
+{elseif $v.type=="depending"}
+
+<tr><td class="left_form">{$v.depending.name1}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.depending.caption1]) && $tmp[$v.depending.caption1]}{$tmp[$v.depending.caption1]}{else}-{/if}</td></tr>
+<tr><td class="left_form">{$v.depending.name2}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.depending.caption2]) && $tmp[$v.depending.caption2]}{$tmp[$v.depending.caption2]}{else}-{/if}</td></tr>
+
+{if $v.depending.no>=3}
+<tr><td class="left_form">{$v.depending.name3}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.depending.caption3]) && $tmp[$v.depending.caption3]}{$tmp[$v.depending.caption3]}{else}-{/if}</td></tr>
+{/if}
+
+{if $v.depending.no>=4}
+<tr><td class="left_form">{$v.depending.name4}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.depending.caption4]) && $tmp[$v.depending.caption4]}{$tmp[$v.depending.caption4]}{else}-{/if}</td></tr>
+{/if}
+
+{if $v.depending.no>=5}
+<tr><td class="left_form">{$v.depending.name5}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.depending.caption5]) && $tmp[$v.depending.caption5]}{$tmp[$v.depending.caption5]}{else}-{/if}</td></tr>
+{/if}
+
+{elseif $v.type=="checkbox"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.caption]) && $tmp[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}</td></tr>
+
+{elseif $v.type=="youtube"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.caption]) && $tmp[$v.caption]}{$tmp[$v.caption]|regex_replace:'/ width="[0-9]+"/':' width="500"'|regex_replace:'/ height="[0-9]+"/':' height="388"'}{else}-{/if}</td></tr>
+{else}
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp[$v.caption]) && $tmp[$v.caption]}{$tmp[$v.caption]}{/if}</td></tr>
+
+{/if}
+
+{/foreach}
+
+</table>
+<br/>
+
+{if $ads_settings.add_meta_with_listings}
+	<h2>{$lng.listings.meta_info}</h2>
+	<br/>
+	<table cellpadding="0" cellspacing="0" width="100%">
+	<tr><td class="left_form">{$lng.listings.meta_keywords}:</td> <td class="right_form">&nbsp;{if isset($tmp.meta_keywords)}{$tmp.meta_keywords}{else}-{/if}</td></tr>
+	<tr><td class="left_form">{$lng.listings.meta_description}:</td> <td class="right_form">&nbsp;{if isset($tmp.meta_description)}{$tmp.meta_description}{else}-{/if}</td></tr>
+	</table>
+	<br/>
+{/if}
+
+{if !$tmp.user_id}
+<h2>{$lng.listings.your_info}</h2>
+<br/>
+<table cellpadding="0" cellspacing="0" width="100%">
+
+{* nologin fields *}
+
+
+{foreach from=$user_fields item=v}
+
+{if $v.type=="image"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp.user[$v.caption]) && $tmp.user[$v.caption]}
+<a href="{$live_site}/uploads/{$v.caption}/{$tmp.user[$v.caption]}" class="imgfield"><img src="{$template_path}images/camera.gif"></a>{/if}
+</td></tr>
+
+{elseif $v.type=="file"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp.user[$v.caption]) && $tmp.user[$v.caption]}
+<a href="{$live_site}/uploads/{$v.caption}/{$tmp.user[$v.caption]}"><img src="{$template_path}/images/download.png" class="tooltip" alt="" title="{$lng.general.download}"/></a>{/if}
+</td></tr>
+
+{elseif $v.type=="multiselect"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;
+{if isset($tmp.user[$v.caption])}{$tmp.user[$v.caption]|@implode:', '}{/if}
+</td></tr>
+
+{elseif $v.type=="google_maps"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form"> {if isset($tmp.user[$v.caption]) && $tmp.user[$v.caption]}
+<input type="hidden" name="{$v.caption}" id="{$v.caption}" value="{$tmp.user[$v.caption]}">
+<div id="gm_{$v.caption}" style="width: 450px; height: 400px"></div>
+
+{/if}
+
+</td></tr>
+
+{elseif $v.type=='checkbox_group'}
+
+<tr>
+<td class="left_form">{$v.name}</td>
+<td class="right_form">
+<table cellpaccing=0 cellspacing=0 width=100%>
+	<tr>
+	{foreach from=$v.extra_elements_array item=t name=check}
+		<td width="30%" height=25>
+		{if isset($tmp.user[$v.caption]) && in_array($t.name, $tmp.user[$v.caption])}<img src="{$template_path}images/checkbox_on.png">{else}<img src="{$template_path}images/checkbox_off.png">{/if}&nbsp;
+		{if $v.prefix!=""} {$v.prefix} {/if}
+		{$t.name}
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		</td>
+		{if $smarty.foreach.check.index!=0 && $smarty.foreach.check.index%3==2}</tr><tr>{/if}
+	{/foreach}
+</tr>
+</table>
+</td></tr>
+
+{elseif $v.type=="depending"}
+
+<tr><td class="left_form">{$v.depending.name1}:</td> <td class="right_form">&nbsp;{if isset($tmp.user[$v.depending.caption1])}{$tmp.user[$v.depending.caption1]}{/if}</td></tr>
+<tr><td class="left_form">{$v.depending.name2}:</td> <td class="right_form">&nbsp;{if isset($tmp.user[$v.depending.caption2])}{$tmp.user[$v.depending.caption2]}{/if}</td></tr>
+
+{if $v.depending.no>=3}
+<tr><td class="left_form">{$v.depending.name3}:</td> <td class="right_form">&nbsp;{if isset($tmp.user[$v.depending.caption3])}{$tmp.user[$v.depending.caption3]}{/if}</td></tr>
+{/if}
+
+{if $v.depending.no==4}
+<tr><td class="left_form">{$v.depending.name4}:</td> <td class="right_form">&nbsp;{if isset($tmp.user[$v.depending.caption4])}{$tmp.user[$v.depending.caption4]}{/if}</td></tr>
+{/if}
+
+{elseif $v.type=="checkbox"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp.user[$v.caption]) && $tmp.user[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}</td></tr>
+
+{elseif $v.type=="youtube"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp.user[$v.caption]) && $tmp.user[$v.caption]}{$tmp.user[$v.caption]|regex_replace:'/ width="[0-9]+"/':' width="500"'|regex_replace:'/ height="[0-9]+"/':' height="388"'}{/if}</td></tr>
+
+{elseif $v.type!="terms"}
+
+<tr><td class="left_form">{$v.name}:</td> <td class="right_form">&nbsp;{if isset($tmp.user[$v.caption])}{$tmp.user[$v.caption]}{/if}</td></tr>
+
+{/if}
+{/foreach}
+
+
+</table>
+<br/>
+{/if}{* end if $crt_usr *}
+
+<div class="form_button">
+		<strong><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id p2=$tmp.title}{else}{$live_site}/details.php?id={$id}{/if}">{$lng.general.view}</a></strong>
+</div>
+
+<div class="form_button">
+		<strong><a id="editad" class="gray" href="javascript:;">{$lng.navbar.editad}</a></strong>
+</div>
+
+<br/>
+
+{if isset($tmp.enable_video) && $tmp.enable_video && isset($tmp.video) && $tmp.video}
+<h2>{$lng.listings.video}</h2>
+<br/>
+<center>{$tmp.video|regex_replace:'/ width="[0-9]+"/':' width="500"'|regex_replace:'/ height="[0-9]+"/':' height="388"'}</center>
+{/if}{* end video *}
+
+{if isset($tmp.enable_url) && $tmp.enable_url && isset($tmp.site_url) && $tmp.site_url}
+<h2>{$lng.listings.url}</h2>
+<br/>
+<a href="{$tmp.site_url}" target="_blank" rel="nofollow">{$tmp.site_url}</a>
+{/if}
+<br/>
+
+</div>
+
+{/if} {* end step 3 *}

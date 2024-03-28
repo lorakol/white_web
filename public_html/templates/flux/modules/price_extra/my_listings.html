@@ -1,0 +1,5 @@
+<div id="offers_list{$v.id}" class="offers_list hidden">
+{foreach from=$v.offers item=t}
+<div class="box" id="offer{$t.id}"><a href="javascript:;" onclick="onDeleteOffer('{$t.id}','{$lng_pe.confirm_delete|addslashes}');" class="ubtn delbtn">{$lng.general.delete}</a>&nbsp;<a href="{$live_site}/modules/price_extra/contact.php?id={$t.id}" class="ocontact ubtn">{$lng.general.contact}</a> {$t.contact_name} | {$t.contact_email} {$lng_pe.offered} <span class="price">{$t.offer_curr}</span></div>
+{/foreach}
+</div>

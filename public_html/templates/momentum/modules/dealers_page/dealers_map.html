@@ -1,0 +1,273 @@
+<script src="{$live_site}/libs/encodings.js"></script>
+
+<div id="dealers_gm" style="{if $dealers_page_settings.map_visible}width: 100%; height: 400px; margin-top: 20px; margin-bottom: 20px; border: 1px solid #aaaaaa;{/if}"></div>
+<script>
+//<![CDATA[
+
+$(document).ready(function() {
+
+	var loaded = 0;
+	$("#showMap").click(function(){
+
+		var w1 = $(".graytab").width();
+
+		$("#dealers_gm").css("width", w1);
+		$("#dealers_gm").css("height", 400);
+		$("#dealers_gm").css("border", "1 px solid #f00"); 
+		$("#dealers_gm").css("margin-top", "20px");
+		$("#dealers_gm").css("margin-bottom", "20px");
+		$("#dealers_gm").css("padding", "10px");
+
+		$("#dealers_gm").slideDown(function() { 
+
+			$("#hideMap").show();
+			$("#showMap").hide();
+			{if $settings.map_type=="gmaps"}
+			if(!loaded) load_gmaps();
+			{else}
+			init_osm();
+			{/if}
+		 });
+
+	});
+
+	$("#hideMap").click(function(){
+
+		$("#dealers_gm").hide();
+		$("#showMap").show();
+		$("#hideMap").hide();
+
+	});
+
+	{if $dealers_page_settings.map_visible}
+		{if $settings.map_type=="gmaps"}
+		load_gmaps();
+		{else}
+		init_osm();
+		{/if}
+	{/if}
+
+});
+
+{if $settings.map_type=="gmaps"}
+function init_gmap() {
+
+	searchGmapsMapLoad();
+	loaded = 1;
+
+}
+
+function searchGmapsMapLoad() {
+
+	var mapHeight = 14;//{$settings.maps_default_height};
+	var myLatlng = new google.maps.LatLng({$settings.maps_default_lat}, {$settings.maps_default_long});
+
+	{literal}
+	var myOptions = {
+  		zoom: mapHeight,
+  		center: myLatlng,
+		panControl: true,
+		zoomControl: true,
+		scaleControl: true,
+		mapTypeControl: true,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+
+	dealers_map = new google.maps.Map(document.getElementById("dealers_gm"), myOptions);
+
+	google.maps.event.addListenerOnce(dealers_map, 'bounds_changed', function(){
+
+		bounds = dealers_map.getBounds();
+		{/literal}
+
+		{foreach from=$dealers_array item=d}
+
+		old=new Array();
+		{if $d[$gmap_field]} old = splitMapsCoord('{$d[$gmap_field]}');{/if}
+		var lat = 0;
+		var long = 0;
+		var h = mapHeight;
+
+		{literal}
+
+		// get coordinates from the map field
+		if (old.length>0) {
+			lat = parseFloat(old[0]);
+			long = parseFloat(old[1]);
+			h = parseInt(old[2]);
+		} 
+		else 
+		// try to get the coordinates using geocoding
+		{
+			var address = {/literal}"{$d.search_map_location}"{literal};
+			var coordinates = {/literal}"{$d.search_map_coordinates}"{literal};
+
+			if(coordinates) {
+
+				var split_data=coordinates.split(",");
+				lat = split_data[0];
+				long = split_data[1];
+
+				if(lat && long) {
+				
+				// add the point to the map
+				p = new google.maps.LatLng(lat , long);
+				{/literal}
+				addPoint(p, '{$d.info|addslashes}', '{$d.id}', bounds);
+				{literal}
+				bestFitWithCenter(dealers_map, bounds);
+				} // end if lat and long
+			}
+			else 
+			if(address) {
+
+				$.post("{/literal}{$live_site}{literal}/include/get_info.php?type=geocoding", { address: base64_encode(address) }, function(data){ 
+
+ 					var split_data=data.split("|");
+						lat = split_data[0];
+						long = split_data[1];
+
+						if(lat && long) {
+						// add the point to the map
+						p = new google.maps.LatLng(lat , long);
+						{/literal}
+						addPoint(p, '{$d.info|addslashes}', '{$d.id}', bounds);
+						{literal}
+						bestFitWithCenter(dealers_map, bounds);
+						} // end if lat && long
+
+	});	
+	
+			}// end if address
+
+		}
+
+		if(lat && long) {	
+		{/literal}
+
+			p = new google.maps.LatLng( lat , long );
+			addPoint(p, '{$d.info|addslashes}', '{$d.id}', bounds);
+
+		} // end if point
+	
+		{/foreach}
+
+		{literal}
+		bestFitWithCenter(dealers_map, bounds);
+
+	}); // end bounds_changed
+
+}
+
+function bestFitWithCenter(map, bounds) {
+
+	mapCenter = bounds.getCenter();
+	var swLL = bounds.getSouthWest();
+	var neLL = bounds.getNorthEast();
+	//leave margin each side 
+	var marginRatio = 0.0001;
+
+	var minLat = Math.min(2*mapCenter.lat() - neLL.lat(), swLL.lat());
+	var maxLat = Math.max(2*mapCenter.lat() - swLL.lat(),  neLL.lat());
+	var minLng = Math.min(2*mapCenter.lng() - neLL.lng(), swLL.lng());
+	var maxLng = Math.max(2*mapCenter.lng() - swLL.lng(), neLL.lng());
+
+	var minLatLng = new google.maps.LatLng(minLat-marginRatio, minLng-marginRatio);
+	var maxLatLng = new google.maps.LatLng(maxLat+marginRatio, maxLng+marginRatio);
+
+	bounds.extend(maxLatLng);
+	bounds.extend(minLatLng);
+
+	map.setCenter(mapCenter);
+	map.fitBounds(bounds);
+
+}
+
+
+function addPoint(point, info, user_id, bounds) {
+
+	bounds.extend(point);
+	var marker = new google.maps.Marker({
+	      position: point,
+	      title: info
+	});
+
+	marker.setMap(dealers_map);
+
+/*	google.maps.event.addListener(marker, "click", function(){
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}/include/get_info.php?type=user&id={literal}"+user_id,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$.magnificPopup.open({
+				items: {
+				src: data,
+				type: 'inline'
+				}
+			});
+		}
+	});
+			
+        });*/
+
+}
+
+{/literal}
+{else} {* osm *}
+
+function init_osm() {
+
+	searchOsmMapLoad();
+	loaded = 1;
+
+}
+
+function searchOsmMapLoad() {
+
+	var mapHeight=14;
+	var dealers_map = L.map("dealers_gm").setView([{$settings.maps_default_lat}, {$settings.maps_default_long}], mapHeight);
+
+    L.tileLayer('https://tile.openstreetmap.org/{literal}{z}/{x}/{y}{/literal}.png', {
+     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+      maxZoom: 18,
+    }).addTo(dealers_map);
+ 
+	var markerArray = [];
+	var osm_marker;
+	{foreach from=$dealers_array item=l}
+	
+		old=new Array();
+		{if $d[$gmap_field]} old = splitMapsCoord('{$d[$gmap_field]}');{/if}
+		var lat = 0;
+		var long = 0;
+		var h = mapHeight;
+
+		// get coordinates from the map field
+		if (old.length>0) {
+			lat = parseFloat(old[0]);
+			long = parseFloat(old[1]);
+			h = parseInt(old[2]);
+		} 
+		else { // !!!!!!! get coordinates with geocoding
+		
+		}
+		
+		if(lat && long) {	
+		
+			markerArray.push([lat, long]);
+			
+			osm_marker = L.marker([lat, long]).addTo(dealers_map);
+			osm_marker.bindPopup("{$d.info|addslashes}").openPopup();
+
+		}
+		
+	{/foreach}
+	if(markerArray.length>0)
+		dealers_map.fitBounds(markerArray);
+}
+{/if}
+
+</script>

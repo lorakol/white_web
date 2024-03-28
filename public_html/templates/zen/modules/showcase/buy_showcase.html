@@ -1,0 +1,98 @@
+{include file="header.html"}
+{include file="modules/showcase/js/showcase_js.html"}
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="wait"></div>
+
+<div id="form_container">
+<h1>{$lng_sw.buy_showcase}</h1>
+
+<div class="form_content">
+
+<div class="error" {if !$error}style="display: none;"{/if}><p>{$error}</p></div>
+
+<form name="showcase" id="showcase" method="post" action="buy_showcase.php?step=2" class="main">
+
+<input type="hidden" name="full_total" id="full_total" value="{$sw_settings.price}"/>
+
+<div class="dcenter eop">
+	<div class="left_div">{$lng_sw.buy_showcase}</div>
+	<div class="right_div"><input type="checkbox" name="sw" onclick="adjustTotal(this.form, {$sw_settings.price}, document.options.sw, {$appearance.price_format_decimals} )" checked="checked" disabled="disabled" />&nbsp;{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$sw_settings.price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}&nbsp;{if isset($pending_showcase) && $pending_showcase}<span class="light">({$lng.listings.pending})</span>{/if}</div>
+</div>
+
+{if $enable_coupons}
+<div class="dcenter eop">
+	<div class="left_div">{$lng.listings.enter_coupon} :</div>
+	<div class="option_right"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" value="{if isset($discount_code) && $discount_code}{$discount_code}{/if}"/></div>
+</div>
+{/if}
+
+{if $credits_allowed}
+<div class="dcenter eop" id="div_credits" {if !$total}style="display: none;"{/if}>
+
+<input type="hidden" name="credit_value" id="credit_value" value="{$credits_settings.unit}"/>
+<input type="hidden" name="current_credits" id="current_credits" value="{$current_credits}"/>
+
+	<div class="left_div">{$lng.credits.credits}</div>
+	<div class="right_div"><b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}<span id="not_enough_credits" {if $current_credits==0 || $current_credits>=$needed_credits}style="display: none;"{/if}> ( {$lng.credits.not_enough_credits} ) </span><span id="no_credits" {if $current_credits==0 || $current_credits<$needed_credits}style="display: none;"{/if}> ( <span id="needed_credits">{$needed_credits}</span> <span id="scredit" {if $needed_credits>1}style="display: none;"{/if}>{$lng.credits.scredit}</span><span id="scredits" {if $needed_credits==1}style="display: none;"{/if}>{$lng.credits.scredits}</span> ) </span>
+</div>
+</div>
+{/if}
+
+<div class="dcenter eop" id="div_total" {if !$total}style="display: none;"{/if}>
+
+{if $no_processors>1 || ($no_processors<=1 && $credits_allowed)}
+
+<div class="left_div">{$lng.listings.choose_payment_method} :</div>
+<div class="right_div">
+{foreach from=$payment_processors name=pp item=v}
+<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (!$credits_allowed || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+
+<br/>
+{/foreach}
+</div>
+{else}
+<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+<div class="left_div">{$lng.subscribe.payment_method}:</div>
+<div class="right_div">{$payment_processors[0].processor_title}</div>
+
+{/if}
+<input type="hidden" id="selected_processor" value="{$payment_processors[0].processor_code}"/>
+
+</div>
+
+<br/>
+
+<div class="dcenter eop" style="text-align: right">
+{$lng.listings.total}: <b>
+{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+</div>
+
+<div class="dcenter eop topnoborder" id="tax_info" style="display: none;" style="text-align: right">
+<b>{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;):</b> <b><span id="tax"></span></b>
+</div>
+
+<div class="dcenter eop topnoborder" id="total_with_tax_info" style="display: none;" style="text-align: right">
+<b>{$lng.general.total_with_tax}:&nbsp;<span class="price" id="total_with_tax"></span></b>
+</div>
+<br/>
+<br/>
+
+
+	<div class="dcenter form_footer">
+	<div class="buttons">
+		<span class="positive"><input type="submit" name="Submit" value="{$lng.general.submit}" /></span>
+		<span class="negative"><input type="submit" name="Cancel" value="{$lng.general.cancel}" /></span>
+	</div>
+	</div>
+
+
+</form>
+<div id="payment" style="display: none;"></div>
+
+</div>
+</div>
+
+{include file="footer.html"}

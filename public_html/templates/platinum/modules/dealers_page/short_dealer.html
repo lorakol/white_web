@@ -1,0 +1,47 @@
+<div class="dealer">
+
+{capture name=some_content assign=dealer_url}
+{if $v.store}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$v.id p2=$v[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$v.id}{/if}
+{else}
+{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=$v.id p2=$v[$settings.contact_name_field]}{else}{$live_site}/user_listings.php?id={$v.id}{/if}
+{/if}
+{/capture}
+
+	{if $dealers_page_settings.logo_field && $v[$dealers_page_settings.logo_field]}
+
+	{capture name=some_content assign=logo_field}{if $dealers_page_settings.logo_field=="store_banner"}/images/store/{$v[$dealers_page_settings.logo_field]}{else}/uploads/{$dealers_page_settings.logo_field}/{$v[$dealers_page_settings.logo_field]}{/if}{/capture}
+
+	<div class="dealer_photo">
+	<a href="{$dealer_url}">
+	<img src="{$live_site}{$logo_field}" class="pic" alt="{$v[$dealers_page_settings.name_field]}" />
+	</a>
+	</div>
+	{/if}
+
+	<div class="dealer_details">
+		<h3><a href="{$dealer_url}">{$v[$dealers_page_settings.name_field]}</a></h3>
+
+		{* ratings *}
+		{if in_array("ratings",$modules_array)}
+		<div>{section name=loop start=0 loop=5 step=1}
+		<img src="{$live_site}/modules/ratings/css/images/star{if $v.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />
+		{/section}</div>
+		{/if}
+
+		{foreach from=$dealers_page_settings.details_fields_array item=t}
+			{if $v[$t]}<span>{$field_names[$t]}:</span> {$v[$t]}<br/>{/if}
+		{/foreach}
+	</div>
+	<div class="dealer_more">
+
+	{if $v.no_listings}
+	<a href="{$dealer_url}">
+	<div class="buttonwrapper"><div class="gray-button-left"><span class="gray-button-right">{$lng.listings.details}</span></div></div>
+	</a>
+	{/if}
+
+
+	</div>
+</div>
+<div class="clearfix"></div>

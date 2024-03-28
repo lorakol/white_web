@@ -1,0 +1,242 @@
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<div id="form_container">
+<h1>{$lng_ba.bump_your_ad} <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id}{else}{$live_site}/details.php?id={$id}{/if}"> #{$id}</a></h1>
+
+<div class="form_content">
+
+<div class="error" {if !$error}style="display: none;"{/if}><p>{$error}</p></div>
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function () {
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { 
+		//var queryString = $.param(formData); 
+		if($("#bump").find("input[type='submit']:focus").attr("id")=="Cancel") {
+			location.href='../../useraccount.php';
+			return false;
+		}
+
+		return true;  
+	},
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1) {
+
+				// go to payment page
+				var selected_processor = $('#selected_processor').val();
+
+				$("#payment").html(ret.payment_form);
+
+				if(selected_processor=="iyzico") {
+				    $("body").removeClass("loading");
+				}
+				else 
+				if(selected_processor=="klarna") {
+					$("body").removeClass("loading");
+					$("#payment").slideDown();
+					$('html,body').animate({scrollTop:$("#payment").offset().top}, 'slow');
+					$(".form_footer").hide();
+				}
+				else if(selected_processor=="stripe") {
+					$("#Submit").attr("disabled", "disabled");
+					setTimeout(function(){ $( ".stripe-button-el" ).trigger("click"); }, 2000);
+				}
+				else 
+					$("#payment_form").submit();
+
+				return;
+			}
+
+			// response = 0 -> show the error
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+
+			$("body").removeClass("loading"); 
+
+} 
+
+//initialize the AJAX form
+ $('#bump').ajaxForm(options);
+
+// *********** tax value **************
+{/literal}
+
+{if $no_processors>1 || ($no_processors==1 && $credits_allowed)}
+only_processor = 0;
+{else}
+only_processor = 1;
+{/if}
+
+{if $total}
+
+if(only_processor)
+	var processor = $('input[name=processor]').val();
+else 
+	var processor = $('input:radio[name=processor]:checked').val();		
+
+var total = $("#full_total").val();
+calculateTaxB(processor, total);
+
+
+{/if} {* end if total *}
+
+{literal}
+
+
+$('input:radio[name=processor]').change(function() { 
+
+	processor = $('input:radio[name=processor]:checked').val();
+	calculateTaxB(processor, $("#full_total").val());
+
+	// for embedded payments
+	$("#selected_processor").val(processor);
+	reinit();
+
+})
+
+// end tax value
+
+
+}); // end document ready
+
+{/literal}
+
+</script>
+
+<form name="bump" id="bump" method="post" action="bump.php?id={$id}&step=2">
+
+<input type="hidden" name="full_total" id="full_total" value="{$ba_settings.price}"/>
+
+<div class="dcenter eop">
+	<div class="left_div">{$lng.listings.listing} ID #{$id}</div>
+	<div class="right_div"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id p2=$listing_title}{else}{$live_site}/details.php?id={$id}{/if}" target="_blank">{$lng.general.view}</a></div>
+</div>
+
+<div class="dcenter eop topnoborder">
+	<div class="left_div">{$lng_ba.bump_your_ad}</div>
+	<div class="right_div"><input type="checkbox" class="noborder" name="ba" onclick="adjustTotal(this.form, {$ba_settings.price}, document.options.ba, {$appearance.price_format_decimals} )" checked="checked" disabled="disabled" />&nbsp;{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ba_settings.price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}&nbsp;{if $pending_bump}({$lng.listings.pending}){/if}</div>
+</div>
+
+{if $enable_coupons}
+<div class="dcenter eop topnoborder" id="div_discount" {if !$total}style="display: none;"{/if}>
+	<div class="left_div">{$lng.listings.enter_coupon} :</div>
+	<div class="right_div"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" value="{$discount_code}"/></div>
+</div>
+{/if}
+
+{if $credits_allowed && !$nologin}
+<div class="dcenter eop topnoborder" id="div_credits" {if !$total}style="display: none;"{/if}>
+
+<input type="hidden" name="credit_value" id="credit_value" value="{$credits_settings.unit}"/>
+<input type="hidden" name="current_credits" id="current_credits" value="{$current_credits}"/>
+
+	<div class="left_div">{$lng.credits.credits}</div>
+	<div class="right_div"><b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}<span id="not_enough_credits" {if $current_credits==0 || $current_credits>=$needed_credits}style="display: none;"{/if}> ( {$lng.credits.not_enough_credits} ) </span><span id="no_credits" {if $current_credits==0 || $current_credits<$needed_credits}style="display: none;"{/if}> ( <span id="needed_credits">{$needed_credits}</span> <span id="scredit" {if $needed_credits>1}style="display: none;"{/if}>{$lng.credits.scredit}</span><span id="scredits" {if $needed_credits==1}style="display: none;"{/if}>{$lng.credits.scredits}</span> ) </span>
+</div>
+</div>
+{/if}
+
+<div class="dcenter eop topnoborder" id="div_total" {if !$total}style="display: none;"{/if}>
+
+{if $no_processors>1 || ($no_processors<=1 && $credits_allowed)}
+
+<div class="left_div">{$lng.listings.choose_payment_method} :</div>
+<div class="right_div">
+{foreach from=$payment_processors name=pp item=v}
+<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (!$credits_allowed || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+
+<br/>
+{/foreach}
+</div>
+{else}
+<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+<div class="left_div">{$lng.subscribe.payment_method}:</div>
+<div class="right_div">{$payment_processors[0].processor_title}</div>
+
+{/if}
+<input type="hidden" id="selected_processor" value="{$payment_processors[0].processor_code}"/>
+
+</div>
+
+<br/>
+
+<div class="dcenter eop" style="text-align: right">
+{$lng.listings.total}: <b>
+{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+</div>
+
+<div class="dcenter eop topnoborder" id="tax_info" style="display: none;" style="text-align: right">
+<b>{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;):</b> <b><span id="tax"></span></b>
+</div>
+
+<div class="dcenter eop topnoborder" id="total_with_tax_info" style="display: none;" style="text-align: right">
+<b>{$lng.general.total_with_tax}:&nbsp;<span class="price" id="total_with_tax"></span></b>
+</div>
+<br/>
+<br/>
+
+	<div class="dcenter form_footer">
+	<div class="buttons">
+		<span class="positive"><input type="submit" name="Submit" value="{$lng.general.submit}" /></span>
+	</div>
+	</div>
+
+</form>
+<div id="payment" style="display: none;"></div>
+
+</div>{* end form_container *}
+</div> {* end main1 *}
+
+<script type="text/javascript">
+
+function calculateTaxB(p, t) {
+	var site = "{$live_site}";
+//alert("calculate tax "+p+"  "+t+" only_pr = "+only_processor);
+	$.post(site+"/include/get_info.php?type=processor", { processor: p, total: t }, function(data){ 
+
+		var split_data=data.split("|");
+		tax = split_data[0];
+		full_total = split_data[1];
+		tax_str = split_data[2];
+
+		if(tax) {
+
+			$("#tax_info").show();
+			$("#total_with_tax_info").show();
+			$("#tax").html(tax);
+			$("#tax_str").html(tax_str);
+			$("#total_with_tax").html(full_total);
+
+		}
+
+		else {
+
+			$("#tax_info").hide();
+			$("#total_with_tax_info").hide();
+
+		}
+
+	});	
+
+}
+</script>
+
+{include file="footer.html"}

@@ -1,0 +1,815 @@
+<!-- REFINE -->
+<div id="refine"> 
+
+<div class="box-heading top-box-text"><div class="box-heading-left"><div class="box-heading-right">{$lng.search.refine_search}</div></div></div>
+<div class="box2-bottom-gray"><div class="box-left"><div class="box-right"><div class="box-bottom-left"><div class="box2-bottom-right">
+
+<div class="vert-box"> 
+
+<form method="post" action="{$live_site}/listings.php" name="search" id="search">
+
+{if isset($post_array.category) && $post_array.category}<input type="hidden" name="category" value="{$post_array.category}" />{/if}
+{if isset($post_array.order) && $post_array.order}<input type="hidden" name="order" value="{$post_array.order}" />{/if}
+{if isset($post_array.order_way) && $post_array.order_way}<input type="hidden" name="order_way" value="{$post_array.order_way}" />{/if}
+{if isset($post_array.page) && $post_array.page}<input type="hidden" name="page" value="{$post_array.page}" />{/if}
+
+{if !isset($category_name)}{$category_name=''}{/if}
+
+{* Uncomment the following for search on stock no *} 
+{*
+<h4>{$lng.listings.stock_no}</h4>
+
+{if $seo_settings.enable_mod_rewrite}
+	{capture name=sfield assign=sfield}##id##/{/capture}
+	{seo->makeSearchLink p1=$post_array p2=$page p3='page|category|id' p4='##id##' p5=$category_name assign='constructed_url'}
+{else}
+	{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!='id' && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+{/if}
+
+{if !isset($post_array.id) || !$post_array.id}
+<div class="property current">#{$post_array.id}&nbsp;<a href="{if $seo_settings.enable_mod_rewrite}{$constructed_url|replace:$sfield:''}{else}{$constructed_url}{/if}" class="remove">&nbsp;<img src="{$template_path}images/remove.gif" class="tooltip" title="{$lng.general.remove}" alt="" /></a></div>
+{else}
+<input name="id" id="id" type="text" style="width: 170px;" />
+<input type="image" class="input_img" src="{$template_path}/images/search-arrow.gif" />
+{/if}
+<hr/>
+*}
+{* ---------------- CATEGORIES ------------------ *}
+{if $seo_settings.enable_mod_rewrite}
+{seo->makeSearchLink p1=$post_array p2=$page p3='category|page' p4='cat' p5=$category_name assign='constructed_url'}
+{else}
+{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!="category" && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+{/if}
+
+{if !$seo_settings.sef_legacy_mode}
+    {capture name=cfield assign=cfield}##cat##{/capture}
+{else}
+    {capture name=cfield assign=cfield}/##cat##{/capture}
+{/if}
+
+<h4>{$lng.listings.category}</h4>
+{if (isset($post_array.category) && $post_array.category) || ( isset($cat) && $cat) }
+<div class="property current">{$category_name}&nbsp;<a href="{if $seo_settings.enable_mod_rewrite}{$constructed_url|replace:$cfield:''}{else}{$constructed_url}{/if}" class="remove">&nbsp;<img src="{$template_path}images/remove.gif" class="tooltip" title="{$lng.general.remove}" alt="" /></a></div>
+{/if}
+
+{if isset($categories_array) && $categories_array|@count}
+
+{if !$seo_settings.enable_mod_rewrite}{if $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{else}{assign var="separator" value="?"}{/if}{/if}
+
+{foreach from=$categories_array item=v name="categories_list"}
+<div class="property"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$constructed_url}{$separator}category={$v.id}{/if}">{$v.name}{if $v.count>0}&nbsp;({$v.count}){/if}</a></div>
+{if $categories_array|@count>10 && $smarty.foreach.categories_list.index==9}
+<div class="more" id="more_categories_link"><a class="more" id="more_categories">{$lng.search.more}</a></div>
+<div style="display: none;" id="more_categories_list">
+{/if}
+{/foreach}
+{if $categories_array|@count>10}
+<div class="more"><a class="more" id="less_categories">{$lng.search.less}</a></div>
+</div>
+
+	<script type="text/javascript">
+		{literal}
+		$("a#more_categories").click(function(){ 
+			$("#more_categories_list").fadeIn(1000);
+			$("#more_categories_link").hide();
+		});
+
+		$("a#less_categories").click(function(){ 
+			$("#more_categories_list").slideUp(300);
+			$("#more_categories_link").show();
+		});
+
+		{/literal}
+	</script>
+
+{/if}
+{/if}
+
+{foreach from=$fields item=v}
+
+	{if $seo_settings.enable_mod_rewrite}{assign var="separator" value="?"}{else}{assign var="separator" value="&amp;"}{/if}
+
+{* ---------------- depending fields ------------------ *}
+
+	{if $v.type=="depending"}
+	{if isset($post_array[$v.depending.caption1]) && $post_array[$v.depending.caption1]}<input type="hidden" name="{$v.depending.caption1}" value="{$post_array[$v.depending.caption1]}" />{/if}
+	{if isset($post_array[$v.depending.caption2]) && $post_array[$v.depending.caption2]}<input type="hidden" name="{$v.depending.caption2}" value="{$post_array[$v.depending.caption2]}" />{/if}
+	{if isset($post_array[$v.depending.caption3]) && $post_array[$v.depending.caption3]}<input type="hidden" name="{$v.depending.caption3}" value="{$post_array[$v.depending.caption3]}" />{/if}
+	{if isset($post_array[$v.depending.caption4]) && $post_array[$v.depending.caption4]}<input type="hidden" name="{$v.depending.caption4}" value="{$post_array[$v.depending.caption4]}" />{/if}
+	{if isset($post_array[$v.depending.caption5]) && $post_array[$v.depending.caption5]}<input type="hidden" name="{$v.depending.caption5}" value="{$post_array[$v.depending.caption5]}" />{/if}
+	{else}
+	{if isset($post_array[$v.caption]) && $post_array[$v.caption]!=''}<input type="hidden" name="{$v.caption}" value="{$post_array[$v.caption]}" />{/if}
+	{/if}
+
+	{if $v.type=="depending"}
+
+{if $seo_settings.enable_mod_rewrite}
+	{if !$seo_settings.sef_legacy_mode}
+		{capture name=sfield assign=sfield}##{$v.depending.caption1}##{/capture}
+	{else}
+		{capture name=sfield assign=sfield}##{$v.depending.caption1}##/{/capture}
+	{/if}
+	{seo->makeSearchLink p1=$post_array p2=$page p3="page|category|`$v.depending.caption1`|`$v.depending.caption2`|`$v.depending.caption3`|`$v.depending.caption4`" p4=$v.depending.caption1 p5=$category_name assign='constructed_url'}
+	
+	{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+	
+{else}
+	{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!=$v.depending.caption1 && $k!=$v.depending.caption2 && $k!=$v.depending.caption3 && $k!=$v.depending.caption4 && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+{/if}
+
+{* ---------------- depending field 1 ------------------ *}
+	<h4>{$v.depending.name1}</h4>
+	{if !isset($post_array[$v.depending.caption1]) || !$post_array[$v.depending.caption1]} {* no value set *}
+	{foreach from=$v.depending.elements item=t name=elements}
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=field_string assign=field_string}{$separator}{$v.depending.caption1}={$t.name|lower|replace:'/':'_'}{/capture}
+		{else}
+			{capture name=field_string assign=field_string}{$v.depending.caption1}-{$t.name|lower|replace:'/':'_'}/{/capture}
+		{/if}
+
+		<div class="property">
+		<a href="{if $settings.enable_locations && in_array($v.depending.caption1, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption1}|{$t.name}'){else}{if $seo_settings.enable_mod_rewrite}{$constructed_url|replace:$sfield:$field_string}{else}{$constructed_url}{$separator}{$v.depending.caption1}={$t.name|replace:'/':'_'}{/if}{/if}">{$t.name}{if $t.count>0}&nbsp;({$t.count}){/if}</a>
+		</div>
+		{if $smarty.foreach.elements.index==4 && $v.depending.elements|@count>5}
+		<div class="more" id="more_{$v.depending.caption1}_link"><a class="more" id="more_{$v.depending.caption1}">{$lng.search.more}</a></div>
+		<div style="display: none;" id="more_{$v.depending.caption1}_list">
+		{/if}
+	{/foreach}
+	{if $v.depending.elements|@count>5}
+	<div class="more"><a class="more" id="less_{$v.depending.caption1}">{$lng.search.less}</a></div>
+	</div>
+
+		<script type="text/javascript">
+			{literal}
+			$("a#more_{/literal}{$v.depending.caption1}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption1}{literal}_list").fadeIn(1000);
+				$("#more_{/literal}{$v.depending.caption1}{literal}_link").hide();
+			});
+
+			$("a#less_{/literal}{$v.depending.caption1}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption1}{literal}_list").slideUp(300);
+				$("#more_{/literal}{$v.depending.caption1}{literal}_link").show();
+			});
+
+			{/literal}
+		</script>
+
+	{/if}
+	{else} {* a value is set for this field *}
+	<div class="property current">{$post_array[$v.depending.caption1]}<a href="{if $settings.enable_locations && in_array($v.depending.caption1, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption1}|'){else}{$constructed_url|replace:$sfield:''}{/if}" class="remove">&nbsp;<img src="{$template_path}images/remove.gif" class="tooltip" title="{$lng.general.remove}" alt="" /></a></div>
+	{/if}
+	<hr/>
+
+{* ---------------- depending field 2 ------------------ *}
+
+	{if isset($post_array[$v.depending.caption1]) && $post_array[$v.depending.caption1]}
+	<h4>{$v.depending.name2}</h4>
+
+	{if $seo_settings.enable_mod_rewrite}
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=sfield assign=sfield}##{$v.depending.caption2}##{/capture}
+		{else}
+			{capture name=sfield assign=sfield}##{$v.depending.caption2}##/{/capture}
+		{/if}
+
+		{seo->makeSearchLink p1=$post_array p2=$page p3="page|category|`$v.depending.caption2`|`$v.depending.caption3`|`$v.depending.caption4`" p4=$v.depending.caption2  p5=$category_name assign='constructed_url'}
+		
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+
+	{else}
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!=$v.depending.caption2 && $k!=$v.depending.caption3 && $k!=$v.depending.caption4 && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+	{/if}
+
+	{if $v.depending.no==2 || !isset($post_array[$v.depending.caption2]) || !$post_array[$v.depending.caption2]}
+	{foreach from=$v.depending.elements2 item=t name=elements2}
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=field_string assign=field_string}{$separator}{$v.depending.caption2}={$t.name|lower|replace:'/':'_'|rawurlencode}{/capture}
+		{else}
+			{capture name=field_string assign=field_string}{$v.depending.caption2}-{$t.name|lower|replace:'/':'_'|rawurlencode}/{/capture}
+		{/if}
+
+		<div class="property">
+		{capture name=surl assign=surl}{if $settings.enable_locations && in_array($v.depending.caption2, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption2}|{$t.name|rawurlencode}'){else}{if $seo_settings.enable_mod_rewrite}{if !isset($post_array[$v.depending.caption2])}{$constructed_url|replace:$sfield:$field_string}{else}{capture name=crt_field_string assign=crt_field_string}{$separator}{$v.depending.caption2}={if $post_array[$v.depending.caption2]|stristr:$t.name|rawurlencode}{$post_array[$v.depending.caption2]|lower|replace:{$t.name|lower}:''|trim:'|'}{else}{$t.name|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.depending.caption2]|lower}{/if}{/capture}{$constructed_url|replace:$sfield:$crt_field_string}{/if}{else}{if !isset($post_array[$v.depending.caption2])}{$constructed_url}{$separator}{$v.depending.caption2}={$t.name|replace:'/':'_'|rawurlencode}{else}{capture name=crt_field_string assign=crt_field_string}{if $post_array[$v.depending.caption2]|stristr:$t.name|rawurlencode}{$post_array[$v.depending.caption2]|lower|replace:{$t.name|lower}:''|trim:'|'}{else}{$t.name|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.depending.caption2]|lower}{/if}{/capture}{$constructed_url}{$separator}{$v.depending.caption2}={$crt_field_string}{/if}{/if}{/if}{/capture}
+		
+		<a href="{$surl}">{$t.name}{if $t.count>0}&nbsp;({$t.count}){/if}</a>{if $v.depending.no==2 && (!$settings.enable_locations || !in_array($v.depending.caption2, $location_fields))}&nbsp;<input type="checkbox" name="{$v.depending.caption2}_{$t.name|rawurlencode}" {if stristr($post_array[$v.depending.caption2], $t.name)}checked{/if} onclick="window.location='{$surl}'" />{/if}&nbsp; 
+		</div>
+		{if $smarty.foreach.elements2.index==4 && $v.depending.elements2|@count>5}
+		<div class="more" id="more_{$v.depending.caption2}_link"><a class="more" id="more_{$v.depending.caption2}">{$lng.search.more}</a></div>
+		<div style="display: none;" id="more_{$v.depending.caption2}_list">
+		{/if}
+	{/foreach}
+	{if $v.depending.elements2|@count>5}
+	<div class="more"><a class="more" id="less_{$v.depending.caption2}">{$lng.search.less}</a></div>
+	</div>
+
+		<script type="text/javascript">
+			{literal}
+			$("a#more_{/literal}{$v.depending.caption2}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption2}{literal}_list").fadeIn(1000);
+				$("#more_{/literal}{$v.depending.caption2}{literal}_link").hide();
+			});
+
+			$("a#less_{/literal}{$v.depending.caption2}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption2}{literal}_list").slideUp(300);
+				$("#more_{/literal}{$v.depending.caption2}{literal}_link").show();
+			});
+
+			{/literal}
+		</script>
+
+	{/if}
+	{else} {* a value is set for this field *}
+	<div class="property current">{$post_array[$v.depending.caption2]}<a href="{if $settings.enable_locations && in_array($v.depending.caption2, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption2}|'){else}{$constructed_url|replace:$sfield:''}{/if}" class="remove">&nbsp;<img src="{$template_path}images/remove.gif" class="tooltip" title="{$lng.general.remove}" alt="" /></a></div>
+	{/if}
+
+	<hr/>
+	{/if} 
+{* ---------------- end depending field 2 ------------------ *}
+
+
+{* ---------------- depending field 3 ------------------ *}
+
+	{if $v.depending.no>=3 && isset($post_array[$v.depending.caption2]) && $post_array[$v.depending.caption2]}
+		<h4>{$v.depending.name3}</h4>
+
+	{if $seo_settings.enable_mod_rewrite}
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=sfield assign=sfield}##{$v.depending.caption3}##{/capture}
+		{else}
+			{capture name=sfield assign=sfield}##{$v.depending.caption3}##/{/capture}
+		{/if}
+		
+		{seo->makeSearchLink p1=$post_array p2=$page p3="page|category|`$v.depending.caption3`|`$v.depending.caption4`" p4=$v.depending.caption3 p5=$category_name assign='constructed_url'}
+		
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+		
+	{else}
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!=$v.depending.caption3 && $k!=$v.depending.caption4 && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+	{/if}
+
+	{if $v.depending.no==3 || !isset($post_array[$v.depending.caption3]) || !$post_array[$v.depending.caption3]}
+	{foreach from=$v.depending.elements3 item=t name=elements3}
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=field_string assign=field_string}{$separator}{$v.depending.caption3}={$t.name|lower|replace:'/':'_'|rawurlencode}{/capture}
+		{else}
+			{capture name=field_string assign=field_string}{$v.depending.caption3}-{$t.name|lower|replace:'/':'_'|rawurlencode}/{/capture}
+		{/if}	
+
+		<div class="property">
+		{capture name=surl assign=surl}{if $settings.enable_locations && in_array($v.depending.caption3, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption3}|{$t.name|rawurlencode}'){else}{if $seo_settings.enable_mod_rewrite}{if !isset($post_array[$v.depending.caption3])}{$constructed_url|replace:$sfield:$field_string}{else}{capture name=crt_field_string assign=crt_field_string}{$separator}{$v.depending.caption3}={if $post_array[$v.depending.caption3]|stristr:$t.name|rawurlencode}{$post_array[$v.depending.caption3]|lower|replace:{$t.name|lower}:''|trim:'|'}{else}{$t.name|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.depending.caption3]|lower}{/if}{/capture}{$constructed_url|replace:$sfield:$crt_field_string}{/if}{else}{if !isset($post_array[$v.depending.caption3])}{$constructed_url}{$separator}{$v.depending.caption3}={$t.name|replace:'/':'_'|rawurlencode}{else}{capture name=crt_field_string assign=crt_field_string}{if $post_array[$v.depending.caption3]|stristr:$t.name|rawurlencode}{$post_array[$v.depending.caption3]|lower|replace:{$t.name|lower}:''|trim:'|'}{else}{$t.name|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.depending.caption3]|lower}{/if}{/capture}{$constructed_url}{$separator}{$v.depending.caption3}={$crt_field_string}{/if}{/if}{/if}{/capture}
+		
+		<a href="{$surl}">{$t.name}{if $t.count>0}&nbsp;({$t.count}){/if}</a>{if $v.depending.no==3 && (!$settings.enable_locations || !in_array($v.depending.caption3, $location_fields))}&nbsp;<input type="checkbox" name="{$v.depending.caption3}_{$t.name|rawurlencode}" {if stristr($post_array[$v.depending.caption3], $t.name)}checked{/if} onclick="window.location='{$surl}'" />{/if}&nbsp; 
+		</div>
+		{if $smarty.foreach.elements3.index==4 && $v.depending.elements3|@count>5}
+		<div class="more" id="more_{$v.depending.caption3}_link"><a class="more" id="more_{$v.depending.caption3}">{$lng.search.more}</a></div>
+		<div style="display: none;" id="more_{$v.depending.caption3}_list">
+		{/if}
+	{/foreach}
+	{if $v.depending.elements3|@count>5}
+	<div class="more"><a class="more" id="less_{$v.depending.caption3}">{$lng.search.less}</a></div>
+	</div>
+
+		<script type="text/javascript">
+			{literal}
+			$("a#more_{/literal}{$v.depending.caption3}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption3}{literal}_list").fadeIn(1000);
+				$("#more_{/literal}{$v.depending.caption3}{literal}_link").hide();
+			});
+
+			$("a#less_{/literal}{$v.depending.caption3}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption3}{literal}_list").slideUp(300);
+				$("#more_{/literal}{$v.depending.caption3}{literal}_link").show();
+			});
+
+			{/literal}
+		</script>
+
+	{/if}
+	{else} {* a value is set for this field *}
+	<div class="property current">{$post_array[$v.depending.caption3]}<a href="{if $settings.enable_locations && in_array($v.depending.caption3, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption3}|'){else}{$constructed_url|replace:$sfield:''}{/if}" class="remove">&nbsp;<img src="{$template_path}images/remove.gif" class="tooltip" title="{$lng.general.remove}" alt="" /></a></div>
+	{/if}
+
+	<hr/>
+	{/if}
+ {* ---------------- end depending field 3 ------------------ *}
+
+
+{* ---------------- depending field 4 ------------------ *}
+
+	{if $v.depending.no>=4 && isset($post_array[$v.depending.caption3]) && $post_array[$v.depending.caption3]}
+		<div class="subtitle">{$v.depending.name4}</div>
+
+	{if $seo_settings.enable_mod_rewrite}
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=sfield assign=sfield}##{$v.depending.caption4}##{/capture}
+		{else}
+			{capture name=sfield assign=sfield}##{$v.depending.caption4}##/{/capture}
+		{/if}
+		
+		{seo->makeSearchLink p1=$post_array p2=$page p3="page|category|`$v.depending.caption4`" p4=$v.depending.caption4  p5=$category_name assign='constructed_url'}
+		
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+		
+	{else}
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!=$v.depending.caption4 && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+	{/if}
+
+	{if $v.depending.no==4 || !isset($post_array[$v.depending.caption4]) || !$post_array[$v.depending.caption4]}
+
+	{foreach from=$v.depending.elements4 item=t name=elements4}
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=field_string assign=field_string}{$separator}{$v.depending.caption4}={$t.name|lower|replace:'/':'_'|rawurlencode}{/capture}
+		{else}
+			{capture name=field_string assign=field_string}{$v.depending.caption4}-{$t.name|lower|replace:'/':'_'|rawurlencode}/{/capture}
+		{/if}
+
+		<div class="property">
+		{capture name=surl assign=surl}{if $settings.enable_locations && in_array($v.depending.caption4, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption4}|{$t.name|rawurlencode}'){else}{if $seo_settings.enable_mod_rewrite}{if !isset($post_array[$v.depending.caption4])}{$constructed_url|replace:$sfield:$field_string}{else}{capture name=crt_field_string assign=crt_field_string}{$separator}{$v.depending.caption4}={if $post_array[$v.depending.caption4]|stristr:$t.name|rawurlencode}{$post_array[$v.depending.caption4]|lower|replace:{$t.name|lower}:''|trim:'|'}{else}{$t.name|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.depending.caption4]|lower}{/if}{/capture}{$constructed_url|replace:$sfield:$crt_field_string}{/if}{else}{if !isset($post_array[$v.depending.caption4])}{$constructed_url}{$separator}{$v.depending.caption4}={$t.name|replace:'/':'_'|rawurlencode}{else}{capture name=crt_field_string assign=crt_field_string}{if $post_array[$v.depending.caption4]|stristr:$t.name|rawurlencode}{$post_array[$v.depending.caption4]|lower|replace:{$t.name|lower}:''|trim:'|'}{else}{$t.name|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.depending.caption4]|lower}{/if}{/capture}{$constructed_url}{$separator}{$v.depending.caption4}={$crt_field_string}{/if}{/if}{/if}{/capture}
+		
+		<a href="{$surl}">{$t.name}{if $t.count>0}&nbsp;({$t.count}){/if}</a>{if $v.depending.no==4 && (!$settings.enable_locations || !in_array($v.depending.caption4, $location_fields))}&nbsp;<input type="checkbox" name="{$v.depending.caption4}_{$t.name|rawurlencode}" {if stristr($post_array[$v.depending.caption4], $t.name)}checked{/if} onclick="window.location='{$surl}'" />{/if}&nbsp;
+		</div>
+		{if $smarty.foreach.elements4.index==4 && $v.depending.elements4|@count>5}
+		<div id="more_{$v.depending.caption4}_link"><a id="more_{$v.depending.caption4}" href="javascript:;">{$lng.search.more}</a></div>
+		<div style="display: none;" id="more_{$v.depending.caption4}_list">
+		{/if}
+	{/foreach}
+
+	{if $v.depending.elements4|@count>5}
+	<div><a id="less_{$v.depending.caption4}" href="javascript:;">{$lng.search.less}</a></div>
+	</div>
+
+		<script type="text/javascript">
+			{literal}
+			$("a#more_{/literal}{$v.depending.caption4}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption4}{literal}_list").fadeIn(1000);
+				$("#more_{/literal}{$v.depending.caption4}{literal}_link").hide();
+			});
+
+			$("a#less_{/literal}{$v.depending.caption4}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption4}{literal}_list").slideUp(300);
+				$("#more_{/literal}{$v.depending.caption4}{literal}_link").show();
+			});
+
+			{/literal}
+		</script>
+
+	{/if}{* if count>5 *}
+
+	{else} {* a value is set for this field *}
+
+	<div class="property current-filter">{$post_array[$v.depending.caption4]}<div class="rfloat rspace10 mt4"><a href="{if $settings.enable_locations && in_array($v.depending.caption4, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption4}|'){else}{$constructed_url|replace:$sfield:''}{/if}" class="remove"><img src="{$template_path}images/remove.gif" class="tooltip mt4" title="{$lng.general.remove}" alt="{$lng.general.remove}" /></a></div></div>
+
+	{/if} {* end if value set *}
+
+	<hr/>
+	{/if}
+ {* ---------------- end depending field 4 ------------------ *}
+
+{* ---------------- depending field 5 ------------------ *}
+
+	{if $v.depending.no>=5 && isset($post_array[$v.depending.caption4]) && $post_array[$v.depending.caption4]}
+		<div class="subtitle">{$v.depending.name5}</div>
+
+	{if $seo_settings.enable_mod_rewrite}
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=sfield assign=sfield}##{$v.depending.caption5}##{/capture}
+		{else}
+			{capture name=sfield assign=sfield}##{$v.depending.caption5}##/{/capture}
+		{/if}	
+		
+		{seo->makeSearchLink p1=$post_array p2=$page p3="page|category|`$v.depending.caption5`" p4=$v.depending.caption5  p5=$category_name assign='constructed_url'}
+		
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+		
+	{else}
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!=$v.depending.caption5 && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+	{/if}
+
+	{*{if !isset($post_array[$v.depending.caption5]) || !$post_array[$v.depending.caption5]}*}
+
+	{foreach from=$v.depending.elements5 item=t name=elements5}
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=field_string assign=field_string}{$separator}{$v.depending.caption5}={$t.name|lower|replace:'/':'_'|rawurlencode}{/capture}
+		{else}
+			{capture name=field_string assign=field_string}{$v.depending.caption5}-{$t.name|lower|replace:'/':'_'|rawurlencode}/{/capture}
+		{/if}	
+
+		<div class="property">
+		{capture name=surl assign=surl}{if $settings.enable_locations && in_array($v.depending.caption5, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption5}|{$t.name|rawurlencode}'){else}{if $seo_settings.enable_mod_rewrite}{if !isset($post_array[$v.depending.caption5])}{$constructed_url|replace:$sfield:$field_string}{else}{capture name=crt_field_string assign=crt_field_string}{$separator}{$v.depending.caption5}={if $post_array[$v.depending.caption5]|stristr:$t.name|rawurlencode}{$post_array[$v.depending.caption5]|lower|replace:{$t.name|lower}:''|trim:'|'}{else}{$t.name|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.depending.caption5]|lower}{/if}{/capture}{$constructed_url|replace:$sfield:$crt_field_string}{/if}{else}{if !isset($post_array[$v.depending.caption5])}{$constructed_url}{$separator}{$v.depending.caption5}={$t.name|replace:'/':'_'|rawurlencode}{else}{capture name=crt_field_string assign=crt_field_string}{if $post_array[$v.depending.caption5]|stristr:$t.name|rawurlencode}{$post_array[$v.depending.caption5]|lower|replace:{$t.name|lower}:''|trim:'|'}{else}{$t.name|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.depending.caption5]|lower}{/if}{/capture}{$constructed_url}{$separator}{$v.depending.caption5}={$crt_field_string}{/if}{/if}{/if}{/capture}
+		
+		<a href="{$surl}">{$t.name}{if $t.count>0}&nbsp;({$t.count}){/if}</a>{if !$settings.enable_locations || !in_array($v.depending.caption5, $location_fields)}&nbsp;<input type="checkbox" name="{$v.depending.caption5}_{$t.name|rawurlencode}" {if stristr($post_array[$v.depending.caption5], $t.name)}checked{/if} onclick="window.location='{$surl}'" />{/if}&nbsp; 
+		</div>
+		{if $smarty.foreach.elements5.index==4 && $v.depending.elements5|@count>5}
+		<div id="more_{$v.depending.caption5}_link"><a id="more_{$v.depending.caption5}" href="javascript:;">{$lng.search.more}</a></div>
+		<div style="display: none;" id="more_{$v.depending.caption5}_list">
+		{/if}
+	{/foreach}
+
+	{if $v.depending.elements5|@count>5}
+	<div><a id="less_{$v.depending.caption5}" href="javascript:;">{$lng.search.less}</a></div>
+	</div>
+
+		<script type="text/javascript">
+			{literal}
+			$("a#more_{/literal}{$v.depending.caption5}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption5}{literal}_list").fadeIn(1000);
+				$("#more_{/literal}{$v.depending.caption5}{literal}_link").hide();
+			});
+
+			$("a#less_{/literal}{$v.depending.caption5}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.depending.caption5}{literal}_list").slideUp(300);
+				$("#more_{/literal}{$v.depending.caption5}{literal}_link").show();
+			});
+
+			{/literal}
+		</script>
+
+	{/if}{* if count>5 *}
+{*
+	{else}
+
+	<div class="property current-filter">{$post_array[$v.depending.caption5]}<div class="rfloat rspace10 mt4"><a href="{if $settings.enable_locations && in_array($v.depending.caption5, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.depending.caption5}|'){else}{$constructed_url|replace:$sfield:''}{/if}" class="remove"><img src="{$template_path}images/remove.png" class="tooltip mt4" title="{$lng.general.remove}" alt="{$lng.general.remove}" /></a></div></div>
+
+	{/if} *}{* end if value set *}
+
+	<hr/>
+	{/if}
+ {* ---------------- end depending field 5 ------------------ *}
+
+
+	{elseif isset($v.type) && $v.type}
+
+	{if $v.type!="checkbox" && ($v.caption!="zip" || !in_array("areasearch",$modules_array))}<h4>{$v.name}</h4>
+	{elseif $v.type!="checkbox" && in_array("areasearch",$modules_array)}<h4>{$lng.areasearch.areasearch}</h4>{/if}
+
+{* ---------------- textbox ------------------ *}
+
+	{if $v.type=="textbox" || $v.type=="date" || $v.type=="url" || $v.type=="price" || $v.type=="phone"}
+
+		{capture name=content assign=low_field}{$v.caption}_low{/capture}
+		{capture name=content assign=high_var}{$v.caption}_high{/capture}
+
+		{* ------------- if no value is set ----------- *}
+		{if (!isset($post_array[$v.caption]) || !$post_array[$v.caption]) && (!isset($post_array[$low_field]) || !$post_array[$low_field]) && (!isset($post_array[$high_var]) || !$post_array[$high_var]) }
+
+		{* if prefix  *}
+		{if $v.prefix!=""} {$v.prefix} {/if}
+
+		{* if price  *}
+		{if $v.type=="price" && $appearance.currency_pos==0}
+		{if isset($currencies) && $currencies|@count>1}
+
+		<select name="currency">
+			{if !in_array("multicurrency", $modules_array)}
+			<option value="">-</option>
+			{/if}
+			{foreach from=$currencies item=i}
+			<option value="{$i.currency}" {if in_array("multicurrency", $modules_array) && $mc_default_currency==$i.currency}selected="selected"{/if}>{$i.currency}</option>
+			{/foreach}
+		</select>
+
+		{else} {$currencies[0].currency}
+		{/if}{* end if currencies no *}
+		{/if} {* end if price *}
+
+		{* if interval  *}
+		{if $v.search_type==2}
+
+		{if $v.type=="date"}
+		{include file="data/date-interval.html"}
+		<input name="{$v.caption}_low_vis" id="{$v.caption}_low_vis" type="text" size="{$v.size}" placeholder="- {$lng.general.min} -"  />&nbsp;{$lng.advanced_search.to}&nbsp;<input name="{$v.caption}_high_vis" id="{$v.caption}_high_vis" type="text" size="{$v.size}" placeholder="- {$lng.general.max} -" />
+
+		<input type="hidden" name="{$v.caption}_low" id="{$v.caption}_low" />
+		<input type="hidden" name="{$v.caption}_high" id="{$v.caption}_high"/>
+
+		{/if}
+
+		{* if search elements *}
+		{if $v.type=="textbox" && $v.is_numeric && $v.search_elements}
+		<select id="{$v.caption}_low" name="{$v.caption}_low">
+			<option value="">- {$lng.general.min} -</option>
+			{if $v.type=="textbox"}
+			{foreach from=$v.search_elements_array item=t}
+			<option value="{$t|replace:',':''|replace:'.':''}">{$t}</option>
+			{/foreach}
+			{else}
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}">{$t}</option>
+			{/foreach}
+			{/if}
+		</select>&nbsp;
+		{$lng.advanced_search.to}&nbsp;
+		<select id="{$v.caption}_high" name="{$v.caption}_high">
+			<option value="">- {$lng.general.max} -</option>
+			{if $v.type=="textbox"}
+			{foreach from=$v.search_elements_array item=t}
+			<option value="{$t|replace:',':''|replace:'.':''}">{$t}</option>
+			{/foreach}
+			{else}
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}" {if $post_array[$high_field]==$t}selected="selected"{/if}>{$t}</option>
+			{/foreach}
+			{/if}
+		</select><!--
+		-->{elseif $v.type!="date"} {* search elements *}<!--
+		
+		--><input name="{$v.caption}_low" id="{$v.caption}_low" type="text" size="{$v.size}" placeholder="- {$lng.general.min} -" {if isset($post_array[$low_field]) && $post_array[$low_field]}value="{$post_array[$low_field]}"{/if} /><!--
+		-->&nbsp;{$lng.advanced_search.to}&nbsp;{if $currencies|@count>1}<br/>{/if}<!--
+		--><input name="{$v.caption}_high" id="{$v.caption}_high" type="text" size="{$v.size}" placeholder="- {$lng.general.max} -" {if isset($post_array[$high_var]) && $post_array[$high_var]}value="{$post_array[$high_var]}"{/if} /><!--
+		-->{/if}{* end search elements *}<!--
+
+		-->{else}{* ----------  not interval ------------- *}<!--
+
+		-->{if $v.type=="date"}
+		{include file="data/date.html"}<!--
+		--><input name="{$v.caption}_vis" id="{$v.caption}_vis" type="text" placeholder="- {$v.name} -" /><input type="hidden" name="{$v.caption}" id="{$v.caption}" /><!--
+		-->{else}<input name="{$v.caption}" id="{$v.caption}" type="text" placeholder="- {$v.name} -"  class="refine_input" /><!--
+		-->{/if}<!--
+		-->{if $v.type=="price" && $appearance.currency_pos==1}<!--
+		-->{if $currencies|@count>1}<!--
+
+		--><select name="currency">
+			<option value="">-</option>
+			{foreach from=$currencies item=v}
+			<option value="{$v.currency}" {if isset($post_array.currency) && $post_array.currency==$v.currency}selected="selected"{/if}>{$v.currency}</option>
+			{/foreach}
+		</select><!--
+
+		-->{else} {$currencies[0].currency}<!--
+		-->{/if}{* end currencies count *}<!--
+		-->{/if}{* end if currency loc *}<!--
+		-->{/if}{* end if interval *}<!--
+		-->{if $v.postfix!=""} {$v.postfix} {/if}<!--
+		--><input type="image" class="input_img" src="{$template_path}images/search-arrow{if $text_direction=="rtl"}-rtl{/if}.gif" alt="{$lng.general.search}" />
+
+		{* -------- else if a value is set  ---------- *}
+		{else} 
+		{* --------------- if value is set --------------- *}
+
+	{* make $constructed_url var *}
+	{if $seo_settings.enable_mod_rewrite}
+
+		{capture name=exclude_str assign=exclude_str}page|category|{if $v.search_type!=2}{$v.caption}{else}{$low_field}|{$high_var}{/if}{if $v.type=="price"}|currency{/if}{/capture}
+
+		{seo->makeSearchLink p1=$post_array p2=$page p3="$exclude_str" p4='' p5=$category_name assign='constructed_url'}
+		
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+
+	{else}
+
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!=$v.caption && $k!=$low_field && $k!=$high_var && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+
+	{/if}
+
+		{* if interval *}
+		{if $v.search_type==2}
+		<div class="property current-filter">{if $v.type=="price"}{$post_array.currency}&nbsp;{elseif $v.prefix}{$v.prefix}&nbsp;{/if}{if isset($post_array[$low_field]) && $post_array[$low_field] && isset($post_array[$high_var]) && $post_array[$high_var]}{$post_array[$low_field]} {$lng.advanced_search.to} {$post_array[$high_var]}{elseif isset($post_array[$low_field]) && $post_array[$low_field]}&gt;&nbsp;{$post_array[$low_field]}{elseif isset($post_array[$high_var]) && $post_array[$high_var]}&lt;&nbsp;{$post_array[$high_var]}{/if}{if $v.postfix}&nbsp;{$v.postfix}{/if}<div class="rfloat"><a href="{$constructed_url}" class="remove"><img src="{$template_path}images/delete.png" class="tooltip mt4" title="{$lng.general.remove}" alt="{$lng.general.remove}" /></a></div></div>
+
+		<input type="hidden"  id="{$v.caption}_low" name="{$v.caption}_low" value="{if isset($post_array[$low_field])}{$post_array[$low_field]}{/if}" />
+		<input type="hidden"  id="{$v.caption}_high" name="{$v.caption}_high" value="{if isset($post_array[$high_var])}{$post_array[$high_var]}{/if}" />
+		{if $v.type=="price"}<input type="hidden" name="currency" value="{if isset($post_array.currency)}{$post_array.currency}{/if}" />{/if}
+		{else} {* not interval *}
+
+		<div class="property current-filter">{if $v.prefix}{$v.prefix}&nbsp;{/if}{$post_array[$v.caption]}{if $v.postfix}&nbsp;{$v.postfix}{/if}<div class="rfloat"><a href="{if $settings.enable_locations && in_array($v.caption, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.caption}|'){else}{$constructed_url|replace:$sfield:''}{/if}" class="remove"><img src="{$template_path}images/delete.png" class="tooltip mt4" title="{$lng.general.remove}" alt="{$lng.general.remove}" /></a></div></div>
+
+		<input type="hidden"  id="{$v.caption}" name="{$v.caption}" value="{$post_array[$v.caption]}" />
+
+		{/if} {* end if interval *}
+		{/if} {* end if value set or not *}
+
+{* ---------------- menu, radio, multiselect ------------------ *}
+
+	{elseif $v.type=="menu" || $v.type=="radio" || $v.type=="multiselect" || $v.type=="checkbox_group" || $v.type=="radio_group"}
+	
+		{capture name=content assign=low_field}{$v.caption}_low{/capture}
+		{capture name=content assign=high_var}{$v.caption}_high{/capture}
+		{if $seo_settings.enable_mod_rewrite}{assign var="separator" value="?"}{/if}
+
+		{if $v.prefix!=""} {$v.prefix} {/if}
+		{if $v.search_type==2}
+
+		{if !isset($post_array[$low_field]) || !$post_array[$low_field] && !isset($post_array[$high_var]) || !$post_array[$high_var] }
+		
+		<select id="{$v.caption}_low" name="{$v.caption}_low">
+			<option value="">- {$lng.general.min} -</option>
+			{if $v.type=="textbox"}
+			{foreach from=$v.search_elements_array item=t}
+			<option value="{$t|replace:',':''|replace:'.':''}">{$t}</option>
+			{/foreach}
+			{else}
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}">{$t}</option>
+			{/foreach}
+			{/if}
+		</select>&nbsp;
+		{$lng.advanced_search.to}&nbsp;
+		<select id="{$v.caption}_high" name="{$v.caption}_high">
+			<option value="">- {$lng.general.max} -</option>
+			{if $v.type=="textbox"}
+			{foreach from=$v.search_elements_array item=t}
+			<option value="{$t|replace:',':''|replace:'.':''}">{$t}</option>
+			{/foreach}
+			{else}
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}" {if $post_array[$high_field]==$t}selected="selected"{/if}>{$t}</option>
+			{/foreach}
+			{/if}
+		</select>
+		{else} {* if !isset($post_array[$low_field]) *}
+
+		<div class="property current-filter">{if $v.prefix}{$v.prefix}&nbsp;{/if}{if isset($post_array[$low_field]) && $post_array[$low_field] && isset($post_array[$high_var]) && $post_array[$high_var]}{$post_array[$low_field]} {$lng.advanced_search.to} {$post_array[$high_var]}{elseif isset($post_array[$low_field]) && $post_array[$low_field]}&gt;&nbsp;{$post_array[$low_field]}{elseif isset($post_array[$high_var]) && $post_array[$high_var]}&lt;&nbsp;{$post_array[$high_var]}{/if}<div class="rfloat"><a href="{$constructed_url}" class="remove"><img src="{$template_path}images/delete.png" class="tooltip mt4" title="{$lng.general.remove}" alt="{$lng.general.remove}" /></a></div></div>
+
+		<input type="hidden"  id="{$v.caption}_low" name="{$v.caption}_low" value="{if isset($post_array[$low_field])}{$post_array[$low_field]}{/if}" />
+		<input type="hidden"  id="{$v.caption}_high" name="{$v.caption}_high" value="{if isset($post_array[$high_var])}{$post_array[$high_var]}{/if}" />
+		
+		{/if}{* if !isset($post_array[$low_field]) *}
+		
+		{else} {* if $v.search_type==2 *}
+		
+		{if $seo_settings.enable_mod_rewrite}
+
+		{if !$seo_settings.sef_legacy_mode}
+			{capture name=sfield assign=sfield}##{$v.caption}##{/capture}
+			{capture name=mfield assign=mfield}{$v.caption}={/capture}
+		{else}
+			{capture name=sfield assign=sfield}##{$v.caption}##/{/capture}
+		{/if}	
+				
+		{capture name=exclude_str assign=exclude_str}page|category|{if $v.search_type!=2}{$v.caption}{else}{$low_field}|{$high_var}{/if}{/capture}
+
+		{seo->makeSearchLink p1=$post_array p2=$page p3="$exclude_str" p4=$v.caption p5=$category_name assign='constructed_url'}
+
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+
+		{else} {* if mod rewrite *}
+
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!=$v.caption && $k!=$low_field && $k!=$high_var && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+		
+		{/if}{* if mod rewrite *}
+		
+		<!--
+		-->{foreach from=$v.elements_array item=t name=elements}
+			{if !$seo_settings.sef_legacy_mode}
+				{capture name=field_string assign=field_string}{$separator}{$v.caption}={$t|lower|replace:'/':'_'|rawurlencode}{/capture}
+			{else}
+				{capture name=field_string assign=field_string}{$v.caption}-{$t|lower|replace:'/':'_'|rawurlencode}/{/capture}
+			{/if}	
+			<div class="property">
+
+			{capture name=surl assign=surl}{if $settings.enable_locations && in_array($v.caption, $location_fields)}javascript:;" onclick="changeLocation('{$live_site}', '{$v.caption}|{$t|rawurlencode}'){else}{if $seo_settings.enable_mod_rewrite}{if !isset($post_array[$v.caption])}{$constructed_url|replace:$sfield:$field_string}{else}{capture name=crt_field_string assign=crt_field_string}{if !$seo_settings.sef_legacy_mode}{$separator}{/if}{$v.caption}{if !$seo_settings.sef_legacy_mode}={else}-{/if}{if $post_array[$v.caption]|stristr:$t|rawurlencode}{$post_array[$v.caption]|lower|replace:{$t|lower}:''|trim:'|'}{else}{$t|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.caption]|lower}{if $seo_settings.sef_legacy_mode}/{/if}{/if}{/capture}{$constructed_url|replace:$sfield:$crt_field_string}{/if}{else}{if !isset($post_array[$v.caption])}{$constructed_url}{$separator}{$v.caption}={$t|replace:'/':'_'|rawurlencode}{else}{capture name=crt_field_string assign=crt_field_string}{if $post_array[$v.caption]|stristr:$t|rawurlencode}{$post_array[$v.caption]|lower|replace:{$t|lower}:''|trim:'|'}{else}{$t|lower|replace:'/':'_'|rawurlencode}|{$post_array[$v.caption]|lower}{/if}{/capture}{$constructed_url}{$separator}{$v.caption}={$crt_field_string}{/if}{/if}{/if}{/capture}
+			
+			<a href="{$surl}">{$t}{if $v.count_elements_array[$smarty.foreach.elements.index]>0}&nbsp;({$v.count_elements_array[$smarty.foreach.elements.index]}){/if}</a>{if !$settings.enable_locations || !in_array($v.caption, $location_fields)}&nbsp;<input type="checkbox" name="{$v.caption}_{$t|rawurlencode}" {if stristr($post_array[$v.caption], $t)}checked{/if} onclick="window.location='{$surl}'" />{/if}
+			</div>
+			{if $smarty.foreach.elements.index==4 && $v.elements_array|@count>5}
+			<div id="more_{$v.caption}_link"><a id="more_{$v.caption}" class="more_link" href="javascript:;">{$lng.search.more}</a></div>
+			<div style="display: none;" id="more_{$v.caption}_list">
+			{/if}
+		{/foreach}
+		{if $v.elements_array|@count>5}
+			<div><a id="less_{$v.caption}" href="javascript:;">{$lng.search.less}</a></div>
+		</div>
+
+		<script>
+			{literal}
+			$("a#more_{/literal}{$v.caption}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.caption}{literal}_list").fadeIn(1000);
+				$("#more_{/literal}{$v.caption}{literal}_link").hide();
+			});
+
+			$("a#less_{/literal}{$v.caption}{literal}").click(function(){ 
+				$("#more_{/literal}{$v.caption}{literal}_list").slideUp(300);
+				$("#more_{/literal}{$v.caption}{literal}_link").show();
+			});
+
+			{/literal}
+		</script>
+
+		{/if}{* end if $v.elements_array|@count>5 *}
+		
+		
+		{/if}{* end if $v.search_type==2 *}
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		
+{* ---------------- checkbox ------------------ *}
+
+	{elseif $v.type=="checkbox"}
+
+	{if $seo_settings.enable_mod_rewrite}
+		{seo->makeSearchLink p1=$post_array p2=$page p3="page|category|`$v.caption`" p4='' p5=$category_name assign='constructed_url'}
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+	{else}
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!=$v.caption && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+	{/if}
+
+		<h4>{$v.name}</h4>&nbsp;
+		{if isset($post_array[$v.caption]) && $post_array[$v.caption]!=''}
+		{if $post_array[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+		<a href="{$constructed_url}" class="remove">&nbsp;<img src="{$template_path}images/remove.gif" class="tooltip" title="{$lng.general.remove}" alt="" /></a>
+		{else}
+		<input name="{$v.caption}" type="radio" value="1" class="noborder"/>&nbsp;{$lng.general.Yes}&nbsp;&nbsp;<input name="{$v.caption}" type="radio" value="0" class="noborder"/>&nbsp;{$lng.general.No}
+		<input type="image" class="input_img" src="{$template_path}/images/search-arrow.gif" />
+		{/if}
+
+	{elseif $v.caption=="zip" && in_array("areasearch",$modules_array)}
+		<select name="area">
+		<option value="">{$lng.areasearch.all_locations}</option>
+		<option value="0" {if $post_array.area=="0"}selected="selected"{/if}>{$lng.areasearch.exact_location}</option>
+		{foreach from=$area_list item=l}
+		<option value="{$l}" {if $post_array.area==$l}selected="selected"{/if}>{$l} {$areasearch_settings.um}</option>
+		{/foreach}
+		</select>&nbsp;{$lng.general.of}<br/>
+		<input type="text" name="zip" size="10" class="defaultText" title="- {$lng.listings.zip} -" {if isset($post_array.zip)}value="{$post_array.zip}{$post_array.zip}"{/if} />
+		<input type="image" class="input_img" src="{$template_path}/images/search-arrow.gif" />
+	{/if}
+
+	<hr/>
+
+	{/if} {* end if not depending *}
+
+{/foreach}
+
+<br />
+<h4>
+{if !$post_array.with_pic}
+<input name="with_pic" type="checkbox" class="noborder" />
+{else}
+<input name="with_pic" type="hidden" value="on"/>
+{/if}
+{$lng.advanced_search.only_ads_with_pic}
+{if !isset($post_array.with_pic) || !$post_array.with_pic}
+<input type="image" class="input_img" src="{$template_path}/images/search-arrow.gif" />
+{/if}
+
+{if $post_array.with_pic==1}
+
+	{if $seo_settings.enable_mod_rewrite}
+		{seo->makeSearchLink p1=$post_array p2=$page p3='page|category|with_pic' p4='' p5=$category_name assign='constructed_url'}
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+	{else}
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!="with_pic" && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+	{/if}
+
+<a href="{$constructed_url}" class="remove">&nbsp;<img src="{$template_path}images/remove.gif" class="tooltip" title="{$lng.general.remove}"/></a>
+
+{/if}
+</h4>
+
+<br />
+<hr/>
+
+{if $ads_settings.enable_auctions}
+<h4>
+
+{if !$post_array.with_auction}
+<input name="with_auction" type="checkbox" class="noborder" />
+{else}
+<input name="with_auction" type="hidden" value="on"/>
+{/if}
+{$lng.advanced_search.only_ads_with_auction}
+{if !isset($post_array.with_auction) || !$post_array.with_auction}
+<input type="image" class="input_img" src="{$template_path}/images/search-arrow.gif" />
+{/if}
+
+{if $post_array.with_auction==1}
+
+	{if $seo_settings.enable_mod_rewrite}
+		{seo->makeSearchLink p1=$post_array p2=$page p3='page|category|with_auction' p4='' p5=$category_name assign='constructed_url'}
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+	{else}
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!="with_auction" && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+	{/if}
+
+<a href="{$constructed_url}" class="remove">&nbsp;<img src="{$template_path}images/remove.gif" class="tooltip" title="{$lng.general.remove}"/></a>
+
+{/if}
+
+</h4>
+<br/>
+<hr/>
+{/if}
+
+
+<h4>{$lng.search.refine_by_keyword}</h4>
+{if !isset($post_array[$keyword_name]) || !$post_array[$keyword_name]}
+<div><input type="text" name="{$keyword_name}" class="defaultText" title="- {$lng.advanced_search.word} -" style="width: 170px;" />
+<input type="image" class="input_img" src="{$template_path}/images/search-arrow.gif" /></div>
+{else}
+
+	{if $seo_settings.enable_mod_rewrite}
+		{seo->makeSearchLink p1=$post_array p2=$page p3="page|category|$keyword_name" p4='' p5=$category_name assign='constructed_url'}
+		{if !$seo_settings.sef_legacy_mode && $constructed_url|strchr:"?"}{assign var="separator" value="&amp;"}{/if}
+	{else}
+		{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!="{$keyword_name}" && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{assign var="separator" value="&amp;"}{/if}{/foreach}{/capture}
+	{/if}
+
+{$post_array[$keyword_name]|urldecode}&nbsp;<a href="{$constructed_url}" class="remove">&nbsp;<img src="{$template_path}images/remove.gif" class="tooltip" title="{$lng.general.remove}" alt="" /></a>
+<input type="hidden" name="{$keyword_name}" value="{$post_array[$keyword_name]}"/>
+{/if}
+
+</form>
+
+	</div></div></div></div></div>
+
+            </div>
+</div>
+<!-- END REFINE -->

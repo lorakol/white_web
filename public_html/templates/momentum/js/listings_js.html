@@ -1,0 +1,140 @@
+{literal}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+$('.fshare').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true
+});
+
+$('a.share').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true
+});
+
+$('a.report').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true
+});
+
+$('a.fmailto').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true
+});
+
+$('a.addtofav').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true,
+  callbacks: {
+  close: function() {
+		var listing_id = $.magnificPopup.instance.st.el.attr("id").substr(3);
+		$("#fav"+listing_id).hide();
+		$("#remfav"+listing_id).show();
+  }
+}
+});
+$('a.remfav').magnificPopup({
+  type: 'ajax',
+  showCloseBtn: true,
+  closeBtnInside:true,
+  callbacks: {
+  close: function() {
+		var listing_id = $.magnificPopup.instance.st.el.attr("id").substr(6);
+		$("#fav"+listing_id).show();
+		$("#remfav"+listing_id).hide();
+  }
+}
+});
+
+
+$("#create_alert").click(function (event) {
+
+$.post( "{/literal}{$live_site}{literal}/include/add_alert.php", { post_str: '{/literal}{if isset($post_json)}{$post_json}{/if}{literal}' })
+	.done(function( data ) {
+
+	$.magnificPopup.open({
+		items: {
+		src: data,
+		type: 'inline'
+		}
+	});
+	});
+ })
+
+$("#save-search").click(function (event) {
+
+$.post( "{/literal}{$live_site}{literal}/include/save_search.php", { post_str: '{/literal}{if isset($post_json)}{$post_json}{/if}{literal}' })
+	.done(function( data ) {
+
+		$.magnificPopup.open({
+			items: {
+			src: data,
+			type: 'inline'
+			}
+		});
+
+	});
+ })
+
+
+var ddlMenter = function(){
+
+	var listing_id = jQuery(this).attr("id").substr(7);
+	$(".ddl-open").hide();
+	$("#ddl-open"+listing_id).show();
+
+};
+
+var ddlMout = function(){
+
+	var listing_id = jQuery(this).attr("id").substr(8);
+	$("#ddl-open"+listing_id).hide();
+
+};
+
+$('.ddl-cto').bind('mouseenter',ddlMenter);
+$('.ddl-open').bind('mouseleave',ddlMout);
+
+
+});// end document ready
+
+
+
+$('.tooltip').powerTip({
+	placement: 'n'
+});
+
+
+$("#with_pic").change(function (event) { 
+
+	if ($('#with_pic').val('on'));
+	$("#search").submit();
+
+});
+
+$("#with_auction").change(function (event) { 
+
+	if ($('#with_auction').val('on'));
+	$("#search").submit();
+
+});
+
+$(".refine_heading").click(function (event) {
+
+	if(window.innerWidth<=900) {
+		if($(".refine").is(":visible") )
+			$(".refine").hide();
+		else 
+			$(".refine").show();
+	}
+
+});
+
+</script>
+{/literal}

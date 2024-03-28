@@ -1,0 +1,74 @@
+{include file="header.html"}
+
+<div id="page_content">
+<br/>
+<div style="width: 80%; margin: auto;" >
+
+{if $groups_array|@count>=3}{assign var="percent" value="32"}{assign var="seppercent" value="2"}{else}{assign var="percent" value="48"}{assign var="seppercent" value="4"}{/if}
+
+<table  width="100%" align="center" cellspacing="0" cellspacing="0">
+	<tr>
+{foreach name=groups from=$groups_array item=v}
+		<td width="{$percent}%">
+
+			<div class="box3-head"><div class="box3-head-left"><div class="box3-head-right">
+				{$v.name}
+			</div></div></div>
+
+			<div class="box3-left"><div class="box3-right" id="inner{$v.id}">
+			<div class="prereg"><p class="group_description">{$v.description}</p></div>
+
+			</div></div>
+
+			<div class="box3-footer"><div class="box3-footer-left"><div class="box3-footer-right">
+			<form name="register" method="post" action="{$live_site}/register.php?group={$v.id}">
+			<div class="buttons"><strong><input type="submit" name="Register{$v.id}" value="{$lng.navbar.register}" /></strong></div>
+			</form>
+			</div></div></div>
+
+
+		</td>
+		{if $smarty.foreach.groups.index%3!=2 && $smarty.foreach.groups.index!=$groups_array|@count-1}<td width="{$seppercent}%"></td>{/if}
+
+	{if $smarty.foreach.groups.index%3==2 && $smarty.foreach.groups.index!=$groups_array|@count-1}
+	</tr>
+	<tr>
+	{/if}
+
+{/foreach}
+
+	</tr>
+
+</table>
+<br/>
+<script type="text/javascript">
+{literal}
+$(document).ready(function() {
+	{/literal}
+	var max=0;
+	{foreach name=groups from=$groups_array item=v}	
+		var divid = "#inner{$v.id}";
+		{literal}
+		if($(divid).height()>max) max = $(divid).height();
+		{/literal}
+	{/foreach}
+
+	{foreach name=groups from=$groups_array item=v}	
+		var divid = "#inner{$v.id}";
+		{literal}
+		$(divid).height(max);
+		{/literal}
+	{/foreach}
+
+	{literal}
+
+});
+{/literal}
+</script>
+
+
+</div>
+
+
+</div>
+{include file="footer.html"}

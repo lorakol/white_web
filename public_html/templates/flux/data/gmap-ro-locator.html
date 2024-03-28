@@ -1,0 +1,65 @@
+	function autoLocator_{$v.caption}{literal}() {
+{/literal}
+
+		var address = '';
+		var address_html = '';
+
+		{assign var=extensions_array value=","|explode:$v.extensions} 
+		{foreach from=$extensions_array item=e}
+
+			var l = "{$listing[$e]}";
+
+			if(l) {
+				if(address!='') { 
+					address = address + ', ';
+					address_html = address_html + '<br/>';
+				}
+				address = address + l;
+				address_html = address_html + "<b>" + l + "</b>";
+			}
+			
+		{/foreach}
+
+
+		if(!address) { 
+			$("#gm_{$v.caption}").hide();
+			return;
+		}
+{literal}		
+		// get coordinates by address
+		geocoder = new google.maps.Geocoder();
+		geocoder.geocode( { 'address': address}, function(results, status) {
+      			if (status == google.maps.GeocoderStatus.OK) {
+
+{/literal}
+			map_{$v.caption}.panTo(results[0].geometry.location);
+{literal}
+			/*if (markersArray_{/literal}{$v.caption}{literal}) {
+				for (i in markersArray_{/literal}{$v.caption}{literal}) {
+				markersArray_{/literal}{$v.caption}{literal}[i].setMap(null);
+				}
+				markersArray_{/literal}{$v.caption}{literal}.length = 0;
+			}*/
+
+			marker = new google.maps.Marker({
+				position: results[0].geometry.location,
+				map:	{/literal}map_{$v.caption}{literal}
+			});
+			markersArray_{/literal}{$v.caption}{literal}.push(marker);
+
+			var infowindow = new google.maps.InfoWindow({
+   				content: address_html
+			});
+
+			infowindow.open({/literal}map_{$v.caption}{literal}, marker);
+			var lat = results[0].geometry.location.lat();
+			var long = results[0].geometry.location.lng();
+{/literal}
+			var h = map_{$v.caption}.getZoom();
+			document.getElementById("{$v.caption}").value=lat+","+long+","+h;
+{literal}
+		}
+		else $("#gm_{/literal}{$v.caption}{literal}").hide();
+		});
+	}
+{/literal}

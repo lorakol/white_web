@@ -1,0 +1,353 @@
+{if $step==1}
+{include file="header.html"}
+{include file="data/magnific-popup.html"}
+
+<div class="wait"></div>
+
+<div id="heading">{$lng.listings.edit_options}</div>
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{if isset($error)}{$error}{/if}</p></div>
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function () {
+
+$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { 
+		//var queryString = $.param(formData); 
+		if($("#options").find("input[type='submit']:focus").attr("id")=="Cancel") {
+			location.href='my_listings.php';
+			return false;
+		}
+		return true;  
+	},
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1) {
+				// go to payment page
+				$("#payment").html(ret.payment_form);
+				$("#payment_form").submit();
+
+				return;
+			}
+
+			// response = 0 -> show the error
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+			$('html,body').animate({scrollTop:$(".error").offset().top}, 'slow');
+
+			$("body").removeClass("loading"); 
+
+} 
+
+//initialize the AJAX form
+ $('#options').ajaxForm(options);
+
+$("#video").click(function(){
+	if($('#video').prop('checked')) $("#video_div").slideDown();
+	else $("#video_div").slideUp();
+});
+
+$("#url").click(function(){
+	if($('#url').prop('checked')) $("#url_div").slideDown();
+	else $("#url_div").slideUp();
+});
+
+	// *********** tax value **************
+	{/literal}
+
+	{if $no_processors>1 || ($no_processors==1 && $credits_allowed)}
+	only_processor = 0;
+	{else}
+	only_processor = 1;
+	{/if}
+
+	{if $total}
+
+	if(only_processor)
+		var processor = $('input[name=processor]').val();
+	else 
+		var processor = $('input:radio[name=processor]:checked').val();		
+
+	var total = $("#full_total").val();
+	calculateTax(processor, total);
+
+
+	{/if} {* end if total *}
+
+	{literal}
+
+
+	$('input:radio[name=processor]').change(function() { 
+
+		processor = $('input:radio[name=processor]:checked').val();
+		calculateTax(processor, $("#full_total").val());
+
+	})
+
+	// end tax value
+
+
+}); // end document ready
+
+{/literal}
+
+</script>
+
+<form name="options" id="options" method="post" action="edit_options.php?id={$id}&step=2{if isset($key) && $key}&key={$key}{/if}">
+
+<input type="hidden" name="full_total" id="full_total" value="0"/>
+
+<div class="p30">
+
+<div class="eoptions clearfix">
+	<div class="lfloat heading_eo">{$lng.listings.listing} ID #{$id}</div>
+	<div class="rfloat">
+
+	<div class="buttonwrapper"><div class="button1-left">
+	<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id p2=$listing_title}{else}{$live_site}/details.php?id={$id}{/if}" target="_blank"><span class="button1-right">{$lng.general.view}</span></a>
+	</div></div>
+	</div>
+</div>
+
+
+{if $ads_settings.enable_featured}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="hidden" name="featured_val" id="featured_val" value=""/>
+		<input type="checkbox" onclick="changeFeaturedPlan(this.form, {$appearance.price_format_decimals} )" name="enable_featured" id="enable_featured" {if $options.featured || (isset($options.pending_featured) && $options.pending_featured)}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.featured}</div>
+		<div class="light">{$ads_settings.featured_description}{if $ads_settings.featured_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.featured_example}" class="imgfield more">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $options.featured}
+			<div class="small-btn activebutton icon">{$lng.listings.active}{if $expiration_dates.featured!='0'} - {$lng.general.expires}:&nbsp;{$expiration_dates.featured}{/if}</div>
+		{elseif isset($options.pending_featured) && $options.pending_featured}
+			<div class="small-btn pendingbutton icon">{$lng.listings.pending}&nbsp;{$lng.listings.featured}&nbsp;{$options.pending_featured_days}&nbsp;{$lng.days}</div>
+		{else}
+			<select name="featured" id="featured" onchange="changeFeaturedPlan(this.form, {$appearance.price_format_decimals})" disabled="disabled">
+				{foreach from=$featured_plans item=v name=fp}
+				<option  value="{$v.id}" title="{$v.amount}" {if $options.featured==$v.id || (isset($options.pending_featured) && $options.pending_featured==$v.id)}selected="selected"{/if} >{$v.no_days} {$lng.days} - {if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$v.amount_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</option>
+				{/foreach}
+			</select>	
+		{/if}	
+	</div>
+</div>
+
+{/if}
+
+{if $ads_settings.enable_highlited}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.highlited_price}, document.options.highlited, {$appearance.price_format_decimals} )" name="highlited" {if $options.highlited || (isset($options.pending_highlited) && $options.pending_highlited)}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.highlited}</div>
+		<div class="light">{$ads_settings.highlited_description}{if $ads_settings.highlited_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.highlited_example}" class="imgfield more">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $options.highlited}
+			<div class="small-btn activebutton icon">{$lng.listings.active}{if $expiration_dates.highlited!='0'} - {$lng.general.expires}:&nbsp;{$expiration_dates.highlited}{/if}</div>
+		{elseif isset($options.pending_highlited) && $options.pending_highlited}
+			<div class="small-btn pendingbutton icon">{$lng.listings.pending}</div>
+		{else}
+			{if $ads_settings.highlited_expires>0}{$ads_settings.highlited_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.highlited_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}	
+	</div>
+</div>
+
+{/if}
+
+{if $ads_settings.enable_priorities}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="hidden" name="pri" id="pri" value=""/>
+		<input type="checkbox" onclick="changePriority(this.form, {$appearance.price_format_decimals} )" name="enable_priority" id="enable_priority" {if $options.priority || (isset($options.pending_priority) && $options.pending_priority)}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.priority}</div>
+		<div class="light">{$ads_settings.priorities_description}{if $ads_settings.priorities_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.priorities_example}" class="imgfield more">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $options.priority}
+			<div class="small-btn activebutton icon">{$lng.listings.active}&nbsp;-&nbsp;{$options.priority_name}&nbsp;{if $expiration_dates.priority!='0'} - {$lng.general.expires}:&nbsp;{$expiration_dates.priority}{/if}</div>
+		{elseif isset($options.pending_priority) && $options.pending_priority}
+			<div class="small-btn pendingbutton icon">{$lng.listings.pending}&nbsp;{$options.pending_priority_name}</div>
+		{else}
+			<select name="priority" id="priority" onclick="changePriority(this.form, {$appearance.price_format_decimals})" disabled="disabled">
+				{foreach from=$priorities item=v}
+				<option  value="{$v.order_no}" title="{$v.price}" {if $options.priority==$v.order_no || (isset($options.pending_priority) && $options.pending_priority==$v.order_no)}selected="selected"{/if} >{$v.name} - {if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$v.price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</option>
+				{/foreach}
+			</select>	
+		{/if}	
+	</div>
+</div>
+{/if}
+
+{if $ads_settings.enable_urgent}
+
+<div class="clearfix eoptions">
+	<label class="options_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.urgent_price}, document.options.urgent, {$appearance.price_format_decimals} )" name="urgent" {if $options.urgent || (isset($options.pending_urgent) && $options.pending_urgent)}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.urgent}</div>
+		<div class="light">{$ads_settings.urgent_description}{if $ads_settings.urgent_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.urgent_example}" class="imgfield more">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $options.urgent}
+			<div class="small-btn activebutton icon">{$lng.listings.active}{if $expiration_dates.urgent!='0'} - {$lng.general.expires}:&nbsp;{$expiration_dates.urgent}{/if}</div>
+		{elseif isset($options.pending_urgent) && $options.pending_urgent}
+			<div class="small-btn pendingbutton icon">{$lng.listings.pending}</div>
+		{else}
+			{if $ads_settings.urgent_expires>0}{$ads_settings.urgent_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.urgent_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}	
+	</div>
+</div>
+
+{/if}
+
+{if $ads_settings.enable_video}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.video_price}, document.options.video, {$appearance.price_format_decimals} )" name="video" id="video" {if $options.enabled_video || (isset($options.pending_video) && $options.pending_video)}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.video}</div>
+		<div class="light">{$ads_settings.video_description}{if $ads_settings.video_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.video_example}" class="imgfield more">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $options.enabled_video}
+			<div class="small-btn activebutton icon">{$lng.listings.active}{if $expiration_dates.video!='0'} - {$lng.general.expires}:&nbsp;{$expiration_dates.video}{/if}</div>
+		{elseif isset($options.pending_video) && $options.pending_video}
+			<div class="small-btn pendingbutton icon">{$lng.listings.pending}</div>
+		{else}
+			{if $ads_settings.video_expires>0}{$ads_settings.video_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.video_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}	
+	</div>
+	<div class="clearfix"></div>
+	<div class="clearfix ml50" id="video_div" style="display: none;">
+		<div>{$lng.listings.video_code}</div>
+		<div><textarea name="video_code" cols="30" rows="3" id="video_code">{if isset($video_code)}{$video_code}{/if}</textarea></div>
+	</div>
+	
+</div>
+
+{/if}
+
+{if $ads_settings.enable_url}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.url_price}, document.options.url, {$appearance.price_format_decimals} )" name="url" id="url" {if $options.enabled_url || (isset($options.pending_url) && $options.pending_url)}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.url}</div>
+		<div class="light">{$ads_settings.url_description}{if $ads_settings.url_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.url_example}" class="imgfield more">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $options.enabled_url}
+			<div class="small-btn activebutton icon">{$lng.listings.active}{if $expiration_dates.video!='0'} - {$lng.general.expires}:&nbsp;{$expiration_dates.url}{/if}</div>
+		{elseif isset($options.pending_url) && $options.pending_url}
+			<div class="small-btn pendingbutton icon">{$lng.listings.pending}</div>
+		{else}
+			{if $ads_settings.url_expires>0}{$ads_settings.url_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.url_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}	
+	</div>
+	
+	<div class="clearfix"></div>
+	<div class="clearfix ml50" id="url_div" style="display: none;">
+		<div>{$lng.listings.site_url}</div>
+		<div><input type="text" name="site_url" size="30" id="site_url" value="{if isset($site_url)}{$site_url}{/if}" /></div>
+	</div>
+</div>
+
+{/if}
+
+{if $enable_coupons}
+<div class="option clearfix" id="div_discount" {if !$total}style="display: none;"{/if}>
+	<div class="option_left">{$lng.listings.enter_coupon} :</div>
+	<div class="option_right"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" value="{if isset($discount_code)}{$discount_code}{/if}"/></div>
+</div>
+{/if}
+
+{if $credits_allowed && !$nologin}
+<div class="option clearfix" id="div_credits" {if !$total}style="display: none;"{/if}>
+
+<input type="hidden" name="credit_value" id="credit_value" value="{$credits_settings.unit}"/>
+<input type="hidden" name="current_credits" id="current_credits" value="{$current_credits}"/>
+
+	<div class="option_left">{$lng.credits.credits}</div>
+	<div class="option_right"><b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}<span id="not_enough_credits" {if $current_credits==0 || $current_credits>=$needed_credits}style="display: none;"{/if}> ( {$lng.credits.not_enough_credits} ) </span><span id="no_credits" {if $current_credits==0 || $current_credits<$needed_credits}style="display: none;"{/if}> ( <span id="needed_credits">{$needed_credits}</span> <span id="scredit" {if $needed_credits>1}style="display: none;"{/if}>{$lng.credits.scredit}</span><span id="scredits" {if $needed_credits==1}style="display: none;"{/if}>{$lng.credits.scredits}</span> ) </span>
+</div>
+</div>
+{/if}
+
+<div class="option clearfix" id="div_total" {if !$total}style="display: none;"{/if}>
+
+{if $no_processors>1 || ($no_processors<=1 && $credits_allowed)}
+
+<div class="option_left">{$lng.listings.choose_payment_method} :</div>
+<div class="option_right">
+{foreach from=$payment_processors name=pp item=v}
+<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (!$credits_allowed || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+
+<br/>
+{/foreach}
+</div>
+{else}
+<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+<div class="option_left">{$lng.subscribe.payment_method}:</div>
+<div class="option_right">{$payment_processors[0].processor_title}</div>
+
+{/if}
+</div>
+
+<br/>
+
+<div class="option option_price clearfix">
+{$lng.listings.total}: <b>
+{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+</div>
+
+<div class="option option_price clearfix" id="tax_info" style="display: none;">
+<b>{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;):</b> <b><span id="tax"></span></b>
+</div>
+
+<div class="option option_price clearfix" id="total_with_tax_info" style="display: none;">
+<b>{$lng.general.total_with_tax}:&nbsp;<span class="price" id="total_with_tax"></span></b>
+</div>
+
+</div> {* end options *}
+
+
+<div class="form_footer">
+<div class="buttons rfloat">
+	<span class="negative"><input type="submit" name="Cancel" id="Cancel" value="{$lng.general.cancel}" /></span>
+	<span class="positive"><input type="submit" name="Submit" id="Submit" value="{$lng.general.submit}" /></span>
+</div>
+<div class="clearfix"></div>
+</div>
+
+</form>
+<div id="payment" style="display: none;"></div>
+
+
+{include file="footer.html"}
+{/if}

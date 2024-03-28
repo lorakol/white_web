@@ -1,0 +1,708 @@
+{if !$step}
+
+{include file="header.html"}
+{include file="data/fancybox.html"}
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="wait"></div>
+
+<div class="form_container">
+<div id="heading">{$lng.navbar.renew_listing}</div>
+
+<form name="renewad" id="renewad" method="post" action="renew_listing.php?id={$id}&step=3{if isset($key) && $key}&key={$key}{/if}" enctype="multipart/form-data">
+	<input type="hidden" name="group" id="group" value="{if isset($group)}{$group}{/if}" />
+	<input type="hidden" name="package" id="package" value="" />
+	<input type="hidden" name="subscription" id="subscription" value="" />
+
+<div id="renewad_plans">
+{if $subscriptions|@count}
+
+<div  id="active_subscriptions">
+
+<div class="form_subtitle">{$lng.listings.choose_active_subscription|replace:" ":"&nbsp;"}</div>
+
+	{foreach from=$subscriptions item=v name=plan}
+	<div class="classified_nl pl10 pt10">
+
+		<div class="subscription_title plan_title{$smarty.foreach.plan.index}">
+			<h3>{$v.package_name}</h3>
+		</div>
+
+		<div class="subscription_body">
+
+		<div class="subscription_details">
+			<ul>
+			<li>{$lng.subscriptions.remaining_ads}: <b>{if $v.ads_left==-1}{$lng.general.unlimited}{else}{$v.ads_left}{/if}</b></li>
+			<li>{$lng.subscriptions.date_start}: <b>{$v.date_start_nice}</b></li>
+			{if $v.date_renew_nice}<li>{$lng.subscriptions.date_renew}: <b>{$v.date_renew_nice}</b></li>{/if}
+			<li>{$lng.subscriptions.date_end}: <b>{if $v.date_end_nice}{$v.date_end_nice}{else}{$lng.general.never}{/if}</b></li>
+			</ul>
+		</div>
+
+		<div class="plan_options">
+
+		<ul>
+
+		<li>{$v.no_pictures}&nbsp;{if $v.no_pictures==1}{$lng.packages.picture}{else}{$lng.packages.pictures}{/if}</li>
+
+		{if $ads_settings.enable_featured && $v.featured}<li>{$lng.packages.featured}</li>{/if}
+		{if $ads_settings.enable_highlited && $v.highlited}<li>{$lng.listings.highlited}</li>{/if}
+		{if $ads_settings.enable_priorities && $v.priority}<li>{$lng.listings.priority}&nbsp;{$v.priority_name}</li>{/if}
+		{if $ads_settings.enable_urgent && $v.urgent}<li>{$lng.listings.urgent}</li>{/if}
+		{if $ads_settings.enable_video && $v.video}<li>{$lng.listings.video}</li>{/if}
+		{if $ads_settings.enable_url && $v.url}<li>{$lng.listings.url}</li>{/if}
+
+		</ul>
+
+		</div>
+		<a href="javascript:;" class="select_subscription gray" id="select_subscription{$v.usr_pkg}" alt="{$v.package_id}^{$v.package_name}^{$v.details}^{$v.no_words}"><div class="plan_button">{$lng.listings.select_subscription}</div></a>
+		</div>{* end plan_body *}
+	</div>{* end plan *}
+	{/foreach}
+	<div class="clearfix"></div>
+
+
+<div id="or_choose_plan"><div class="lfloat">{$lng.general.or}&nbsp;</div>
+
+	<div class="form_button"><strong><a href="javascript:;" id="choose_plan">{$lng.newad.choose_a_new_plan}</a></strong></div>
+
+<div class="clearfix"></div>
+</div>{* end or_choose_plan *}
+
+</div>{* end active_subscriptions *}
+
+{/if} {* end subscriptions count *}
+
+
+<div {if $subscriptions|@count}style="display: none;"{/if}  id="available_plans">
+
+<div class="form_subtitle">{$lng.listings.choose_plan|replace:" ":"&nbsp;"}</div>
+
+	{foreach from=$plans_array item=v name=plan}
+	<div class="classified_nl pl10 pt10">
+
+		<div class="plan_title plan_title{$smarty.foreach.plan.index}">
+			<h3>{$v.name}</h3>
+			<div class="small-light">{$v.description}</div>
+		</div>
+		<div class="plan_body">
+
+		<div class="plan_price">{$v.price_curr}</div>
+
+		<div class="plan_options">
+
+		<ul>
+
+		{if $v.type=="sub"}
+		<li>{if $v.subscription_time}{$v.subscription_time}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.days}&nbsp;{$lng.packages.subscription}</li>
+
+		<li>{if $v.no_ads}{$v.no_ads}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.ads}</li>
+	
+		{/if}
+
+		<li>{if $v.no_words}{$v.no_words}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.words}</li>
+
+		<li>{$lng.packages.available}&nbsp;{if $v.no_days}{$v.no_days}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.days}</li>
+
+		<li>{$v.no_pictures}&nbsp;{if $v.no_pictures==1}{$lng.packages.picture}{else}{$lng.packages.pictures}{/if}</li>
+
+		{if $ads_settings.enable_featured && $v.featured}<li class="feature">{$lng.packages.featured}</li>{/if}
+		{if $ads_settings.enable_highlited && $v.highlited}<li class="feature">{$lng.listings.highlited}</span></li>{/if}
+		{if $ads_settings.enable_priorities && $v.priority}<li class="feature">{$lng.listings.priority}&nbsp;{$v.priority_name}</li>{/if}
+		{if $ads_settings.enable_urgent && $v.urgent}<li class="feature">{$lng.listings.urgent}</li>{/if}
+		{if $ads_settings.enable_video && $v.video}<li class="feature">{$lng.listings.video}</li>{/if}
+		{if $ads_settings.enable_url && $v.url}<li class="feature">{$lng.listings.url}</li>{/if}
+
+		</ul>
+		</div>
+
+		<div class="form_button mb10"><strong><a href="javascript:;" class="select_plan gray" id="select_plan{$v.id}" alt="{$v.name}^{$v.no_words}">{$lng.listings.select_plan}</a></strong></div>
+
+		</div>{* end plan_body *}
+	</div>{* end plan *}
+	{/foreach}
+
+	<div class="clearfix"></div>
+
+{if $subscriptions|@count}
+<div id="or_choose_subscription"><div class="lfloat">{$lng.general.or}&nbsp;</div>
+
+	<div class="form_button"><strong><a href="javascript:;" id="choose_subscription">{$lng.listings.choose_active_subscription}</a></strong></div>
+
+<div class="clearfix"></div>
+</div>
+
+{/if}
+
+</div>{* end available_plans *}
+</div> {* end renewad_plans *}
+
+	<div id="plan_selected" class="mt10 mb10 pl10"  style="display: none;">
+
+	<strong>{$lng.listings.package}: </strong><br/>
+
+	<div class="form_button"><strong><a href="javascript:;" id="change_plan"><span class="tag"></span>&nbsp;&nbsp;|&nbsp;{$lng.listings.change_plan}</span></a></strong></div>
+	<div class="clearfix"></div>
+
+	</div>{* end plan_selected *}
+
+	<div id="subscription_selected" class="mb10 pl10" style="display: none;"><strong>{$lng.packages.subscription}: </strong><br/>
+	<span class="tag bold"></span><br/><span class="details"></span><div class="clearfix"></div>
+
+	<div id="or_choose_plan" class="p10">
+		<div class="lfloat"><label>{$lng.general.or}&nbsp;</label></div>
+		<div class="lfloat form_button">
+		<strong><a href="javascript:;" id="choose_plan">{$lng.newad.choose_a_new_plan}</a></strong>
+		</div>
+
+		<div class="clearfix"></div>
+	</div>{* end or_choose_plan *}
+
+	</div> {* end subscription_selected *}
+
+	<div id="renewad_details"></div>
+</form>
+
+<div id="payment" style="display: none;"></div>
+
+</div> {* end form_container *}
+
+
+{literal}
+<script type="text/javascript">
+
+//<![CDATA[
+
+$(document).ready(function() {
+
+
+var options = { 
+       // target:        '#output1',   // target element(s) to be updated with server response 
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  beforeSubmit,  // pre-submit callback 
+        success:       successResponse  // post-submit callback 
+ 
+        // other available options: 
+        //url:       url         // override for form's 'action' attribute 
+        //type:      type        // 'get' or 'post', override for form's 'method' attribute 
+        //dataType:  null        // 'xml', 'script', or 'json' (expected server response type) 
+        //clearForm: true        // clear all form fields after successful submit 
+        //resetForm: true        // reset the form after successful submit 
+ 
+        // $.ajax options can be used here too, for example: 
+        //timeout:   3000 
+    }; 
+
+function beforeSerialize(jqForm, options) {
+
+	$("body").addClass("loading"); 
+	// return false to cancel submit
+
+}
+
+// pre-submit callback 
+function beforeSubmit(formData, jqForm, options) { 
+
+    // formData is an array; here we use $.param to convert it to a string to display it 
+    // but the form plugin does this for you automatically when it submits the data 
+    var queryString = $.param(formData); 
+ 
+    // jqForm is a jQuery object encapsulating the form element.  To access the 
+    // DOM element for the form do this: 
+    // var formElement = jqForm[0]; 
+ 
+    //alert('About to submit: \n\n' + queryString); 
+ 
+    // here we could return false to prevent the form from being submitted; 
+    // returning anything other than false will allow the form submit to continue 
+	if($("#renewad").find("input[type='submit']:focus").attr("id")=="Cancel") {
+		location.href='my_listings.php';
+		return false;
+	}
+
+    return true; 
+} 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+    // for normal html responses, the first argument to the success callback 
+    // is the XMLHttpRequest object's responseText property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'xml' then the first argument to the success callback 
+    // is the XMLHttpRequest object's responseXML property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'json' then the first argument to the success callback 
+    // is the json data object returned by the server 
+ 
+    //alert('status: ' + statusText + '\n\nresponseText: \n' + responseText + 
+    //    '\n\nThe output div should have already been updated with the responseText.'); 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+
+			var final_amount = $("#full_total").val();
+
+			if(ret.response==1) {
+
+				// go to payment page
+				$("#payment").html(ret.payment_form);
+				$("#payment_form").submit();
+
+				return;
+			}
+
+			// response = 0 -> there are errors in submit ad process 
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+
+				// nicEditor fix
+				if(err_field.match("description[a-z0-9_]*")) $("#"+err_field+"_elm").addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".error").offset().top}, 'slow');
+
+			$("body").removeClass("loading");
+
+			{/literal}{if $settings.nologin_image_verification && $settings.enable_recaptcha && !$crt_usr}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+} 
+
+//initialize the AJAX form for submit ad
+ $('#renewad').ajaxForm(options);
+
+
+// ----------- SELECT PLAN ----------
+$(document).on("click", ".select_plan", function(){ 
+
+	// get current selected plan
+	var plan_no = parseInt(jQuery(this).attr("id").substr(11));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var plan_name = split_res[0];
+
+	// set value for selected plan
+	$("#package").val(plan_no);
+	$("#subscription").val(0);
+
+	// change button style
+	$(".select_plan").attr('class', "select_plan gray");
+	$("#select_plan"+plan_no).attr('class', "select_plan");
+
+	$("#renewad_plans").slideUp();
+	$("#plan_selected span").html(plan_name);
+	$("#plan_selected").slideDown();
+	$("#subscription_selected").hide();
+
+	loadOptions(plan_no, 0);
+
+}); // end select_plan click
+
+// ----------- SELECT PLAN ----------
+$(document).on("click", ".select_subscription", function(){ 
+
+	// get current selected subscription
+	var sub_no = parseInt(jQuery(this).attr("id").substr(19));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var plan_no = split_res[0];
+	var sub_name = split_res[1];
+	var sub_details = split_res[2];
+
+	// set value for selected plan
+	$("#package").val(plan_no);
+	$("#subscription").val(sub_no);
+	// change button style
+	$(".select_plan").attr('class', "select_plan gray");
+	$("#select_plan"+plan_no).attr('class', "select_plan");
+
+	$("#renewad_plans").slideUp();
+
+	$("#subscription_selected span.tag").html(sub_name);
+	$("#subscription_selected span.details").html(sub_details);
+	$("#plan_selected").hide();
+	$("#subscription_selected").slideDown();
+
+	loadOptions(plan_no, sub_no);
+
+}); // end select_plan click
+
+
+$(document).on("click", "#change_plan", function(){ 
+
+	// empty plan value
+	$("#package").val(0);
+
+	// show plans box
+	$("#plan_selected").slideUp();
+	$("#renewad_plans").slideDown();
+
+	// hide listing details form
+	$("#renewad_details").html("");
+	$("#renewad_details").show();
+
+}); // end change plan
+
+$(document).on("click", "#choose_subscription", function(){ 
+
+	$("#active_subscriptions").slideDown();
+	$("#available_plans").slideUp();
+
+}); // end choose subscription
+
+
+$(document).on("click", "#choose_plan", function(){ 
+
+	$("#subscription_selected").slideUp();
+	$("#active_subscriptions").slideUp();
+	$("#renewad_plans").slideDown();
+	$("#available_plans").slideDown();
+
+}); // end choose plan
+
+}); // end document.ready
+
+function loadOptions(plan_no, sub_no) {
+
+	var str = "";
+	if(plan_no>0) str+="&plan="+plan_no;
+	if(sub_no>0) str+="&subscription="+sub_no;
+	// get custom fields, images and extra options boxes
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/renew_listing.php?id={/literal}{$id}{if isset($key) && $key}&key={$key}{/if}{literal}&step=2"+str,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#renewad_details").html(data);
+			$('html,body').animate({scrollTop:$(".form_container").offset().top}, 'slow');
+		}// end data
+	}); // end ajax
+
+}
+
+function onVideo() {
+	if($('#video').is(':checked')) $("#video_div").slideDown();
+	else $("#video_div").slideUp();
+}
+function onUrl() {
+    if($('#url').is(':checked')) $("#url_div").slideDown();
+    else $("#url_div").slideUp();
+}
+
+//]]>
+
+</script>
+{/literal}
+
+{include file="footer.html"}
+{/if} {* end if first step *}
+
+
+{if $step==2}
+
+{literal}
+<script type="text/javascript">
+$(document).ready(function() {
+
+	$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+	
+	// *********** tax value **************
+	{/literal}
+	only_processor = 0;
+
+	{if $no_processors>1 || ($no_processors==1 && $credits_allowed)}
+	only_processor = 0;
+	{else}
+	only_processor = 1;
+	{/if}
+
+	{if $total}
+
+	if(only_processor)
+		var processor = $('input[name=processor]').val();
+	else 
+		var processor = $('input:radio[name=processor]:checked').val();		
+
+	var total = $("#full_total").val();
+	calculateTax(processor, total);
+
+
+	{/if} {* end if total *}
+
+	{literal}
+
+
+	$('input:radio[name=processor]').change(function() { 
+
+		processor = $('input:radio[name=processor]:checked').val();
+		calculateTax(processor, $("#full_total").val());
+
+	})
+
+	// end tax value
+
+});
+</script>
+{/literal}
+
+<!-- EXTRA OPTIONS -->
+<div class="form_subtitle">{$lng.listings.extra_options|replace:" ":"&nbsp;"}</div>
+
+<div class="p30">
+
+<div class="eoptions clearfix">
+{if $subscription}
+	<div class="eoptions_left">{$lng.packages.subscription}</div>
+	<div class="eoptions_right"><b><span class="tag">{$plan_name}</span></b></div>
+{else}
+	<div class="eoptions_left">{$lng.listings.package} <b><span class="tag">{$plan_name}</span></b></div>
+	<div class="eoptions_right">{$plan_amount}</div>
+{/if}
+</div>
+
+{if $ads_settings.enable_featured}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="hidden" name="featured_val" id="featured_val" value=""/>
+		<input type="checkbox" onclick="changeFeaturedPlan(this.form, {$appearance.price_format_decimals} )" name="enable_featured" id="enable_featured" {if $featured}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.featured}</div>
+		<div class="light">{$ads_settings.featured_description}{if $ads_settings.featured_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.featured_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $featured}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			<select name="featured" id="featured" onchange="changeFeaturedPlan(this.form, {$appearance.price_format_decimals})" disabled="disabled">
+				{foreach from=$featured_plans item=v name=fp}
+				<option  value="{$v.id}" title="{$v.amount}" {if $featured==$v.id}selected="selected"{/if} >{$v.no_days} {$lng.days} - {if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$v.amount_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</option>
+				{/foreach}
+			</select>
+		{/if}	
+	</div>
+</div>
+
+{/if}
+
+{if $ads_settings.enable_highlited}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.highlited_price}, document.renewad.highlited, {$appearance.price_format_decimals} )" name="highlited" {if $highlited}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.highlited}</div>
+		<div class="light">{$ads_settings.highlited_description}{if $ads_settings.highlited_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.highlited_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $highlited}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			{if $ads_settings.highlited_expires>0}{$ads_settings.highlited_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.highlited_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}	
+	</div>
+</div>
+
+{/if}
+
+{if $ads_settings.enable_priorities}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="hidden" name="pri" id="pri" value=""/>
+		<input type="checkbox" onclick="changePriority(this.form, {$appearance.price_format_decimals} )" name="enable_priority" id="enable_priority" {if $priority}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.priority}</div>
+		<div class="light">{$ads_settings.priorities_description}{if $ads_settings.priorities_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.priorities_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $priority}
+			<div class="small-btn activebutton icon">{$lng.listings.active}&nbsp;-&nbsp;{$options.priority_name}</div>
+		{else}
+			<select name="priority" id="priority" onclick="changePriority(this.form, {$appearance.price_format_decimals})" disabled="disabled">
+				{foreach from=$priorities item=v}
+				<option  value="{$v.order_no}" title="{$v.price}" {if $priority==$v.order_no}selected="selected"{/if} >{$v.name} - {if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$v.price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</option>
+				{/foreach}
+			</select>	
+		{/if}	
+	</div>
+</div>
+{/if}
+
+{if $ads_settings.enable_urgent}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.urgent_price}, document.renewad.urgent, {$appearance.price_format_decimals} )" name="urgent" {if $urgent}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.urgent}</div>
+		<div class="light">{$ads_settings.urgent_description}{if $ads_settings.urgent_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.urgent_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $urgent}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			{if $ads_settings.urgent_expires>0}{$ads_settings.urgent_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.urgent_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}	
+	</div>
+</div>
+
+{/if}
+
+{if $ads_settings.enable_video}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.video_price}, document.renewad.video, {$appearance.price_format_decimals} ); onVideo();" name="video" id="video" {if $video}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.video}</div>
+		<div class="light">{$ads_settings.video_description}{if $ads_settings.video_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.video_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $video}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			{if $ads_settings.video_expires>0}{$ads_settings.video_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.video_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}	
+	</div>
+	<div class="clearfix"></div>
+	<div class="clearfix ml50" id="video_div"{if !$video} style="display: none;"{/if}>
+		<div>{$lng.listings.video_code}</div>
+		<div><textarea name="video_code" cols="70" rows="2" id="video_code">{if isset($video_code)}{$video_code}{/if}</textarea></div>
+	</div>
+	
+</div>
+
+{/if}
+
+{if $ads_settings.enable_url}
+
+<div class="clearfix eoptions">
+	<label class="eoptions_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.url_price}, document.renewad.url, {$appearance.price_format_decimals}); onUrl();" name="url" id="url" {if $url}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading_eo">{$lng.listings.url}</div>
+		<div class="light">{$ads_settings.url_description}{if $ads_settings.url_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.url_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="eoptions_right">
+		{if $options.url}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			{if $ads_settings.url_expires>0}{$ads_settings.url_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.url_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}	
+	</div>
+	
+	<div class="clearfix"></div>
+	<div class="clearfix ml50" id="url_div"{if !$url} style="display: none;"{/if}>
+		<div>{$lng.listings.site_url}</div>
+		<div><input type="text" name="site_url" size="50" id="site_url" value="{if isset($site_url)}{$site_url}{/if}" /></div>
+	</div>
+</div>
+
+{/if}
+
+	<input type="hidden" name="full_total" id="full_total" value="{$total}"/>
+
+	{if $enable_coupons}
+	<div class="option clearfix" id="div_discount" {if !$total}style="display: none;"{/if}>
+		<div class="option_left">{$lng.listings.enter_coupon} :</div>
+		<div class="option_right"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',0, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',0, {$appearance.price_format_decimals})" value="{if isset($discount_code)}{$discount_code}{/if}"/></div>
+	</div>
+	{/if}
+
+	{if $credits_allowed && !$nologin}
+	<div class="option clearfix" id="div_credits" {if !$total}style="display: none;"{/if}>
+
+	<input type="hidden" name="credit_value" id="credit_value" value="{$credits_settings.unit}"/>
+	<input type="hidden" name="current_credits" id="current_credits" value="{$current_credits}"/>
+
+	<div class="option_left">{$lng.credits.credits}</div>
+	<div class="option_right"><b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+	<label class="enh_radio chk_container">
+	<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}<span id="not_enough_credits" {if $current_credits==0 || $current_credits>=$needed_credits}style="display: none;"{/if}> ( {$lng.credits.not_enough_credits} ) </span><span id="no_credits" {if $current_credits==0 || $current_credits<$needed_credits}style="display: none;"{/if}> ( <span id="needed_credits">{$needed_credits}</span> <span id="scredit" {if $needed_credits>1}style="display: none;"{/if}>{$lng.credits.scredit}</span><span id="scredits" {if $needed_credits==1}style="display: none;"{/if}>{$lng.credits.scredits}</span> ) </span>
+	<div class="chk_indicator"></div>
+	</label>
+	</div>
+	</div>
+	{/if}
+
+	<div class="option clearfix" id="div_total" {if !$total}style="display: none;"{/if}>
+
+	{if $no_processors>1 || ($no_processors<=1 && $credits_allowed)}
+
+	<div class="option_left">{$lng.listings.choose_payment_method} :</div>
+	<div class="option_right">
+	{foreach from=$payment_processors name=pp item=v}
+	<label class="enh_radio chk_container">
+	<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (!$credits_allowed || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+	<div class="chk_indicator"></div>
+	</label>
+	{* if subscription choose if recurring *}
+
+	{if isset($is_subscription) && $is_subscription && $v.recurring==2}&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="recurring{$v.processor_code}" checked="checked" />&nbsp;&nbsp;{$lng.subscribe.recurring}{/if}
+
+	<br/>
+	{/foreach}
+	</div>
+	{else}
+	<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+	<div class="option_left">{$lng.subscribe.payment_method}:</div>
+	<div class="option_right">{$payment_processors[0].processor_title}</div>
+
+	{/if}
+	</div>
+
+	<div class="option option_price clearfix">
+	{$lng.listings.total}: <b>
+	{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+	</div>
+
+	<div class="option option_price clearfix" id="tax_info" style="display: none;">
+	{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;): <b><span id="tax"></span></b>
+	</div>
+
+	<div class="option option_price clearfix" id="total_with_tax_info" style="display: none;">
+	{$lng.general.total_with_tax}:&nbsp;<b><span id="total_with_tax"></span></b>
+	</div>
+
+
+	</div> {* end options *}
+
+	<div class="p10">
+	<div class="buttons rfloat">
+		<span class="negative"><input type="submit" name="Cancel" id="Cancel" value="{$lng.general.cancel}" /></span>
+		<span class="positive"><input type="submit" name="Submit" id="Submit" value="{$lng.general.submit}" /></span>
+	</div>
+	<div class="clearfix"></div>
+	</div>
+
+
+{/if}{* end step3 *}

@@ -1,0 +1,25 @@
+<div class="pdiv4 small-light">{$lng.users.image_verification_info}</div>
+<input name="number" id="number" type="text" />
+<div class="pdiv4"><img id="rand_img" src="{$live_site}/include/random_image.php" alt="" />&nbsp;<a href="javascript:;" id="refresh_captcha"><img src="{$template_path}images/refresh.png" /></a></div>
+<script type="text/javascript">
+$(document).ready(function() {
+
+	$("#refresh_captcha").click(function (event) {
+		
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{$live_site}/include/random_image.php?encoded=1",
+		success: function(data) {
+
+				$("#rand_img").attr("src", data); 
+
+			} // end data
+	});// end ajax
+
+	})
+
+
+});
+</script>
+

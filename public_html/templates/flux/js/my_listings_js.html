@@ -1,0 +1,118 @@
+{literal}
+
+<script>
+
+$(document).ready(function() {
+
+	$("input").keypress(function(e)
+	{
+       		// if the key pressed is the enter key
+       		if (e.which == 13)
+       		{
+
+			// delay action so the autocomplete list to fill
+			setTimeout(function() { $("#search").submit();}, 200);
+
+			return false;
+       		}
+	});
+	$("#remove_search").hide();
+	$("#search_box").hide();
+	$("#add_search").click(function()
+	{
+		$("#remove_search").show();
+		$("#add_search").hide();
+		$("#search_box").slideDown('fast').show();
+			
+	});
+
+	$("#remove_search").click(function()
+	{
+		$("#add_search").show();
+		$("#remove_search").hide();
+		$("#search_box").slideUp('fast');
+	});
+
+	$('.tooltip').powerTip({
+		placement: 'n'
+	});
+		
+	$('a.addac').magnificPopup({
+		type: 'ajax',
+		showCloseBtn: true,
+		closeBtnInside:true,
+			callbacks: {
+			close: function() {
+			location.reload(true);
+		}
+		}
+
+	});
+	
+	$("a.email-on").click(function(event){
+
+		var id = jQuery(this).attr("id").substr(8);
+		$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/include/actions.php?action=email-off&object=listing&id="+id,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$("#email-on"+id).hide();
+				$("#email-off"+id).show();
+
+			} // end data
+		});// end ajax
+	}); // end email-on
+	
+	$("a.email-off").click(function(event){
+
+		var id = jQuery(this).attr("id").substr(9);
+		$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/include/actions.php?action=email-on&object=listing&id="+id,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+
+				$("#email-off"+id).hide();
+				$("#email-on"+id).show();
+
+			} // end data
+		});// end ajax
+	}); // end email-off
+	
+}); // end document ready
+
+setTimeout(function() {
+	$('#date_from_vis').datepicker({
+		dateFormat: "M dd yy",
+		changeMonth: true,
+		changeYear: true,
+		altField: '#date_from', altFormat: 'yy-mm-dd'
+	});
+
+	$('#date_to_vis').datepicker({
+		dateFormat: "M dd yy",
+		changeMonth: true,
+		changeYear: true,
+		altField: '#date_to', altFormat: 'yy-mm-dd'
+	});
+}, 1000);
+
+function toggleCheck() {
+
+	if( $("#check-uncheck").hasClass( "checked" )) {
+		uncheckAll(document);
+		$("#check-uncheck").removeClass("checked");
+	}	
+	else{
+		checkAll(document);
+		$("#check-uncheck").addClass("checked");
+	}	
+
+}
+
+</script>
+{/literal}

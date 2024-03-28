@@ -1,0 +1,34 @@
+{if $showcase_allowed==1}
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+<div class="pb30">
+<div class="heading heading_large heading5">{$lng_sw.showcase}</div>
+<div class="heading_large_under heading5-under"></div>
+
+
+<div class="row row-{$row}">
+<div class="lfloat">{$lng.general.status}</div>
+<div class="rfloat gray-bold">
+	{if isset($user.showcase) && $user.showcase}
+		<div class="small-btn activebutton icon mt10">{$lng.listings.active}</div>
+	{elseif isset($user.showcase_pending) && $user.showcase_pending}
+		<div class="small-btn pendingbutton icon mt10">{$lng.listings.pending}</div>
+	{else}
+		<div class="small-btn inactivebutton icon mt10">{$lng.listings.inactive}</div>
+	{/if}
+</div>
+<div class="clearfix"></div>
+</div>
+
+{if !isset($user.showcase) || !$user.showcase}
+{if $row=="odd"}{assign var="row" value="even"}{else}{assign var="row" value="odd"}{/if}
+
+<div class="row row-{$row}">
+<div class="lfloat"></div>
+<div class="rfloat gray-bold"><div class="btn5"><a href="modules/showcase/buy_showcase.php" class="rfloat med-btn btn-green">{$lng_sw.buy_showcase}</a></div>
+</div>
+<div class="clearfix"></div>
+</div>
+{/if}
+</div>
+{/if}

@@ -1,0 +1,132 @@
+#
+#	
+# OxyClassifieds.com : PHP Classifieds (http://www.oxyclassifieds.com)
+# version 9
+# (c) 2017 OxyClassifieds.com (office@oxyclassifieds.com).
+#
+#
+
+<IfModule mod_deflate.c>
+# DEFLATE by type - html, text, css, xml
+AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+
+# DEFLATE by type - javascript
+AddOutputFilterByType DEFLATE application/x-javascript application/javascript text/javascript text/x-js text/x-javascript
+
+# DEFLATE by extension
+AddOutputFilter DEFLATE js css htm html xml
+</IfModule>
+
+
+## Uncomment this if FollowSymLinks is not already enabled on your server
+#Options +FollowSymLinks
+
+## Use mod rewrite
+## Comment the line below if RewriteEngine not already enabled on your server
+RewriteEngine On
+
+## Uncomment the line below and change the path if your script is installed
+## in a different path than the root folder of your domain
+
+#RewriteBase /
+
+# redirect links accesses without www towards the ones with www
+#RewriteCond %{HTTP_HOST} !^www\.
+#RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
+
+#redirect to https
+#RewriteCond %{HTTPS} off
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [NC,L,R=301]
+
+# start SEF links structure
+RewriteRule ^new_listing$ new_listing.php [nc,qsa]
+RewriteRule ^news/?$ modules/news/news.php?page=$1 [nc,qsa]
+RewriteRule ^compare/?$ modules/listings_compare/compare.php
+
+RewriteRule ^recent_ads recent_ads.php [nc,qsa]
+RewriteRule ^featured_ads featured_ads.php [nc,qsa]
+RewriteRule ^auctions auctions.php [nc,qsa]
+RewriteRule ^register register.php [nc,qsa]
+RewriteRule ^login login.php [nc,qsa]
+RewriteRule ^logout logout.php [nc,qsa]
+RewriteRule ^favorites favorites.php [nc,qsa]
+RewriteRule ^contact$ contact.php [nc,qsa]
+RewriteRule ^pre-submit pre-submit.php [nc,qsa]
+RewriteRule ^refine refine.php [nc,qsa]
+RewriteRule ^search/?$ listings.php [nc,qsa,L]
+RewriteRule ^search/([^/]+) listings.php?category_slug=$1 [nc,qsa,L]
+RewriteRule ^users/([^/]+) user_listings.php?user_slug=$1 [nc,qsa,L]
+RewriteRule ^store/([^/]+) store.php?user_slug=$1 [nc,qsa,L]
+RewriteRule ^contact-details/([^/]+) contact_details.php?user_slug=$1 [nc,qsa,L]
+RewriteRule ^content/([^/]+) content.php?cp_slug=$1 [nc,qsa,L]
+RewriteRule ^affiliate/([^./]+)$ index.php?aff=$1 [nc,qsa]
+RewriteCond %{REQUEST_URI} !^/admin/.*$ [NC]
+RewriteRule ^([^./]+)$ index.php?category_slug=$1 [nc,qsa]
+RewriteCond %{REQUEST_URI} !^/include/.*$ [NC]
+RewriteRule ^([^./]+)/([^./]+)/?$ details.php?category_slug=$1&listing_slug=$2 [nc,qsa]
+
+
+# end SEF links structure
+
+# legacy urls
+RewriteRule ^new_listing.html new_listing.php [nc]
+RewriteRule ^index.html index.php [nc]
+RewriteRule ^recent_ads.html recent_ads.php [nc]
+RewriteRule ^featured_ads.html featured_ads.php [nc]
+RewriteRule ^auctions.html auctions.php [nc]
+RewriteRule ^register.html register.php [nc]
+RewriteRule ^login.html login.php [nc]
+RewriteRule ^logout.html logout.php [nc]
+RewriteRule ^favorites.html favorites.php [nc]
+RewriteRule ^contact.html contact.php [nc]
+RewriteRule ^listings.html listings.php [nc]
+RewriteRule ^pre-submit.html pre-submit.php [nc]
+RewriteRule ^refine.html refine.php [nc]
+RewriteRule ^([0-9]+)-([^\/]+)?/content.html$ content.php?id=$1 [nc,qsa]
+RewriteRule ^([0-9]+)-([^\/]+)?/index.html$ index.php?category=$1 [nc,qsa]
+RewriteRule ^([0-9]+)-([^\/]+)?/details.html$ details.php?id=$1 [nc,qsa]
+RewriteRule ^([^\/]+)/([^\/]+)/([^\/]+)/recent_ads.html$ recent_ads.php?page=$1&order=$2&order_way=$3 [nc,qsa]
+RewriteRule ^([^\/]+)/([^\/]+)/([^\/]+)/featured_ads.html$ featured_ads.php?page=$1&order=$2&order_way=$3 [nc,qsa]
+RewriteRule ^([^\/]+)/featured_ads.html$ featured_ads.php?page=$1 [nc,qsa]
+RewriteRule ^([^\/]+)/([^\/]+)/([^\/]+)/auctions.html$ auctions.php?page=$1&order=$2&order_way=$3 [nc,qsa]
+RewriteRule ^([^\/]+)/recent_ads.html$ recent_ads.php?page=$1 [nc,qsa]
+RewriteRule ^([0-9]+)-([^\/]+)?/user_listings.html$ user_listings.php?id=$1 [nc,qsa]
+RewriteRule ^([0-9]+)-([^\/]+)?/contact_details.html$ contact_details.php?id=$1 [nc,qsa]
+RewriteRule ^([0-9]+)-([^\/]+)?/([^\/]+)/([^\/]+)/([^\/]+)/user_listings.html$ user_listings.php?id=$1&page=$3&order=$4&order_way=$5 [nc,qsa]
+RewriteRule ^([0-9]+)-([^\/]+)/([^\/]+)/user_listings.html$ user_listings.php?id=$1&page=$3 [nc,qsa]
+RewriteRule ^([^\/]+)/([^\/]+)/([^\/]+)/favorites.html$ favorites.php?page=$1&order=$2&order_way=$3 [nc,qsa]
+RewriteRule ^([0-9]+)-([^\/]+)?/store.html$ store.php?id=$1 [nc,qsa]
+RewriteRule ^([0-9]+)-([^\/]+)?/([^\/]+)/([^\/]+)/([^\/]+)/store.html$ store.php?id=$1&page=$3&order=$4&order_way=$5 [nc,qsa]
+RewriteRule ^([0-9]+)-([^\/]+)/([^\/]+)/store.html$ store.php?id=$1&page=$3 [nc,qsa]
+
+RewriteCond %{REQUEST_URI} ^(.*)(/listings.html)(.*)$ [NC]
+RewriteCond %{SCRIPT_FILENAME} !-f
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteRule (.*) ./listings.php?$1 [QSA]
+
+#affiliate link
+RewriteCond %{REQUEST_URI} ^(.*)/aff-([0-9]+)(.*)$ [NC]
+RewriteRule (.*) ./index.php?aff=%2
+
+# end legacy urls
+
+# mobile subdomain
+RewriteCond %{HTTP_HOST} ^m\.(.*)$ [NC]
+RewriteRule (.*) %{SCRIPT_FILENAME}?mobile=1 [NC,QSA]
+
+## Uncomment the following line when activating location subdomains
+## Don't forget to replace yourdomainname.com with your own domain name !
+#RewriteCond %{HTTP_HOST} !www.yourdomainname.com$ [NC]
+#RewriteCond %{HTTP_HOST} ^(www.)?([a-z0-9-_]+).yourdomainname.com [NC]
+#RewriteRule (.*) %{SCRIPT_FILENAME}?crt_city=%2 [NC,QSA]
+
+# error page
+# if your script is installed in a subfolder then correct the path below by adding the 
+# subfolder in the following way: /subfolder/notfound.php
+ErrorDocument 404 /notfound.php
+
+# dealer subdomain
+#RewriteCond %{HTTP_HOST} !www.domain.com$ [NC]
+#RewriteCond %{HTTP_HOST} ^(www.)?([a-z0-9-_]+).domain.com [NC]
+#RewriteCond %{REQUEST_URI} !^/include/.*$ [NC]
+#RewriteRule (.*) store.php?crt_dealer=%2 [nc,qsa]

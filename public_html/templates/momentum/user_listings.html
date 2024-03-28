@@ -1,0 +1,388 @@
+{include file="header.html"}
+
+{if $invalid_user}
+<div class="main box">
+<div class="pdiv1 pb30">
+<div class="info"><p>{$lng.users.no_such_id}</p></div>
+</div>
+</div>
+{else}
+
+	{capture name=some_content assign=lcol_width}{math equation="w-w1" w=$appearance.outer_table w1=770}{/capture}
+
+	<script type="text/javascript">
+	//<![CDATA[
+
+	{foreach from=$gmaps item=v}
+		{if isset($user[$v.caption]) && $user[$v.caption] && $v.public}
+			{include file="data/map-ro.html"}
+		{/if}
+	{/foreach}
+
+
+function init_gmap() {
+
+	{foreach from=$user_fields_array item=v}
+		{if $v.type=="google_maps" &&  $tmp[$v.caption]}
+			init_gmap_{$v.caption}();
+		{/if}
+	{/foreach}
+
+}
+function init_osm() {
+
+	{foreach from=$user_fields_array item=v}
+		{if $v.type=="google_maps" &&  $tmp[$v.caption]}
+			init_osm_{$v.caption}();
+		{/if}
+	{/foreach}
+
+}
+
+	$(document).ready(function() {
+
+	var gmaps_on = {if $gmaps}1{else}0{/if};
+	// initialize google maps
+	if (gmaps_on) {
+	{if $settings.map_type=="gmaps"}
+	load_gmaps();
+	{else}
+	init_osm();
+	{/if}
+	}
+
+	});
+
+	//]]>
+	</script>
+
+
+{literal}
+<style type="text/css">
+
+	.smallimg { width: {/literal}{$ads_settings.thmb_width}{literal}px; height: {/literal}{$ads_settings.thmb_height}{literal}px; }
+	.highlited { background: {/literal}{$ads_settings.highlited_color}{literal}; }
+	.rclass { {/literal}{if $text_direction=="rtl"}margin-right: {$ads_settings.thmb_width}px;{else}margin-left: {$ads_settings.thmb_width}px;{/if}{literal} }
+
+	@media all and (min-width: 801px)
+	{
+		.rclass { height: 80px; }
+	}
+
+</style>
+{/literal}
+
+
+<div class="main box">
+
+<div class="pdiv1">
+
+    {if in_array("showcase",$modules_array)}
+    {include file="modules/showcase/showcase.html"}
+    {/if}
+
+
+	<div class="heading inline lfloat" style="margin-{if $text_direction=="rtl"}left{else}right{/if}: 10px;"><h1>{if $self_noext=="store"}{$user[$settings.contact_name_field]} {$lng.users.store}{else}{$lng.listings.all_listings_for} {$user[$settings.contact_name_field]}{/if}</h1></div>
+
+	{* ratings *}
+
+	{if in_array("ratings",$modules_array) && $ratings_settings.rate_listings}
+	<div class="inline">
+	{include file="modules/ratings/user_rating.html"}
+	</div>
+	{/if}
+
+	{* end ratings *}
+
+ <div class="clearfix"></div>
+
+
+	<div class="lfloat tabs">
+
+	<ul>
+	<li class="crt tlist"><a href="javascript:;" id="view-user-info">{if $self_noext=="store"}{$lng.users.store_info}{else}{$lng.users.user_info}{/if}</a></li>
+
+	<li class="tlist"><a href="javascript:;" id="view-user-listings">{$lng.users.user_listings}</a></li>
+
+	{if  in_array("ratings", $modules_array) && $ratings_settings.rate_users && $ratings_settings.enable_reviews && (in_array($user.group, $ratings_settings.groups_array) || !$ratings_settings.groups)}
+	<li class="tlist"><a href="javascript:;" id="view-reviews">{$lng_ratings.reviews} (<span id="tab_no_reviews">{$no_reviews}</span>)</a></li>
+	{/if}
+
+	</ul>
+
+	</div> {* end tabs *}
+
+</div>{* end pdiv1 *}
+
+<div class="clearfix"></div>
+
+{* tab contents box  *}
+<div class="pdiv2 gdiv">
+
+	{* ------------- user details ------------- *}
+	<a href="#user-info-view" class="accordion-header">{if $self_noext=="store"}{$lng.users.store_info}{else}{$lng.users.user_info}{/if}</a>
+	<div class="tab-content first" id="user-info-view">
+
+	<div class="wbox p20">
+	<div class="col-6">
+
+	{if $special_user_fields.logo && $special_user_fields.logo && isset($user[$special_user_fields.logo]) && $user[$special_user_fields.logo]}
+	<img src="{$live_site}/uploads/{$special_user_fields.logo}/{$user[$special_user_fields.logo]}" />
+	{/if}
+
+	{* contact information *}
+
+	{foreach from=$user_fields_array item=v}
+
+	{capture name=some_content assign=pub_field}pb_{$v.caption}{/capture}
+	
+	{if isset($user[$v.caption]) && $user[$v.caption]  && ($v.public==1 || ($v.public==2 && $user[$pub_field]==1 )) && $v.type!="google_maps" && $v.type!="youtube" && $v.type!="logo"}
+
+	<div class="fdesc">
+	<span>{$v.name}:</span>
+
+	{if $v.type=='url'}<a href="{$user[$v.caption]}" target="_blank" rel="nofollow">{/if}
+	{if isset($v.prefix) && $v.prefix}{$v.prefix}{/if}
+
+	{if $v.type=="date"}
+	{$user.vis[$v.caption]}
+
+	{elseif $v.type=="multiselect"}
+	{", "|implode:$user[$v.caption]}
+
+	{elseif $v.type=="checkbox"}
+	{if $user[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+	{elseif $v.type=="checkbox_group"}
+
+	{foreach from=$user[$v.caption] item=t name=check}
+		<div class="lfloat check_on" >{$t}</div>
+		
+	{/foreach}
+	<div class="clearfix"></div>
+
+	{elseif $v.type=="user_email"}
+
+	<span class="aw"><img src="{$template_path}images/email.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_email}</a>
+
+	{elseif $v.type=="phone"}
+
+	<span class="aw"><img src="{$template_path}images/phone.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_phone}</a>
+
+	{elseif $v.type=="whatsapp"}
+
+	<span class="aw"><img src="{$template_path}images/whatsapp.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_whatsapp}</a>
+
+	{elseif $v.type!="file" && $v.type!="image"}
+
+	{if $v.type=="menu" && $user[$v.caption]=="all" && $v.all_val}
+	{$lng.general.all}
+	{else}
+	{$user[$v.caption]}
+	{/if}
+
+	{else}
+		{if $v.type=="file"}
+		<a href="{$live_site}/uploads/{$v.caption}/{$user[$v.caption]}"><img src="{$template_path}images/download.png" class="tooltip mbm7" alt="" name="{$lng.general.download}"/></a><div class="clearfix"></div>
+		{/if}
+
+		{if $v.type=="image"}
+		<a href="{$live_site}/uploads/{$v.caption}/{$user[$v.caption]}" class="imgfield"><img src="{$template_path}images/camera.png" alt="" /></a><div class="clearfix"></div>
+		{/if}
+	{/if}
+
+	{if isset($v.postfix) && $v.postfix}{$v.postfix}{/if}
+
+	{if $v.type=='url'}</a>{/if}
+
+</div> {* end fdesc *}
+
+
+	{/if}
+	{/foreach}
+	</div>{* end wdiv *}
+
+	<div class="col-6">
+
+	{foreach from=$user_fields_array item=v}
+
+	{if isset($user[$v.caption]) && $user[$v.caption] && $v.type=='youtube' }
+
+	<div class="heading heading_large heading1">{$v.name}</div>
+	<div class="heading_large_under heading1-under"></div>
+
+	<div class="pb30">{$user[$v.caption]}</div>
+	
+
+	{/if} {* end youtube *}
+
+	{if isset($user[$v.caption]) && $user[$v.caption] && $v.type=='google_maps' }
+
+	<div class="heading heading_large heading1">{$v.name}</div>
+	<div class="heading_large_under heading1-under"></div>
+	
+	<div id="gm_{$v.caption}" class="map pb30"></div>
+
+	{/if} {* end map *}
+
+	{/foreach}
+
+	</div> {* end rfloat  *}
+	<div class="clearfix"></div>
+	</div> {* end wbox p20 *}
+
+
+	</div> {* end user-info-view *}
+
+	{* ------------- listings ------------- *}
+	<a href="#user-listings-view" class="accordion-header">{$lng.users.user_listings}</a>
+	<div id="user-listings-view" class="tab-content">
+
+{if $no_listings>0}
+
+	<div class="sc1"></div>
+
+	<div class="mb10 clearfix">
+	{include file="paginator.html"}
+	</div>
+
+	{include file="order_listings.html"}
+
+	{foreach name="listings" from=$listings_array item=v}
+		{include file="short_listing.html"}
+
+		{if ($smarty.foreach.listings.index+1)==$appearance.ads_per_page/2|ceil && $smarty.foreach.listings.index!=$listings_array|@count-1}
+		{* ------ listings4 banners ------- *}
+		{if in_array('listings4',$banners_positions)}
+		{banner->getTemplateBanners p1='listings4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+		{if $array_banners|@count}<div class="clearfix" style="margin: 10px 0 10px 0;"></div><div class="dcenter">{/if}
+		{foreach from=$array_banners item=v}
+		<div class="vert_banners">{include file="banner.html"}</div><div class="clearfix"></div>
+		{/foreach}
+		{if $array_banners|@count}</div>{/if}{/if}
+		{* ------- end listings4 banners ------- *}
+		{/if}
+
+	{/foreach}
+
+	{* if listings_compare *}
+	{if in_array("listings_compare", $modules_array)}
+	{include file="modules/listings_compare/cmp_js.html"}
+	{/if}
+
+	<div class="clearfix">
+	{include file="paginator.html"}
+	</div>
+
+{else}
+	<div class="info"><p>{$lng.listings.no_listings}</p></div>
+{/if}
+
+	</div> {* end user-listings-view *}
+
+	{* ------------- reviews ------------- *}
+	{if  in_array("ratings", $modules_array) && $ratings_settings.rate_users && $ratings_settings.enable_reviews && (in_array($user.group, $ratings_settings.groups_array) || !$ratings_settings.groups)}
+	<a href="#reviews-view" class="accordion-header">{$lng_ratings.reviews} (<span id="tab_no_reviews">{$no_reviews}</span>)</a>
+	<div id="reviews-view" class="tab-content">
+
+	{include file="modules/ratings/user_reviews.html"}
+
+	</div> {* end reviews-view *}
+	{/if}
+
+</div> {* end pdiv2 *}
+
+</div>{* end main *}
+
+
+	<script type="text/javascript">
+		{literal}
+		jQuery(document).ready(function(){
+
+	$(".accordion-header").on('click',function(){
+		$("div.first").removeClass("first");
+	});
+
+	$("#view-user-info").on('click',function(){
+		$(".tab-content").hide();
+		$("#user-info-view").show();
+		$("li.tlist").removeClass("crt");
+		$("#view-user-info").parent().addClass("crt");
+	});
+
+	$("#view-user-listings").on('click',function(){
+		$(".tab-content").hide();
+		$("#user-listings-view").show();
+		$("li.tlist").removeClass("crt");
+		$("#view-user-listings").parent().addClass("crt");
+	});
+
+	{/literal}
+	{if in_array("ratings",$modules_array)}
+	{literal}
+
+	$("#view-reviews").on('click',function(){
+		$(".tab-content").hide();
+		$("#reviews-view").show();
+		{/literal}
+		{if $ratings_settings.ar_html_editor && !$rating_nologin && !$same_user}
+			loadReviewsEditor();
+		{/if}
+		{literal}
+		$("li.tlist").removeClass("crt");
+		$("#view-reviews").parent().addClass("crt");
+	});
+
+	$("#h-view-reviews").on('click',function(){
+
+		{/literal}
+		{if $ratings_settings.ar_html_editor && !$rating_nologin && !$same_user}
+			loadReviewsEditor();
+		{/if}
+		{literal}
+	});
+	{/literal}
+	{/if}
+	{literal}
+
+	$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+
+	{/literal}
+	{if $page>=1}
+	{literal}
+	$("#view-user-listings").trigger( "click" );
+	{/literal}
+	{/if}
+	{literal}
+
+
+
+	$("a.more").click(function(event){
+
+		var field = jQuery(this).attr("id").substr(5);
+
+		$.ajax({
+			type		: "GET",
+			cache		: false,
+			url		: "{/literal}{if $ads_settings.dealer_subdomain && $self_noext=='store'}{seo->makeDealerLink p1=$id}{else}{$live_site}/{/if}include/get_phone.php?id={$id}&field={literal}"+field,
+			data		: $(this).serializeArray(),
+			success: function(data) {
+
+				$("#span_"+field).html(data);
+				$("#show_"+field).hide();
+
+			} // end data
+		});// end ajax
+
+	});
+
+		});
+
+		{/literal}
+
+	</script>
+
+	{include file="js/listings_js.html"}
+
+{/if}
+{include file="footer.html"}

@@ -1,0 +1,37 @@
+{include file="header.html"}
+
+<div class="page_title"><a href="{$live_site}/{$admin_folder}/modules.php">{$lng.panel.modules}</a> > {$lng_cfgth.title}</div>
+
+<div class="p30">
+<form name="cfgth_settings" method="post" action="">
+
+<div class="form_container">
+
+{if isset($error) && $error != ""}<div class="error">{$error}</div>{/if}
+
+
+{foreach from=$cfgth_templates item=v}
+<div class="form_subtitle_bg"><div class="btn1"><strong>{$v.template_name}</strong></div></div>
+<div class="clearfix">
+	<div class="left_form">{$lng.general.enabled}</div>
+	<div class="right_form"><input type="checkbox" name="active{$v.id}" {if $v.active==1}checked{/if} /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.categs_per_row}</div>
+	<div class="right_form"><input type="text" size="4" name="max_cat_per_row{$v.id}" value="{$v.max_cat_per_row}" /></div>
+</div>
+{/foreach}
+
+<div class="form_footer">
+	<div class="buttons rfloat" onClick='{if $demo}alert("{$lng.general.errors.demo}");return false;{/if}'>
+		<span class="positive"><input type="submit" name="Submit" id="Submit" value="{$lng.general.submit}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+</div> {* end form_container *}
+</form>
+</div> {* p30 *}
+
+{include file="footer.html"}

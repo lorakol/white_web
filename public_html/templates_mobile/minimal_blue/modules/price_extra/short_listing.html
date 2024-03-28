@@ -1,0 +1,4 @@
+{if $v.price>0 || ($v.price==0 && $pe_settings[$v.fieldset].use_free==0)}<div class="price">{$v.price_curr}{if $v.price>0 && $pe_settings[$v.fieldset].use_negotiable==1 && $v.negotiable==1}&nbsp;{$pe_settings[$v.fieldset].lang[$crt_lang].negotiable}{/if}</div>
+{elseif $v.price==0 && $pe_settings[$v.fieldset].use_free==1}<div class="price">{$pe_settings[$v.fieldset].lang[$crt_lang].free|replace:" ":"&nbsp;"}</div>
+{elseif $v.price==-1 && $pe_settings[$v.fieldset].use_tags==1 && $v.price_tag}<div class="price">{$v.price_tag|replace:" ":"&nbsp;"}</div>
+{/if}

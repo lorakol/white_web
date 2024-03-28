@@ -1,0 +1,375 @@
+{if !$step}
+<script src="https://js.stripe.com/v3/"></script>
+{literal}
+<script>
+
+//<![CDATA[
+
+$(document).ready(function() {
+
+
+var options = { 
+       // target:        '#output1',   // target element(s) to be updated with server response 
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  beforeSubmit,  // pre-submit callback 
+        success:       successResponse  // post-submit callback 
+ 
+        // other available options: 
+        //url:       url         // override for form's 'action' attribute 
+        //type:      type        // 'get' or 'post', override for form's 'method' attribute 
+        //dataType:  null        // 'xml', 'script', or 'json' (expected server response type) 
+        //clearForm: true        // clear all form fields after successful submit 
+        //resetForm: true        // reset the form after successful submit 
+ 
+        // $.ajax options can be used here too, for example: 
+        //timeout:   3000 
+    }; 
+
+function beforeSerialize(jqForm, options) {
+
+	$("body").addClass("loading"); 
+	// return false to cancel submit
+
+}
+
+// pre-submit callback 
+function beforeSubmit(formData, jqForm, options) { 
+
+    // formData is an array; here we use $.param to convert it to a string to display it 
+    // but the form plugin does this for you automatically when it submits the data 
+    var queryString = $.param(formData); 
+ 
+    // jqForm is a jQuery object encapsulating the form element.  To access the 
+    // DOM element for the form do this: 
+    // var formElement = jqForm[0]; 
+ 
+    //alert('About to submit: \n\n' + queryString); 
+ 
+    // here we could return false to prevent the form from being submitted; 
+    // returning anything other than false will allow the form submit to continue 
+
+	if($("#renewad").find("input[type='submit']:focus").attr("id")=="Cancel") {
+		location.href='my_listings.php';
+		return false;
+	}
+
+    return true; 
+} 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+    // for normal html responses, the first argument to the success callback 
+    // is the XMLHttpRequest object's responseText property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'xml' then the first argument to the success callback 
+    // is the XMLHttpRequest object's responseXML property 
+ 
+    // if the ajaxForm method was passed an Options Object with the dataType 
+    // property set to 'json' then the first argument to the success callback 
+    // is the json data object returned by the server 
+ 
+    //alert('status: ' + statusText + '\n\nresponseText: \n' + responseText + 
+    //    '\n\nThe output div should have already been updated with the responseText.'); 
+
+//alert(responseText);
+			var ret = JSON.parse(responseText);
+
+			var final_amount = $("#full_total").val();
+
+			if(ret.response==1) {
+
+				// go to payment page
+				var selected_processor = $('#selected_processor').val();
+
+		$("#checkout-form").html("");
+
+		if(selected_processor=="iyzico") {
+		    $("body").addClass("loading");
+		    $( '<div id="checkout-form"><div id="iyzipay-checkout-form" class="responsive"></div></div>' ).insertAfter( "#renewad" );
+		    $("#renewad").hide();
+		}
+				    
+				$("#payment").html(ret.payment_form);
+
+				if(selected_processor=="klarna" || selected_processor=="tpay" || selected_processor=="iyzico") {
+					$("body").removeClass("loading");
+					$("#payment").slideDown();
+					$('html,body').animate({scrollTop:$("#payment").offset().top}, 'slow');
+					$(".form_footer").hide();
+					$("#payment_form").submit();
+				}
+				else 
+					$("#payment_form").submit();
+		if(selected_processor=="iyzico") 
+		    $("body").removeClass("loading");
+
+				return;
+			}
+
+			// response = 0 -> there are errors in submit ad process 
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				
+				/*if(!err_field) { $("#plan_selected").prepend('<div class="left_form">&nbsp;</div><div class="right_form clearfix"><label class="err_label" id="nofield_err">'+err_string+'</label></div><div class="clearfix"></div>'); $("#nofield_err").addClass("err"); continue; }*/
+
+				
+				$("#"+err_field).addClass("err");
+
+				// nicEditor fix
+				if(err_field.match("description[a-z0-9_]*")) $("#"+err_field+"_elm").addClass("err");
+				$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".error").offset().top}, 'slow');
+
+			$("body").removeClass("loading");
+
+			{/literal}{if $settings.nologin_image_verification && $settings.enable_recaptcha && !$crt_usr}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+//initialize the AJAX form for submit ad
+ $('#renewad').ajaxForm(options);
+
+
+// ----------- SELECT PLAN ----------
+$(document).on("click", ".select_plan", function(){ 
+
+	// get current selected plan
+	var plan_no = parseInt(jQuery(this).attr("id").substr(11));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var plan_name = split_res[0];
+
+	// set value for selected plan
+	$("#package").val(plan_no);
+	$("#subscription").val(0);
+
+	$("#renewad_plans").slideUp();
+	$("#plan_selected span").html(plan_name);
+	$("#plan_selected").slideDown();
+	$("#subscription_selected").hide();
+
+	loadOptions(plan_no, 0);
+	loadPlanInfo();
+	reinit();
+
+}); // end select_plan click
+
+// ----------- SELECT PLAN ----------
+$(document).on("click", ".select_subscription", function(){ 
+
+	// get current selected subscription
+	var sub_no = parseInt(jQuery(this).attr("id").substr(19));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var plan_no = split_res[0];
+	var sub_name = split_res[1];
+	var sub_details = split_res[2];
+
+	// set value for selected plan
+	$("#package").val(plan_no);
+	$("#subscription").val(sub_no);
+
+	$("#renewad_plans").slideUp();
+
+	$("#subscription_selected span.tag").html(sub_name);
+	$("#subscription_selected span.details").html(sub_details);
+	$("#plan_selected").hide();
+	$("#subscription_selected").slideDown();
+
+	loadOptions(plan_no, sub_no);
+	loadPlanInfo();
+	reinit();
+
+}); // end select_plan click
+
+
+$(document).on("click", "#change_plan", function(){ 
+
+	// empty plan value
+	$("#package").val(0);
+
+	// show plans box
+	$("#plan_selected").slideUp();
+	$("#renewad_plans").slideDown();
+
+	// hide listing details form
+	$("#renewad_details").html("");
+	$("#renewad_details").show();
+
+}); // end change plan
+
+$(document).on("click", "#choose_subscription", function(){ 
+
+	$("#active_subscriptions").slideDown();
+	$("#available_plans").slideUp();
+
+}); // end choose subscription
+
+
+$(document).on("click", "#choose_plan", function(){ 
+
+	$("#subscription_selected").slideUp();
+	$("#active_subscriptions").slideUp();
+	$("#renewad_plans").slideDown();
+	$("#available_plans").slideDown();
+	
+	// hide listing details form
+	$("#renewad_details").html("");
+	$("#renewad_details").show();
+
+
+}); // end choose plan
+
+}); // end document.ready
+
+function loadOptions(plan_no, sub_no) {
+
+	var str = "";
+	if(plan_no>0) str+="&plan="+plan_no;
+	if(sub_no>0) str+="&subscription="+sub_no;
+	// get custom fields, images and extra options boxes
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/renew_listing.php?id={/literal}{$id}{if isset($key) && $key}&key={$key}{/if}{literal}&step=2"+str,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#renewad_details").html(data);
+			}// end data
+	}); // end ajax
+
+}
+
+function loadPlanInfo() {
+
+	var plan_no = $("#package").val();
+
+	var str = "";
+	if(plan_no>0) str+="&plan="+plan_no;
+	
+	// get listing plan information
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/renew_listing.php?id={/literal}{$id}{literal}&step=4"+str,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#plan_details").html(data);
+		}// end data
+	}); // end ajax
+
+}
+$("#view_plan_info,#view_sub_info").magnificPopup({
+		type: 'inline',
+		fixedContentPos: false,
+		fixedBgPos: true,
+		overflowY: 'auto',
+		closeBtnInside: true,
+		preloader: false,
+		midClick: true
+});
+
+function onVideo() {
+	if($('#video').is(':checked')) $("#video_div").slideDown();
+	else $("#video_div").slideUp();
+}
+
+function onUrl() {
+	if($('#url').is(':checked')) $("#url_div").slideDown();
+	else $("#url_div").slideUp();
+}
+
+//]]>
+
+</script>
+{/literal}
+
+{/if}
+
+{if $step==2}
+
+{literal}
+<script>
+$(document).ready(function() {
+
+	$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+
+	// *********** tax value **************
+	{/literal}
+	only_processor = 0;
+
+	{if $no_processors>1 || ($no_processors==1 && isset($credits_allowed) && $credits_allowed)}
+	only_processor = 0;
+	{else}
+	only_processor = 1;
+	{/if}
+
+	{if $total}
+
+	if(only_processor)
+		var processor = $('input[name=processor]').val();
+	else 
+		var processor = $('input:radio[name=processor]:checked').val();		
+
+	var total = $("#full_total").val();
+	calculateTax(processor, total);
+
+
+	{/if} {* end if total *}
+
+	{literal}
+
+
+	$('input:radio[name=processor]').change(function() { 
+
+		processor = $('input:radio[name=processor]:checked').val();
+		calculateTax(processor, $("#full_total").val());
+
+		// for embedded payments
+		$("#selected_processor").val(processor);
+		reinit();
+
+	})
+
+	// end tax value
+
+	$("#view_plan_info1").magnificPopup({
+		type: 'inline',
+		fixedContentPos: false,
+		fixedBgPos: true,
+		overflowY: 'auto',
+		closeBtnInside: true,
+		preloader: false,
+		midClick: true
+});
+
+});
+</script>
+{/literal}
+{/if}

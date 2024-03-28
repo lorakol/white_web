@@ -1,0 +1,93 @@
+<section id="video_ads">
+    <div class="tab_content" id="video_tab_content">
+
+    		{section name=loop start=0 loop=$no_video step=1}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$video[loop].id p2=$video[loop].title p3='' p4=$video[loop].category_id p5=$video[loop].slug}{else}{$live_site}/details.php?id={$video[loop].id}{/if}{/capture}
+
+			<a href="{$details_url}">
+			<div class="box-container">
+			<div class="fbox box clearfix{*{if $v.highlited && $ads_settings.enable_highlited} highlited{/if}*}">
+
+				<img id="fpic{$video[loop].id}" src="{$live_site}/{$video[loop].medImage}" alt="{if $video[loop].image_id}{$video[loop].title|strip_tags:false|substr:0:100}{/if}" />
+
+				{if $video[loop].sold}<div class="ribbon ribbon_sold"><span>{$lng.listings.sold}</span></div>{/if}
+				{if $video[loop].rented}<div class="ribbon ribbon_rented"><span>{$lng.listings.rented}</span></div>{/if}
+
+				{if in_array("acategories", $modules_array) && in_array($video[loop].category_id, $ac_settings.array_categories_list)}
+				<div id="ac{$video[loop].id}" class="ac_over">{$lng.general.click_to_view}</div>
+				{/if}
+
+				<div class="ltitle">{if $data_set=="cars" && ((isset($video[loop].make) && $video[loop].make) || (isset($video[loop].model) && $video[loop].model))}{$video[loop].make} {$video[loop].model}{else}{if $appearance.charset=="UTF-8"}{$video[loop].title|mb_truncate:30:"...":"UTF-8"}{else}{$video[loop].title|truncate:30:"...":false}{/if}{/if}</div>
+
+				<div class="lloc">{$video[loop].location_str}</div>
+
+				{if $ads_settings.enable_price}
+
+					{if in_array("price_extra",$modules_array) && ( isset($pe_settings[$video[loop].fieldset]) || isset($pe_settings[0]) )}
+
+						{include file="modules/price_extra/gallery_listing.html" pe_listing=$video[loop]}
+
+					{else}
+
+						{if !empty($video[loop].price) && $video[loop].price>=0}<div class="lprice">{$video[loop].price_curr}</div>{/if}
+
+					{/if}
+
+				{/if} {* end if enable price *}
+
+				{if !in_array($video[loop].id, $fav_array)}
+				<div class="starfav addtofav tooltip make-fav" id="fav{$video[loop].id}" title="{$lng.listings.add_to_favourites}"></div>
+				{else}
+				<div class="starfav remfav tooltip rem-fav" id="fav{$video[loop].id}" title="{$lng.listings.remove_favourite}"></div>
+				{/if}
+{*				
+				{if $v.urgent && $ads_settings.enable_urgent}<div class="clearfix"></div><div class="mt5"><span class="urgent sq-btn sq-btn1">{$lng.listings.urgent}</span></div>{/if}
+*}
+			</div>
+			</div>
+			</a>
+		{/section}
+
+		<div class="clearfix"></div>
+
+    </div>
+
+	{if $no_video}
+		<div><a href="{$live_site}/modules/video_ads/video_ads.php"><h2 class="view_more">{$lng_va.view_all_video}</h2></a></div>
+		<div class="clearfix"></div>
+	{/if}
+
+
+    <hr/>
+</section>
+
+
+<script>
+//<![CDATA[
+jQuery(document).ready(function() {
+
+//	$('#tab_video').prop('checked', true);
+
+	if($('#tab_video').is(':checked')) {
+		$('#video_tab_content').imagesLoaded( function() {
+			startMasonryvideo();
+		});
+	}
+
+});
+
+$('input:radio[name="tabs"]').change(function() { if ($(this).attr("id") == 'tab_video') startMasonryvideo(); });
+
+
+function startMasonryvideo() {
+
+$('#video_tab_content').masonry({
+  // options
+  itemSelector: '.box-container'
+});
+
+}
+
+//]]>
+</script>

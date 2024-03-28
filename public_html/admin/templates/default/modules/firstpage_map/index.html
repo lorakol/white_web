@@ -1,0 +1,30 @@
+{include file="header.html"}
+
+<div class="page_title"><a href="{$live_site}/{$admin_folder}/modules.php">{$lng.panel.modules}</a> > Firspage Google Map</div>
+
+<div class="p30">
+<form name="fpm_settings" method="post" enctype="multipart/form-data" action="">
+
+<div class="form_container">
+
+{if isset($error) && $error != ""}<div class="error">{$error}</div>{/if}
+
+<div class="clearfix">
+	<div class="left_form">Number of listings</div>
+	<div class="right_form">
+		<input type="text" size="6" name="no_ads" id="no_ads" value="{if isset($fpm_settings.no_ads) && $fpm_settings.no_ads}{$fpm_settings.no_ads}{/if}" />	&nbsp;ads
+	</div>
+</div>
+
+<div class="form_footer">
+	<div class="buttons rfloat" onClick='{if $demo}alert("{$lng.general.errors.demo}");return false;{/if}'>
+		<span class="positive"><input type="submit" name="Submit" id="Submit" value="{$lng.general.submit}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+</div> {* end form_container *}
+</form>
+</div> {* p30 *}
+
+{include file="footer.html"}

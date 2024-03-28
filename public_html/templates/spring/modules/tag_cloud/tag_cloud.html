@@ -1,0 +1,6 @@
+<div id="tagcloud">
+	{if $tag_cloud_title}<h1 class="head">{$tag_cloud_title}</h1>{/if}
+	{foreach from=$tag_cloud_array item=v}
+		<span class="{$v.class}"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$sef_keyword p2=$v.word}{else}{$live_site}/listings.php?{$sef_keyword}={$v.word|urlencode}{/if}">{$v.word}</a></span>
+	{/foreach}
+</div>

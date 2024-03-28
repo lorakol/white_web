@@ -1,0 +1,48 @@
+
+	<form name="report_form" id="report_form" method="post" action="{$live_site}/report.php?post=1&id={$id}">
+
+	<div class="form2 mt20">
+
+	<div id="report_info" class="info" style="display: none;">
+		<span class="closebtn" onclick='$("#report_info").hide();'>&times;</span>
+		<span class="content"></span>
+	</div>
+
+	<div id="report" class="hidden cf_form">
+	<div class="heading">{$lng.listings.report_abusive}</div>
+	<ul>
+	
+		<li>
+			<label for="report_name">{$lng.recommend.your_name}<span class="mandatory"> *</span></label>
+			<input type="text" name="your_name" id="report_name" value="{if isset($crt_usr_sett[$settings.contact_name_field])}{$crt_usr_sett[$settings.contact_name_field]}{/if}" />
+		</li>
+
+		<li>
+			<label for="report_email">{$lng.recommend.your_email}<span class="mandatory"> *</span></label>
+			<input type="text" name="your_email" id="report_email" value="{if isset($crt_usr_sett.email)}{$crt_usr_sett.email}{/if}" />
+		</li>
+
+		<li>
+			<label for="report_message">{$lng.listings.report_reason}</label>
+			<textarea name="message" id="report_message" rows="6"></textarea>
+		</li>
+
+	</ul>
+
+	{if $settings.contact_captcha}
+	{if $settings.enable_recaptcha}
+	<div class="mb20">
+	{include file="data/recaptcha.html" extension="_report"}
+	</div>
+	{else}
+	{include file="data/random_image.html"}
+	{/if}
+	{/if}
+
+	<div class="buttons">
+	<input type="submit" class="button" name="Submit" id="Send" value="{$lng.general.send}" />
+	</div>
+	</div> {* end share *}
+
+	</div>
+	</form>

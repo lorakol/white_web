@@ -1,0 +1,208 @@
+{include file="header.html"}
+{include file="data/magnific-popup.html"}
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng_compare.compare}</h1></div>
+</div>
+
+<div class="wbg">
+<div class="page_bounds mb40">
+
+	{if $no_compare>0}
+
+	<table class="datatable" cellpadding="0" cellspacing="0">
+
+{foreach from=$compare_array item=c}
+
+		<tr>
+		<td class="left-heading dark" rowspan="2"></td>
+		{foreach from=$c item=t}
+		<td width="{$percent}%" align="center" class="lbox">
+		{* -------- PICTURE --------- *}
+		<div class="smallimg mb10 mt20 centered">
+		<img src="{if $t.images[0].picture}{$live_site}/images/listings/{if $t.images[0].folder}{$t.images[0].folder}/{/if}thmb/{$t.images[0].picture}{else}{$live_site}/images/{$ads_settings.nopic}{/if}" class="pic" alt="{$t.title|strip_tags:false}"/></div>
+		{* -------- TITLE --------- *}
+		<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$t.id p2=$t.title}{else}{$live_site}/details.php?id={$t.id}{/if}"><h2>{$t.title|wordwrap:50:" ":true}</h2></a>
+
+		{* -------- PRICE --------- *}
+		{if $ads_settings.enable_price && !$t.auction}
+		{if in_array("price_extra",$modules_array)}
+
+		{include file="modules/price_extra/compare.html" listing=$t}
+
+		{else}
+
+		{if !empty($t.price) && $t.price>=0}<div class="price mt10">{$t.price_curr}</div>{/if}
+
+		{/if}
+		{/if}
+
+		{if $t.auction}
+		<div class="sq-btn sq-btn2">{$lng.useraccount.auction}</div>
+		{/if}
+
+		</td>
+		{/foreach}
+		</tr>
+
+		{* view details button *}
+		<tr>{*<td class="left-heading"></td>*}
+			{foreach from=$c item=t}
+			<td align="center">
+
+			<div class="button wide_button positive"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$t.id p2=$t.title}{else}{$live_site}/details.php?id={$t.id}{/if}">{$lng_compare.view_details}</a></div>
+
+			</td>
+			{/foreach}
+		</tr>
+
+
+
+		{foreach name=fields from=$fields item=v}
+
+		{assign var="found" value="0"}
+		{foreach from=$c item=t}
+		    {if $t[$v.caption]}{assign var="found" value="1"}{/if}
+		{/foreach}
+		{if $found==1}
+
+		<tr>
+			<td class="left-heading">{$v.name}</td>
+			{foreach from=$c item=t}
+			<td {if $smarty.foreach.fields.index%2==0}class="even"{/if} valign="top">
+			{if isset($v.prefix) && $v.prefix && isset($t[$v.caption]) && $t[$v.caption]}{$v.prefix}{/if}
+
+			{if $v.type=="checkbox_group" || $v.type=="multiselect"}
+			{foreach name=multi from = $t[$v.caption] item=x}
+			{if $smarty.foreach.multi.index!=0},&nbsp;{/if}{$x}
+			{/foreach}
+			{elseif $v.type=="youtube" && $t[$v.caption]}
+			{$t[$v.caption]|regex_replace:'/ width="[0-9]+"/':" width='200'"|regex_replace:'/ height="[0-9]+"/':" height='180'"}
+
+			{elseif $v.type=="url" && $t[$v.caption]}
+			<a href="{$t[$v.caption]}">{$t[$v.caption]}</a>
+
+			{elseif $v.type=="file" && $t[$v.caption]}
+			<a href="{$live_site}/uploads/{$v.caption}/{$t[$v.caption]}" class="download tooltip" title="{$lng.general.download}">&nbsp;</a>
+
+			{elseif $v.type=="image" && $t[$v.caption]}
+			<a href="{$live_site}/uploads/{$v.caption}/{$t[$v.caption]}" class="imgfield view_image">&nbsp;</a>
+
+			{elseif $v.type=="date"}
+			{$t.vis[$v.caption]}
+
+			{elseif isset($v.validation_type) && $v.validation_type=="numeric"}
+			{$t.formatted[$v.caption]}
+
+			{elseif $v.type=="textarea"}
+			{$t.formatted[$v.caption]}
+
+			{elseif $v.type=="checkbox"}
+			{if $t[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+			{elseif $v.type=="google_maps" && $t[$v.caption]}
+			<div id="gm_{$v.caption}_{$t.id}" class="small_map"></div>
+
+			<script>
+			{include file="modules/listings_compare/map-ro.html"}
+			</script>
+
+			{else}
+			{if $t[$v.caption]}{$t[$v.caption]}{else}-{/if}
+			{/if}
+	{if isset($v.postfix) && $v.postfix && isset($t[$v.caption]) && $t[$v.caption]}{$v.postfix}{/if}
+
+			</td>
+			{/foreach}
+		</tr>
+		{/if}
+		{/foreach}
+
+		{* remove compare button *}
+
+		<tr><td class="left-heading"></td>
+			{foreach from=$c item=t}
+			<td align="center">
+
+			<div class="button wide_button negative"><a class="remcmpwin" href="{$live_site}/modules/listings_compare/remove_compare.php?id={$t.id}" id="remcmp{$t.id}">{$lng_compare.rem_compare}</a></div>
+
+			</td>
+			{/foreach}
+		</tr>
+
+		{* if not last *}
+		<tr class="trbreak"><td colspan="4"></td></tr>
+		{* if not last *}
+
+{/foreach}
+	</table>
+
+	<div class="clearfix"></div>
+	{else}
+	<div class="info"><p>{$lng_compare.no_items}</p></div>
+	{/if}
+
+	</div> {* end page_bounds *}
+</div> {* end wbg *}
+
+
+<script>
+
+jQuery(document).ready(function() {
+
+	// initialize google maps
+	{if $settings.map_type=="gmaps"}
+	load_gmaps();
+	{else}
+	init_osm();
+	{/if}
+	
+{literal}
+	$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+{/literal}	
+	$('.remcmpwin').magnificPopup({
+		type: 'ajax',
+		showCloseBtn: true,
+		closeBtnInside:true,
+		callbacks: {
+			close: function() {
+			location.reload(true);
+			}
+		}
+	}); // end magnificPopup
+
+});
+
+{if $settings.map_type=="gmaps"}
+function init_gmap() {
+
+
+	{foreach from=$compare_array item=c}
+		{foreach from=$c item=t}
+		{foreach from=$gmap_fields item=g}
+			{if $t[$g]}
+			init_gmap_{$t.id}_{$g}();
+			{/if}
+		{/foreach}
+		{/foreach}
+	{/foreach}
+	}
+{else}
+function init_osm() {
+
+	{foreach from=$compare_array item=c}
+		{foreach from=$c item=t}
+		{foreach from=$gmap_fields item=g}
+			{if $t[$g]}
+			init_osm_{$t.id}_{$g}();
+			{/if}
+		{/foreach}
+		{/foreach}
+	{/foreach}
+}
+
+{/if}
+
+</script>
+
+{include file="footer.html"}

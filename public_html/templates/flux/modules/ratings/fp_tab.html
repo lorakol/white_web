@@ -1,0 +1,11 @@
+{if $ratings_settings.enable_latest_listing_reviews}
+{capture name=some_content assign=title_field}latest_listing_reviews_title_{$crt_lang}{/capture}
+	<input id="tab_llr" type="radio" name="tabs" {if !$ck}checked{/if}>
+	<label for="tab_llr">{$ratings_settings[$title_field]}</label>
+{/if}
+
+{if $ratings_settings.enable_latest_user_reviews}
+{capture name=some_content assign=title_field}latest_user_reviews_title_{$crt_lang}{/capture}
+	<input id="tab_lur" type="radio" name="tabs" {if !$ck}checked{/if}>
+	<label for="tab_lur">{$ratings_settings[$title_field]}</label>
+{/if}

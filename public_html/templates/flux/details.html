@@ -1,0 +1,768 @@
+{include file="header.html"}
+
+{if !$info}
+
+<div class="wait"></div>
+
+<div id="top_details_section">
+
+<div class="page_bounds">
+<div class="details-top">
+
+	<div class="cat-path dtl">
+
+	<a href="{$live_site}/">{$lng.navbar.home}</a>
+	{section name=catpath loop=$category_path step=-1}
+	&nbsp;&raquo;
+	<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$category_path[catpath].id p2=$category_path[catpath].name}{else}{$live_site}/listings.php?category={$category_path[catpath].id}{/if}">{$category_path[catpath].name}</a>
+	{/section}
+	&nbsp;&raquo; {$listing.title}
+	</div> {* end cat-path *}
+
+	<div class="dtr details-price">
+	{if $ads_settings.enable_auctions && $listing.auction.active}
+
+		{include file="auction.html"}
+
+	{elseif $ads_settings.enable_price}
+
+		{if in_array("price_extra",$modules_array) && ( isset($pe_settings[$listing.fieldset]) || isset($pe_settings[0]) )}
+
+		{include file="modules/price_extra/details.html"}
+
+		{else}
+
+			{if !empty($listing.price) && $listing.price>=0}
+			<div class="dt-price price">
+			{if in_array("multicurrency",$modules_array)}
+				{include file="modules/multicurrency/details-price.html"}
+			{else}
+				{$vat = $config_vat_rates[$listing.country].standard_rate}
+				{$ratio = $vat / 100 + 1}
+				{$listing.price_curr} ({$lng.general.taxbrut})<br>
+				<small style="font-weight:500;">{$listing.currency}{number_format(floor(str_replace(",","",$listing.price) / $ratio))} ({$lng.general.taxnet}) {$vat},00% {$lng.general.tax}</small>
+			{/if}
+			</div>
+			{/if}
+
+		{/if}
+
+	{/if} {* end elseif enable_price *}
+	</div> {* end details-top-right *}
+
+	<div class="clearfix"></div>
+
+	<div class="dtl">
+
+		<h1{if $listing.sold} class="sold_title"{elseif $listing.rented} class="rented_title"{/if}>{$listing.title}{if $listing.sold}<div class="sold_button">{$lng.listings.sold}</div>{elseif $listing.rented}<div class="rented_button">{$lng.listings.rented}</div>{/if}{if $listing.urgent && $ads_settings.enable_urgent}<div class="urgent_button">{$lng.listings.urgent}</div>{/if}</h1>
+
+		{if in_array("ratings",$modules_array) && $ratings_settings.rate_listings}
+		<div class="inline">
+		{include file="modules/ratings/rating.html" v=$listing}
+		</div>
+		{/if}
+		<div class="clearfix"></div>
+		<div class="small-light">{if $ads_settings.show_ad_date_for_everybody==1}{$lng.listings.added_on}&nbsp;{$listing.date_nice} | {/if}{$lng.listings.views}: {$listing.viewed}</div>
+		
+		{if $listing.featured}<div class="featured_button">{$lng.listings.featured}</div>{/if}
+		{if $listing.priority}<div class="priority_button">{$listing.priority_name}&nbsp;{$lng.listings.s_priority}</div>{/if}
+
+	</div>{* end dtl *}
+
+	<div class="dtr">
+
+		{if $ads_settings.enable_auctions && $listing.auction.active}
+
+			{include file="bid-btn.html"}
+
+		{/if}
+
+		{* price drop alert *}
+		{if in_array("price_drop_alert",$modules_array) && $listing.price>0 && ($listing.user_id==0 || $crt_usr!=$listing.user_id) && !($ads_settings.enable_auctions && $listing.auction.active)}
+
+			{include file="modules/price_drop_alert/details.html"}
+
+		{/if}
+		{* end price drop alert *}
+
+	</div> {* end dtr *}
+	<div class="clearfix"></div>
+
+</div> {* end details-top *}
+</div> {* end page_bounds *}
+
+{if $ads_settings.enable_auctions && $listing.auction.active}
+
+	{include file="auction-details.html"}
+
+{/if}
+
+{* price drop alert form *}
+{if in_array("price_drop_alert",$modules_array)}
+
+	{include file="modules/price_drop_alert/add_alert.html"}
+
+{/if}
+{* end price drop alert form *}
+
+
+</div> {* end top_details_section *}
+
+
+<div class="details-content">
+<div class="page_bounds">
+
+{* ------ details1 banners ------- *}
+{if in_array('details1',$banners_positions)}
+{banner->getTemplateBanners p1='details1' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{foreach from=$array_banners item=v}
+<div class="center mtm10 mb10">{include file="banner.html" bclass="btype728"}</div>
+{/foreach}
+{/if}
+{* ------- end details1 banners ------- *}
+
+
+<div class="dc-left col-7 col-m-6">
+
+{* ------ details2 banners ------- *}
+{if in_array('details2',$banners_positions)}
+{banner->getTemplateBanners p1='details2' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{foreach from=$array_banners item=v}
+<div class="vert_banners">{include file="banner.html" bclass="btypeldp_rc"}</div>
+{/foreach}
+{/if}
+{* ------- end details2 banners ------- *}
+
+
+<section id="listing_details_section">
+
+{include file="listing_gallery.html"}
+
+<div id="listing-details" class="mb20">
+
+	{* logo *}
+	{foreach $special_listing_fields.logo as $logo}
+	{if (isset($listing[$logo.caption]) && $listing[$logo.caption])}
+	<div class="mb10"><img src="{$live_site}/uploads/{$logo.caption}/{$listing[$logo.caption]}" /></div>
+	{/if}
+	{/foreach}
+
+	{foreach $special_listing_fields.phone as $phone}
+
+	{if isset($listing[$phone.caption]) && $listing[$phone.caption]}
+	<div class="clearfix mb10">
+	<div class="phone_icon"></div><span class="span_phone" id="span_{$phone.caption}">{$listing[$phone.caption]|substr:0:2}********</span><a class="ml20 med-btn btn2 show_l_phone" href="javascript:;" id="show_{$phone.caption}">{$lng.listings.show_phone}</a>
+	</div>
+	{/if}
+
+	{/foreach}
+
+	{foreach $special_listing_fields.whatsapp as $whatsapp}
+
+	{if isset($listing[$whatsapp.caption]) && $listing[$whatsapp.caption]}
+	{if !$is_phone}
+	<div class="clearfix mb10">
+	<div class="whatsapp_icon"></div><span class="span_phone" id="span_{$whatsapp.caption}">{$listing[$whatsapp.caption]|substr:0:2}********</span><a class="ml20 med-btn btn-green show_l_phone" href="javascript:;" id="show_{$whatsapp.caption}">{$lng.listings.show_whatsapp}</a>
+	</div>
+	{else}
+	<div class="cdbtns mb10">
+	<a class="med-btn btn-green center cdbtn" href="https://wa.me/{$listing[$whatsapp.caption]|replace:'+':''}"><div class="swhatsapp_icon"></div>{$lng.listings.click_to_chat}</a>
+	</div>
+
+	{/if} {* end is phone *}
+	{/if}
+
+	{/foreach}
+
+	{foreach $special_listing_fields.twitter as $twitter}
+
+	{if isset($listing[$twitter.caption]) && $listing[$twitter.caption]}
+	<div class="clearfix mb10">
+	<div class="twitter_icon"></div><span class="span_phone"><a href="https://twitter.com/{$listing[$twitter.caption]|replace:'@':''}" target="_blank">{$listing[$twitter.caption]}</a></span>
+	</div>
+	{/if}
+	{/foreach}
+
+	{assign var="map_field" value=""}
+	{assign var="video_field" value=""}
+
+	{foreach from=$fields_array item=v name=ff}
+
+		{if $v.type=="google_maps"}{assign var="map_field" value="{$v.caption}"}{/if}
+
+		{if $v.type=="youtube"}{assign var="video_field" value="{$v.caption}"}{/if}
+
+	{if ((isset($listing[$v.caption]) && $listing[$v.caption]) || $v.type=="checkbox"
+		|| ( isset($listing[$v.depending.caption1]) && $listing[$v.depending.caption1])
+		|| ( isset($listing[$v.depending.caption2]) && $listing[$v.depending.caption2])
+		|| (isset($listing[$v.depending.caption3]) && $listing[$v.depending.caption3])
+		|| (isset($listing[$v.depending.caption4]) && $listing[$v.depending.caption4] )
+		|| (isset($listing[$v.depending.caption5]) && $listing[$v.depending.caption5] ))
+		&& $v.type!='price'  && $v.type!='youtube' && $v.type!="google_maps" && $v.type!="checkbox_group" && $v.type!="video" && $v.type!="audio" && $v.type!="phone" && $v.type!="whatsapp" && $v.type!="twitter" && $v.type!="logo" && $v.type!="htmlarea" && $v.type!="button" }
+
+		<div class="fdesc ld">
+		{if $v.type=="depending"}
+			<span>{$v.depending.name1}:</span>
+		{else}
+			<span>{$v.name}:</span>
+		{/if}
+
+		{if $v.type=='url'}<a href="{$listing[$v.caption]}" target="_blank" rel="nofollow">{/if}
+		{if $v.prefix}{$v.prefix}{/if}
+
+		{if $v.type=="date"}
+		{$listing.vis[$v.caption]}
+
+		{elseif $v.type=="textarea" || $v.type=="htmlarea"}
+		{$listing.formatted[$v.caption]}
+
+		{elseif $v.type=="file"}
+		{if $listing[$v.caption]}<a href="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}" class="download tooltip mbm7" title="{$lng.general.download}">&nbsp;</a>{/if}
+
+		{elseif $v.type=="image"}
+			<a href="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}" class="view_image imgfield">&nbsp;</a>
+
+		{elseif $v.type=="multiselect"}
+		{", "|implode:$listing[$v.caption]}
+
+		{elseif $v.type=="checkbox"}
+		{if $listing[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+		{elseif $v.type=="depending"} {* ------- depending -------- *}
+
+			{if $listing[$v.depending.caption1]=="all" && $v.all_val}
+			{$lng.general.all}
+			{else}
+			{$listing[$v.depending.caption1]}
+			{/if}
+
+			{if isset($listing[$v.depending.caption2]) && $listing[$v.depending.caption2]}
+			</div>
+
+			<div class="fdesc ld">
+				<span>{$v.depending.name2}:</span>
+
+				{if $listing[$v.depending.caption2]=="all" && $v.all_val}
+				{$lng.general.all}
+				{else}
+				{$listing[$v.depending.caption2]}
+				{/if}
+
+			{/if}
+
+			{if isset($listing[$v.depending.caption3]) && $listing[$v.depending.caption3]}
+			</div>
+
+			<div class="fdesc ld">
+				<span>{$v.depending.name3}:</span>
+
+				{if $listing[$v.depending.caption3]=="all" && $v.all_val}
+				{$lng.general.all}
+				{else}
+				{$listing[$v.depending.caption3]}
+				{/if}
+			{/if}
+
+			{if isset($listing[$v.depending.caption4]) && $listing[$v.depending.caption4]}
+			</div>
+
+			<div class="fdesc ld">
+				<span>{$v.depending.name4}:</span>
+				{if $listing[$v.depending.caption4]=="all" && $v.all_val}
+				{$lng.general.all}
+				{else}
+				{$listing[$v.depending.caption4]}
+				{/if}
+			{/if}
+
+			{if isset($listing[$v.depending.caption5]) && $listing[$v.depending.caption5]}
+			</div>
+
+			<div class="fdesc ld">
+				<span>{$v.depending.name5}:</span>
+				{if $listing[$v.depending.caption5]=="all" && $v.all_val}
+				{$lng.general.all}
+				{else}
+				{$listing[$v.depending.caption5]}
+				{/if}
+			{/if}
+
+			{* ------- end depending -------- *}
+
+		{else} {* else if depending and the rest *}
+
+			{if $v.type=="menu" && $v.all_val && $listing[$v.caption]=="all"}
+			{$lng.general.all}
+			{else}
+			{$listing[$v.caption]}
+			{/if}
+
+		{/if} {* end if $v.type=="date" *}
+
+		{if $v.postfix}{$v.postfix}{/if}
+		{if $v.type=='url'}</a>{/if}
+
+		</div> {* end fdesc *}
+
+	{/if} {* end if $listing[$v.caption] *}
+
+	{/foreach} {* end foreach $fields_array *}
+
+	<div class="clearfix"></div>
+
+</div> {* end listing-details *}
+
+<div id="pdescription" class="mb20">{$listing.description_formatted}</div>
+
+{* listing-extra *}
+{foreach from=$fields_array item=v}
+
+{* --------- checkbox group ---------- *}
+{if (isset($listing[$v.caption]) && $listing[$v.caption]) && $v.type=='checkbox_group' }
+
+<div class="heading">{$v.name}</div>
+<div class="listing-extra mb20">
+
+	{foreach from=$listing[$v.caption] item=t name=check}
+	<div class="lfloat check_on" >{$t}</div>
+	{/foreach}
+	<div class="clearfix"></div>
+
+</div>
+
+{/if} {* end checkbox group *}
+
+{* --------- video ---------- *}
+{if (isset($listing[$v.caption]) && $listing[$v.caption]) && $v.type=='video' }
+
+<div class="heading">{$v.name}</div>
+<div class="mb20">
+
+	<video controls>
+	<source src="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}" type="video/mp4">
+	Your browser does not support the video tag.
+	</video>
+	<div class="clearfix"></div>
+
+</div>
+
+{/if} {* end video *}
+
+{* --------- audio ---------- *}
+{if (isset($listing[$v.caption]) && $listing[$v.caption]) && $v.type=='audio' }
+
+<div class="heading">{$v.name}</div>
+<div class="mb20">
+
+	<audio controls>
+	<source src="{$live_site}/uploads/{$v.caption}/{$listing[$v.caption]}" type="audio/mpeg">
+	Your browser does not support the audio element.
+	</audio>
+	<div class="clearfix"></div>
+
+</div>
+
+{/if} {* end audio *}
+
+{* --------- HTML Area ---------- *}
+{if (isset($listing[$v.caption]) && $listing[$v.caption]) && $v.type=='htmlarea' }
+
+<div class="heading">{$v.name}</div>
+<div class="mb20">
+
+	{$listing[$v.caption]}
+
+</div>
+
+{/if} {* end audio *}
+
+{if !in_array($v.type, $default_fields_types) && in_array($v.type, $modules_array)}
+
+	{include file="modules/`$v.type`/details.html"}
+
+{/if}
+
+
+{/foreach}
+{* end listing-extra *}
+
+</section>{* end listing_details_section *}
+
+<section id="listing_extra1">
+
+{if in_array("social_networks", $modules_array)}
+{include file="modules/social_networks/sn_fb_comments.html"}
+{/if}
+
+{* ------------- comments ------------- *}
+{if in_array("comments", $modules_array)}
+	{include file="modules/comments/comments_js.html"}
+	{include file="modules/comments/comments.html"}
+{/if}
+{* ------------- end comments ------------- *}
+
+{* ------------- reviews ------------- *}
+{if in_array("ratings",$modules_array) && $ratings_settings.rate_listings && $ratings_settings.ar_enable_reviews}
+	{include file="modules/ratings/listing_reviews.html"}
+{/if}
+{* ------------- end reviews ------------- *}
+
+</section> {* end listing_extra1 *}
+
+
+{* ------ details3 banners ------- *}
+{if in_array('details3',$banners_positions)}
+{banner->getTemplateBanners p1='details3' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{foreach from=$array_banners item=v}
+<div class="center vert_banners mtm10 mb10">{include file="banner.html" bclass="btypeldp_rc"}</div>
+{/foreach}
+<div class="clearfix"></div>
+{/if}
+{* ------- end details3 banners ------- *}
+
+</div> {* end dc-left *}
+
+<div class="dc-right col-5 col-m-6">
+
+<section id="listing_user_details">
+{* ------------- nologin owner --------------- *}
+{if !$listing.user_id && isset($key) && $key}
+
+<div class="heading">{$lng.listings.manage_ad}</div>
+
+<div class="container2 mb20">
+
+	<div class="fdesc">
+		<span>{$lng.listings.added_on}:</span>
+		{$listing.date_nice}
+	</div>
+
+	<div class="fdesc">
+		<span>{$lng.general.expires}:</span>
+		{if $listing.date_expires_nice}{$listing.date_expires_nice}{else}{$lng.general.never}{/if}
+	</div>
+
+	<div class="fdesc">
+		<span>{$lng.general.status}:</span>
+		{if $listing.pending}{$lng.listings.waiting_admin_approval}{elseif $listing.active}{$lng.listings.active}{else}{$lng.listings.inactive}{/if}
+	</div>
+
+	{if isset($ad_options.pending_featured) && $ad_options.pending_featured}
+	<div class="lfloat small-btn pendingbutton icon">{$lng.listings.pending_featured}</div>
+	{/if}
+
+	{if isset($ad_options.pending_highlited) && $ad_options.pending_highlited}
+	<div class="lfloat small-btn pendingbutton icon">{$lng.listings.pending_highlited}</div>
+	{/if}
+
+	{if isset($ad_options.pending_priority) && $ad_options.pending_priority}
+	<div class="lfloat small-btn pendingbutton icon">{$lng.listings.pending_priority_name}</div>
+	{/if}
+
+	{if isset($ad_options.pending_video) && $ad_options.pending_video}
+	<div class="lfloat small-btn pendingbutton icon">{$lng.listings.pending_video}</div>
+	{/if}
+<!--  -->
+	<div class="clearfix"></div>
+
+	{if $settings.nologin_allow_edit || $settings.nologin_allow_delete || $settings.nologin_extra_options}
+	<div class="cdbtns">
+
+		{if $settings.nologin_allow_edit}
+		<a class="btnr cdbtn" href="{$live_site}/edit_listing.php?id={$listing.id}&key={$key}">{$lng.general.edit}</a>
+
+		<a class="btnr cdbtn" href="{$live_site}/edit_photos.php?id={$listing.id}&key={$key}">{$lng.listings.edit_photos}</a>
+		{/if}
+
+		{if $settings.nologin_extra_options}
+		<a class="btnr cdbtn" href="{$live_site}/edit_options.php?id={$listing.id}&key={$key}">{$lng.listings.edit_ad_options}</a>
+		{/if}
+
+		{if $settings.nologin_allow_delete}
+		<a class="btnr cdbtn" href="{$live_site}/details.php?id={$listing.id}&key={$key}&delete=1" onclick="return myConfirm('{$lng.listings.confirm_delete|addslashes}')">{$lng.general.delete}</a>
+		{/if}
+
+	</div>
+	{/if}
+
+</div>
+{/if}
+
+{* bump ad button *}
+{if $crt_usr==$listing.user_id && in_array("bump",$modules_array) && $listing.active && $listing.priority!=100}
+	{include file="modules/bump/details.html"}
+{/if}
+
+{* repost ad button *}
+{if $crt_usr==$listing.user_id && in_array("auto_repost",$modules_array) && $listing.active}
+	{include file="modules/auto_repost/details.html"}
+{/if}
+
+<div id="contact-details" class="dark-container">
+
+{if ($logged_in || $is_admin || !$ads_settings.hide_contact_when_not_logged)}
+
+	<div class="contact_name">
+		<h2>
+			{$listing.country} | {$listing.region} | {$lng.general.postalcode}: {$listing.zip}
+<!--		{if $listing.user_id}-->
+<!--		{if isset($listing.user[$special_user_fields.contact_name]) && $listing.user[$special_user_fields.contact_name]}{$listing.user[$special_user_fields.contact_name]}{/if}-->
+<!--		{else}-->
+<!--		{if isset($listing.user.mgm_name) && $listing.user.mgm_name}{$listing.user.mgm_name}{/if}-->
+<!--		{/if}-->
+		</h2>
+		{if $listing.user_id && in_array("ratings",$modules_array) && $ratings_settings.rate_users}
+		<div>
+		{include file="modules/ratings/user_blind_rating.html" v=$listing.user}
+		</div>
+		{/if}
+
+	</div>
+	<div class="clearfix"></div>
+
+	{if $listing.user_id && ($ads_settings.show_more_link || $listing.user.store>0)}
+
+		<div class="lfloat">{$lng.listings.user_since}: {$listing.user.date_nice}</div>
+
+		<a href="{if $listing.user.store>0}{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$listing.user_id p2=$listing.user[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$listing.user_id}{/if}{else}{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=$listing.user_id p2=$listing.user.url_name}{else}{$live_site}/user_listings.php?id={$listing.user_id}{/if}{/if}" class="rfloat">{if $listing.user.store>0}<div class="med-btn btn1">{/if}{$lng.listings.see_all}{if $listing.user.store>0}</div>{/if}</a>
+		<div class="clearfix"></div>
+	{/if}
+
+	<hr/>
+
+	{* logo *}
+	{foreach $special_user_fields.logo as $logo}
+
+	{capture name=pb assign=pb}pb_{$logo.caption}{/capture}
+
+	{if (isset($listing.user[$logo]) && $listing.user[$logo])}
+	<div class="mb10"><img src="{$live_site}/uploads/{$logo}/{$listing.user[$logo]}" /></div>
+	{/if}
+	{/foreach}
+
+	{* if email is public show here *}
+	{foreach $special_user_fields.email as $email}
+
+	{capture name=pb assign=pb}pb_{$email.caption}{/capture}
+
+	{if (isset($listing.user[$email.caption]) && $listing.user[$email.caption]) && ( $email.public==1 || $listing.user[$pb]==1 )}
+	<div class="clearfix mb10">
+	<div class="email_icon"></div><span class="span_email" id="span_{$email.caption}">{$listing.user[$email.caption]|substr:0:2}********</span><a class="rfloat med-btn btn2 show_email" href="javascript:;" id="show_{$email.caption}">{$lng.listings.show_email}</a>
+	</div>
+	{/if}
+	{/foreach}
+
+<!--	{foreach $special_user_fields.phone as $phone}-->
+
+<!--	{capture name=pb assign=pb}pb_{$phone.caption}{/capture}-->
+
+<!--	{if (isset($listing.user[$phone.caption]) && $listing.user[$phone.caption]) && ( $phone.public==1 || $listing.user[$pb]==1 )}-->
+<!--	{if !$is_phone}-->
+<!--	<div class="clearfix mb10">-->
+<!--	<div class="phone_icon"></div><span class="span_phone" id="span_{$phone.caption}">{$listing.user[$phone.caption]|substr:0:2}********</span><a class="rfloat med-btn btn2 show_phone" href="javascript:;" id="show_{$phone.caption}">{$lng.listings.show_phone}</a>-->
+<!--	</div>-->
+<!--	{else} {* is phone, show call and SMS links *}-->
+<!--	<div class="cdbtns mb10">-->
+<!--	<a class="med-btn btn-green center mr10 cdbtn" href="tel:{$listing.user[$phone.caption]}"><div class="sphone_icon"></div>{$lng.listings.call}</a>-->
+<!--	<a class="med-btn btn-green center cdbtn asms" href="sms:{$listing.user[$phone.caption]}?body=Re:%20{$listing.title|urlencode}">{$lng.listings.sms}</a>-->
+<!--	<a class="med-btn btn-green center cdbtn iossms" style="display: none;" href="sms:{$listing.user[$phone.caption]}">{$lng.listings.sms}</a>-->
+<!--	</div>-->
+<!--	{/if}-->
+<!--	{/if}-->
+<!--	{/foreach}-->
+
+	{foreach $special_user_fields.whatsapp as $whatsapp}
+
+	{capture name=pb assign=pb}pb_{$whatsapp.caption}{/capture}
+
+	{if (isset($listing.user[$whatsapp.caption]) && $listing.user[$whatsapp.caption]) && ( $whatsapp.public==1 || $listing.user[$pb]==1 )}
+	{if !$is_phone}
+	<div class="clearfix mb10">
+	<div class="whatsapp_icon"></div><span class="span_phone" id="span_{$whatsapp.caption}">{$listing.user[$whatsapp.caption]|substr:0:2}********</span><a class="rfloat med-btn btn-green show_phone" href="javascript:;" id="show_{$whatsapp.caption}">{$lng.listings.show_whatsapp}</a>
+	</div>
+	{else}{* is phone, show Click to chat link *}
+
+	<div class="cdbtns mb10">
+	<a class="med-btn btn-green center cdbtn" href="https://wa.me/{$listing.user[$whatsapp.caption]|replace:'+':''}"><div class="swhatsapp_icon"></div>{$lng.listings.click_to_chat}</a>
+	</div>
+
+	{/if}
+	{/if}
+	{/foreach}
+
+	{foreach $special_user_fields.twitter as $twitter}
+
+	{capture name=pb assign=pb}pb_{$twitter.caption}{/capture}
+
+	{if (isset($listing.user[$twitter.caption]) && $listing.user[$twitter.caption]) && ( $twitter.public==1 || $listing.user[$pb]==1 )}
+	<div class="clearfix mb10">
+	<div class="twitter_icon"></div><span class="span_phone"><a href="https://twitter.com/{$listing.user[$twitter.caption]|replace:'@':''}" target="_blank">{$listing.user[$twitter.caption]}</a></span>
+	</div>
+	{/if}
+	{/foreach}
+
+	{if isset($listing.site_url) && $listing.site_url && $ads_settings.enable_url}
+	<div class="mb10"><div class="website_icon"></div><a href="{$listing.site_url}" class="ml10" target="_blank">{$listing.site_url}</a></div>
+	{/if}
+
+	{foreach $special_user_fields.url as $url}
+
+	{capture name=pb assign=pb}pb_{$url.caption}{/capture}
+
+	{if (isset($listing.user[$url.caption]) && $listing.user[$url.caption]) && ( $url.public==1 || $listing.user[$pb]==1 )}
+	<div><div class="website_icon"></div><a href="{$listing.user[$url.caption]}" class="ml10">{$listing.user[$url.caption]}</a></div>
+	{/if}
+	{/foreach}
+
+	{else} {* hide contacts! *}
+
+	<div class="warning">{$lng.listing.login_to_view_contact|replace:'::LOGIN_LINK::':$login_link}</div>
+
+	{/if} {* end if ($logged_in || $is_admin || !$ads_settings.hide_contact_when_not_logged) *}
+
+	{if $ads_settings.hide_contact_button==0 || ($ads_settings.hide_contact_button==2 && $listing.email_contact)}
+	{include file="user_contact.html"}
+	{/if}
+	
+	{if in_array("price_extra",$modules_array) && ( isset($pe_settings[$listing.fieldset]) || isset($pe_settings[0]) ) && $listing.negotiable==1}
+
+		{include file="modules/price_extra/make_offer.html"}
+		
+	{/if}
+
+	{* buttons *}
+	{foreach $special_listing_fields.button as $button}
+	{if (isset($listing[$button.caption]) && $listing[$button.caption])}
+	<div class="mb10">{$listing[$button.caption]}</div>
+	{/if}
+	{/foreach}
+	
+	<div class="cdbtns">
+
+		<a href="javascript:;" class="btnr cdbtn fshare cf" id="share_btn"><span class="sshare"></span>&nbsp;{$lng.listings.recommend_this}</a>
+
+		<a href="javascript:;" class="btnr cdbtn freport cf" id="report_btn"><span class="sreport"></span>&nbsp;{$lng.listings.report_ad}</a>
+
+		{if !isset($fav_array) || !in_array($listing.id, $fav_array)}
+		<a  href="javascript:;" id="fav{$listing.id}" class="btnr cdbtn addtofav"><span class="sfav"></span>&nbsp;{$lng.listings.favourite}</a>
+		{/if}
+
+		{* if listing compare module *}
+		{if in_array("listings_compare", $modules_array)}
+
+		{include file="modules/listings_compare/cmp_js.html"}
+
+		<a href="javascript:;" class="btnr cdbtn addcmp" id="cmp{$listing.id}" {if isset($cmp) && in_array($listing.id, $cmp)}style="display: none;"{/if}><span class="scompare"></span>&nbsp;{$lng_compare.add_to_compare}</a>
+
+		<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}compare{else}modules/listings_compare/compare.php{/if}" id="compare_btn" class="btnr cdbtn" {if !isset($cmp) || !$cmp || ($cmp && !in_array($listing.id, $cmp))}style="display: none;"{/if}><span class="scompare"></span>&nbsp;{$lng_compare.compare}</a>
+
+		{/if}
+		{* end if listing compare module *}
+
+	</div> {* end cdbtns *}
+
+	{include file="share.html"}
+
+	{include file="report.html"}
+
+
+</div> {* end contact-details *}
+
+{* -------- social networks ---------- *}
+{if in_array("social_networks", $modules_array)}
+<div class="share">
+{include file="modules/social_networks/sn_details.html"}
+</div>
+<div class="clearfix"></div>
+{/if}
+{* -------- end social networks ---------- *}
+
+{* -------- claim_listing ---------- *}
+{if !$logged_in && !$listing.user_id && in_array("claim_listing", $modules_array)}
+{include file="modules/claim_listing/details.html"}
+{/if}
+{* -------- end claim_listing ---------- *}
+
+{* -------- qrcode ---------- *}
+{if in_array("qrcode", $modules_array)}
+{include file="modules/qrcode/details.html"}
+{/if}
+{* -------- end qrcode ---------- *}
+
+
+{if isset($map_field) && $map_field} {*  && $listing[$map_field] *}
+
+<div id="gm_{$map_field}" class="map mb20"></div>
+{* end map-details *}
+
+{/if}
+
+
+{* ------ details4 banners ------- *}
+{if in_array('details4',$banners_positions)}
+{banner->getTemplateBanners p1='details4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+{foreach from=$array_banners item=v}
+<div class="center vert_banners">{include file="banner.html" bclass="btypeldp_rc"}</div>
+{/foreach}
+<div class="clearfix"></div>
+{/if}
+{* ------- end details4 banners ------- *}
+
+
+{if $listing.enable_video && isset($listing.video) && $listing.video}
+<div class="mb20">{$listing.video}</div>
+{/if}
+
+{if (isset($video_field) && $video_field)}
+<div class="mb20">{$listing[$video_field]}</div>
+{/if}
+{* end video-details *}
+
+</section> {* end listing_user_details *}
+
+<section id="listing_extra2">
+
+{* ------------- loancalc ------------- *}
+{if in_array("loancalc", $modules_array)}
+	{include file="modules/loancalc/loancalc.html"}
+{/if}
+{* ------------- end loancalc ------------- *}
+
+{if in_array("latest_visited", $modules_array) && $no_latest_visited}
+{include file="modules/latest_visited/details.html"}
+{/if}
+
+{if in_array("similar_ads", $modules_array)}
+{include file="modules/similar_ads/similar_ads.html"}
+{/if}
+
+</section> {* end listing_extra2 *}
+
+</div> {* end dc-right *}
+
+<div class="clearfix"></div>
+
+</div> {* end details-content *}
+</div> {* end page_bounds *}
+
+{include file="js/details_js.html"}
+
+{else}
+
+<div class="details-content">
+<div class="page_bounds">
+
+	<div class="info"><p>{$info}</p></div>
+
+</div>
+</div>
+
+{/if}
+
+{if isset($details_bottom_inclusions)}
+{foreach from=$details_bottom_inclusions item=v}
+{include file="$v"}
+{/foreach}
+{/if}
+
+{include file="footer.html"}

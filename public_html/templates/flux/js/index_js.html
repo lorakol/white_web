@@ -1,0 +1,242 @@
+<script>
+$(document).ready(function() {
+
+$(document).on("click", ".addtofav", function(event){
+
+	event.preventDefault();
+	var listing_id = $(this).attr("id").substr(3);
+	var live_site = '{$live_site}';
+	makeFavorite(listing_id, live_site);
+	
+	var id = $(this).attr("id");
+    // change class to addtofav
+    $("#"+id).attr('class', 'starfav remfav tooltip rem-fav');
+    // change title to $lng.listings.remove_favourite
+    $("#"+id).attr('title', '{$lng.listings.remove_favourite}');
+	
+  }
+);
+
+$(document).on("click", ".remfav", function(event){
+
+	event.preventDefault();
+	var live_site = '{$live_site}';
+	var listing_id = $(this).attr("id").substr(3);
+	remFavorite(listing_id, live_site);
+
+	var id = $(this).attr("id");
+    // change class to addtofav
+    $("#"+id).attr('class', 'starfav addtofav tooltip make-fav');
+    // change title to $lng.listings.remove_favourite
+    $("#"+id).attr('title', '{$lng.listings.add_to_favourites}');
+
+  }
+);
+
+
+$(".ac_over").on('click',function(){
+	var acid = jQuery(this).attr("id").substr(2);
+	$("#ac"+acid).hide();
+});
+
+
+{if $settings.enable_locations}
+
+	var choose = "{$lng.location.choose}";
+	// delete location
+	$(".link_delete_location").click(function(){
+
+		var field = jQuery(this).attr("id").substr(7);
+
+		// empty input field values
+		$("#"+field).val("");
+		$("#"+field+"_id").val("");
+
+		// change the delete button to gray
+		$("#img_delete_"+field).addClass("low_op");
+
+		// remove "current" class from the old field
+		jQuery(this).closest('.loc_holder').find('li').removeClass("bold").removeClass("underline");
+
+		emptyNextFields(field);
+
+    });
+
+	// when a location element is clicked
+
+	$(document).on("click", ".dep_selector", function(event){ 
+
+		// get the location field
+		var field = jQuery(this).closest('.loc_selector').attr("id").substr(4);
+		var val_id = jQuery(this).attr("id").substr(field.length);
+		var val_name = jQuery(this).find('span:first').html();
+		
+		emptyNextFields(field);
+		setField(field, val_id, val_name);
+		populateNextFieldList(field, val_id);
+		
+		//alert("field "+field+" val "+val_id);
+		// remove class crt_loc from all li elements
+		jQuery(this).closest('.loc_selector').find('li').removeClass("bold").removeClass("underline");
+		
+		// change css class for that particular field to make it visible
+		jQuery(this).addClass("bold").addClass("underline");
+		
+		// change the delete button
+		$("#img_delete_"+field).removeClass("low_op");
+		
+	});
+
+	$(document).on("click", ".menu_selector", function(event){ 
+
+		var val_name = jQuery(this).find('span:first').html();
+		$("#location").val(val_name);
+
+		// remove class crt_loc from all li elements
+		jQuery(this).closest('.loc_selector').find('li').removeClass("bold").removeClass("underline");
+		
+		// change css class for that particular field to make it visible
+		jQuery(this).addClass("bold").addClass("underline");
+		
+		// change the delete button
+		$("#img_delete").removeClass("low_op");
+		
+		$.post("{$live_site}/include/set_location.php", $("#set_location").serialize(), function(data){ 
+			parent.location.reload(true);
+		} );
+
+		
+	});
+
+	$(document).on("click", "#delete", function(event){ 
+
+		$("#location").val();
+
+		$.post("{$live_site}/include/set_location.php", $("#set_location").serialize(), function(data){ 
+			parent.location.reload(true);
+		} );
+
+		
+	});
+
+	function emptyField(f) {
+
+			$("#"+f).val("");
+			$("#"+f+"_id").val("");
+			$("#div_"+f).html("");
+	
+	}
+
+	function getNextField(f) {
+
+		var locations_array_str = $("#locations_array").val();
+		var locations_array = locations_array_str.split("|");
+		var no_loc = locations_array.length;
+		
+		var index = 0;
+		for (var idx=0; idx<no_loc; idx++) {
+			var loc = locations_array[idx].split("^");
+			
+			if(f==loc[0] && idx<no_loc-1) { 
+				loc = locations_array[idx+1].split("^");
+				return loc[0];
+			}  
+		}	
+		return "";
+		
+	}
+
+	function emptyNextFields(f) {
+	
+		var locations_array_str = $("#locations_array").val();
+		var locations_array = locations_array_str.split("|");
+		var no_loc = locations_array.length;
+		
+		var del_index = 0;
+		for (var idx=0; idx<no_loc; idx++) {
+			var loc = locations_array[idx].split("^");
+			if(f==loc[0]) { del_index = idx+1; break; } 
+		}	
+
+		for(idx=del_index; idx<no_loc; idx++ ) {
+
+			var loc = locations_array[idx].split("^");
+			$("#"+loc[0]).val("");
+			$("#"+loc[0]+"_id").val("");
+			$("#div_"+loc[0]).html("<br/>"+choose+" "+loc[1]+"<br/></br>");
+
+			// change the delete button to gray
+			$("#img_delete_"+loc[0]).addClass("low_op")
+			
+		}
+	
+	}
+
+	function setField(f, val_id, val_name) {
+	
+		$("#"+f+"_id").val(val_id);
+		$("#"+f).val(val_name);
+
+	}
+	
+	function populateNextFieldList(f, val) {
+		// val numeric si table
+		var next_field = getNextField(f);
+		if(!next_field) return;
+	
+		var table = $("#"+next_field+"_table").val();
+		
+		//get next field values for field f, value val
+		$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{$live_site}/include/get_info.php?type=dep_value&field="+next_field+"&table="+table+"&val="+val,
+		success: function(data) {
+
+			var str = "<br/>";
+
+			if(data) {
+
+			var arr = data.split("|");
+			var no = arr.length;
+			var no_per_column = Math.ceil((no/3));
+			var loc_name = "";
+			var loc_id = "";
+			var no_elem = "";
+			str = "<ul class='nolist list1'>";
+
+			for(idx=0; idx<no; idx++ ) {
+				split_d=arr[idx].split('^');
+				loc_id=split_d[0];
+				loc_name=split_d[1];
+				no_elem=split_d[2];
+				str+="<li class=\"mlink dep_selector\" id=\""+next_field+loc_id+"\"><span >"+loc_name+"</span>";
+				if(no_elem) str+=" ( "+no_elem+" )";
+				str+="</li>";
+				if( idx%no_per_column==no_per_column-1 ) str+="</ul><ul class='nolist list1'>";
+			}
+			str+="</ul>";
+			} // end if data
+			$("#div_"+next_field).html(str);
+
+
+		}
+	});
+
+	}
+
+ $("#Save").click(function(event){
+
+		event.preventDefault();
+		$.post("{$live_site}/include/set_location.php", $("#set_location").serialize(), function(data){ 
+			location.reload(true);
+		} );
+		
+	});
+
+{/if} {* end if enable locations *}
+
+
+}); // end document ready
+</script>
+

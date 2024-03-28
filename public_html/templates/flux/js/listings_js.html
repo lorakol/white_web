@@ -1,0 +1,154 @@
+{literal}
+<script>
+
+$(document).ready(function() {
+
+$("#save-search").click(function (event) {
+
+$.post( "{/literal}{$live_site}{literal}/include/save_search.php?post=1", { post_str: '{/literal}{if isset($post_json)}{$post_json}{/if}{literal}' })
+	.done(function( data ) {
+
+	if(data==0) {
+
+		$(".search_info").show();
+		return;
+
+	}
+
+	$(".search_error").html("<p>"+data+"</p>");
+	$(".search_error").show();
+
+	});
+ })
+
+{/literal} 
+{if $ads_settings.alerts_enabled}
+{literal}
+
+	$(".info").hide();
+	$(".error").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+	var ret = JSON.parse(responseText);
+
+	$("body").removeClass("loading");
+
+	if(ret.response==1) {
+
+		$(".alert_error").hide();
+		$(".alert_info").html("<p>"+ret.info+"</p>");
+		$(".alert_info").show();
+		$(".alert_content").slideUp();
+		return;
+
+	}
+
+	// response = 0 -> there are errors
+	$(".alert_error").html("<p>"+ret.error+"</p>");
+	$(".alert_error").show();
+
+} 
+
+ $('#alert').ajaxForm(options);
+
+{/literal}
+{/if} 
+{literal} 
+
+$("#show_save_search").click(function (event) {
+
+	if($(".save_search_details").is(":visible"))
+		$(".save_search_details").slideUp();
+	else { 
+		$(".save_search_details").slideDown();
+		$('html,body').animate({scrollTop:$(".save_search_details").offset().top}, 'slow');
+	}	
+
+});
+
+$(".show_refine").click(function (event) {
+
+	$(".search_left").slideDown();
+	$(".show_refine").hide();
+	$(".hide_refine").css('display', 'inline-block');
+
+});
+$(".hide_refine").click(function (event) {
+
+	$(".search_left").slideUp();
+	$(".show_refine").css('display', 'inline-block');
+	$(".hide_refine").hide();
+
+});
+
+});// end document ready
+
+$("#with_pic").change(function (event) { 
+
+	if ($('#with_pic').val('on'));
+	$("#search").submit();
+
+});
+
+$("#with_auction").change(function (event) { 
+
+	if ($('#with_auction').val('on'));
+	$("#search").submit();
+
+});
+
+$(".refine_heading").click(function (event) {
+
+	if(window.innerWidth<=900) {
+		if($(".refine").is(":visible") )
+			$(".refine").hide();
+		else 
+			$(".refine").show();
+	}
+
+});
+
+$(document).on("click", ".addtofav", function(event){
+
+	event.preventDefault();
+	var live_site = '{/literal}{$live_site}{literal}';
+	var listing_id = $(this).attr("id").substr(3);
+	makeFavorite(listing_id, live_site);
+
+	var id = $(this).attr("id");
+    // change class to addtofav
+    $("#"+id).attr('class', 'starfav remfav fbavr tooltip sl-rem-fav');
+    // change title to {$lng.listings.remove_favourite
+    $("#"+id).attr('title', '{/literal}{$lng.listings.remove_favourite}{literal}');
+	
+  }
+);
+
+
+$(document).on("click", ".remfav", function(event){
+
+	event.preventDefault();
+	var live_site = '{/literal}{$live_site}{literal}';
+	var listing_id = $(this).attr("id").substr(3);
+	remFavorite(listing_id, live_site);
+
+	var id = $(this).attr("id");
+    // change class to addtofav
+    $("#"+id).attr('class', 'starfav addtofav fbavr tooltip sl-make-fav');
+    // change title to {$lng.listings.remove_favourite
+    $("#"+id).attr('title', '{/literal}{$lng.listings.add_to_favourites}{literal}');
+
+  }
+);
+
+</script>
+{/literal}

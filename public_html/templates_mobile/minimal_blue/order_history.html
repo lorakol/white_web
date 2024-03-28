@@ -1,0 +1,31 @@
+{include file="header.html"}
+
+<div id="heading">{$lng.useraccount.order_history}</div>
+
+{foreach from=$actions_array item=v}
+
+<div class="classified_nl">
+
+<div class="classifieds_content">
+<h3>#{$v.invoice}&nbsp;|&nbsp;{$v.processor_title}&nbsp;|&nbsp;{$v.amount_nice}</h3>
+<b>{$v.date_nice}</b>&nbsp;|&nbsp;{if $v.completed==1}<span class="green">{$lng.order_history.completed}</span>{else}<span class="red">{$lng.order_history.not_completed}</span>{/if}{if !$v.completed && $v.processor!='manual'}&nbsp;|&nbsp;<a href="complete_payment.php?id={$v.invoice}">[ {$lng.order_history.complete_payment} ]</a>{/if}
+</div>
+
+<div class="clearfix"></div>
+
+<div class="class_buttons">{$v.action_str}</div>
+<div class="clearfix"></div>
+</div>
+{/foreach}
+
+{if $no_actions==0}
+	<div class="p10">
+	{$lng.order_history.no_actions}
+	</div>
+{/if}
+
+<div class="clearfix"></div>
+
+{if $no_pages>1}<div id="pages">{include file="paginator.html"}</div>{/if}
+
+{include file="footer.html"}

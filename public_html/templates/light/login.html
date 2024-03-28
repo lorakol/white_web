@@ -1,0 +1,166 @@
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<div style="width: 80%; margin: auto;" >
+<br/>
+
+<table {if $no_groups}width="100%"{else}width="50%"{/if} align="center" cellspacing="0" cellpadding="0" style="margin: auto;">
+	<tr>
+		<td width="49%">
+		<div class="box3-head"><div class="box3-head-left"><div class="box3-head-right">
+			{$lng.navbar.login}
+		</div></div></div>
+
+		<div class="box3-bottom"><div class="box3-left"><div class="box3-right"><div class="box3-bottom-left"><div class="box3-bottom-right" id="inner1">
+
+	<div id="login">
+	
+	{if !isset($step) || !$step}
+	
+	{if isset($general_info) && $general_info}<p class="mt20">{$general_info}</p>{/if}
+	<div class="error" style="display: none;"></div>
+	<form name="login_form" id="login_form" method="post" action="{$live_site}/login.php?post=1{if isset($loc) && $loc}&loc={$loc}{/if}">
+	{if $settings.enable_username}
+	<label>{$lng.login.username_or_email}:</label>
+	<input name="username" id="username" type="text" style="width: 250px;" maxlength="255" /><br/>
+	{else}
+	<label>{$lng.useraccount.email}:</label>
+	<input name="email" id="email" type="text" style="width: 250px;" maxlength="255" /><br/>
+	{/if}
+
+	<label>{$lng.login.password}:</label>
+	<input name="password" id="password" type="password" style="width: 250px;" maxlength="255"/><br/><br/>
+	
+	<p>{$lng.login.forgot_pass}&nbsp;<a href="password_recovery.php">{$lng.login.click_here}</a></p>
+	<label><input type="checkbox" name="remember" id="remember" />&nbsp;{$lng.remember_me}</label>
+
+	{if $settings.login_captcha}
+	{if $settings.enable_recaptcha}
+	{include file="data/recaptcha.html"}
+	{else}
+	{include file="data/random_image.html"}
+	{/if}
+	{/if}
+
+	<div class="buttons"><strong><input type="submit" name="Login" id="Login" value="{$lng.login.login}" /></strong></div>
+	</form>
+
+	{* -------- connect ---------- *}
+	{if in_array("connect", $modules_array)}
+	{include file="modules/connect/connect.html"}
+	{/if}
+	{* -------- end connect ---------- *}
+
+	{else}
+
+	{* ------------- Two Factor Authentication ------------- *}
+	<h2 class="heading mt20">{$lng.login.2step_verification}</h2>
+
+	{if isset($tfa_info) && $tfa_info}<p class="mb30">{$tfa_info}</p>{/if}
+	<div class="error" style="display: none;"></div>
+
+	<form name="login_form" id="login_form" method="post" action="login.php?step=2&post=1&auth_name={$auth_name}{if isset($loc) && $loc}&loc={$loc}{/if}">
+
+		<div class="mt30 mb20">
+		<input type="text" name="otp" id="otp" />
+		</div>
+
+		<div class="buttons"><strong><input type="submit" class="button positive" name="Login" id="Login" value="{$lng.login.login}" /></strong></div>
+	
+
+	</form>
+	<div class="clearfix"></div>
+	{/if}
+
+
+	</div> {* end #login *}
+
+		</div></div></div></div></div>
+
+		</td>
+
+		{if $no_groups>=1}
+		<td width="2%"></td>
+		<td width="49%">
+			
+			<div class="box3-head"><div class="box3-head-left"><div class="box3-head-right">
+				{$lng.navbar.register}
+			</div></div></div>
+			<div class="box3-left"><div class="box3-right" id="inner2">
+
+			<div id="register">{$lng.login.dont_have_account|stripslashes}</div>
+
+			</div></div>
+
+			<div class="box3-footer"><div class="box3-footer-left"><div class="box3-footer-right">
+			<form name="reg" id="reg" method="post" action="register.php">
+			<div class="buttons"><strong><input type="submit" name="Register" id="Register" value="{$lng.navbar.register}" /></strong></div>
+			</form>
+			</div></div></div>
+		</td>
+		{/if}
+	</tr>
+
+</table>
+<br/>
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function() {
+{/literal}
+{if $no_groups>=1}
+{literal}
+	$("#inner2").height($("#inner1").height()-78);
+{/literal}
+{/if}
+{literal}
+	$(".error").hide();
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options){ $("body").addClass("loading") },
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+			$("body").removeClass("loading"); 
+
+			if(ret.response==1) {
+				// redirect to the proper page
+				window.location.href = ret.redirect;
+				return;
+			}
+
+			// blocked failed attempt
+			if(ret.response==-1) {
+
+				window.location.href = "index.php";
+				return;
+
+			}
+
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+
+			{/literal}{if $settings.login_captcha && $settings.enable_recaptcha}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+ $('#login_form').ajaxForm(options);
+
+});
+{/literal}
+</script>
+
+</div>
+{include file="footer.html"}

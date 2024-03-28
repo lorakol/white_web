@@ -1,0 +1,366 @@
+{if $step==1}
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<div class="main1 box">
+<div class="page_title heading"><h1>{if !isset($renew) || !$renew}{$lng.navbar.subscribe}{else}{$lng.subscribe.renew_subscription}{/if}</h1></div>
+
+<div class="form_container">
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{if isset($error)}{$error}{/if}</p></div>
+{if !isset($error) || !$error}
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script type="text/javascript">
+{literal}
+$(document).ready(function () {
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { 
+		//var queryString = $.param(formData); 
+		if($("#subscribe").find("input[type='submit']:focus").attr("id")=="Cancel") {
+			location.href='subscriptions.php';
+			return false;
+		}
+		return true;
+
+	},
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1) {
+
+				// go to payment page
+				var selected_processor = $('#selected_processor').val();
+
+				$("#payment").html(ret.payment_form);
+
+				if(selected_processor=="iyzico") {
+				    $("body").removeClass("loading");
+				}
+				else 
+				if(selected_processor=="klarna") {
+					$("body").removeClass("loading");
+					$("#payment").slideDown();
+					$('html,body').animate({scrollTop:$("#payment").offset().top}, 'slow');
+					$(".form_footer").hide();
+				}
+				else 
+					$("#payment_form").submit();
+
+				return;
+			}
+
+			// response = 0 -> show the error
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+
+			$("body").removeClass("loading"); 
+
+} 
+
+//initialize the AJAX form
+ $('#subscribe').ajaxForm(options);
+
+$(document).on("click", ".select_subscription", function(){ 
+
+	// get current selected subscription
+	var sub_no = parseInt(jQuery(this).attr("id").substr(19));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var sub_no = split_res[0];
+	var sub_name = split_res[1];
+	var sub_price = split_res[2];
+
+	// set value for selected plan
+	$("#subscription").val(sub_no);
+	// change button style
+	$(".select_subscription").attr('class', "select_subscription gray");
+	$("#select_subscription"+sub_no).attr('class', "select_subscription");
+
+	$("#subscriptions").slideUp();
+
+	$("#subscription_selected span.tag").html(sub_name+" ( "+sub_price+" )");
+	$("#subscription_selected").slideDown();
+
+	loadPayment( sub_no);
+	reinit();
+
+}); // end select_plan click
+
+$(document).on("click", "#change_subscription", function(){ 
+
+	// empty plan value
+	$("#subscription").val(0);
+
+	// show plans box
+	$("#subscription_selected").slideUp();
+	$("#subscriptions").slideDown();
+
+	// hide payment_details form
+	$("#payment_details").html("");
+	$("#payment_details").show();
+
+}); // end change plan
+
+}); // end document ready
+
+
+function loadPayment (sub_no) {
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/subscribe.php?step=2&subscription="+sub_no,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#payment_details").html(data);
+		}// end data
+	}); // end ajax
+
+}
+
+{/literal}
+
+{if (isset($id) && $id) || (isset($only_sub) && $only_sub)}
+loadPayment ({$only_sub});
+{/if}
+</script>
+
+<form name="subscribe"  id="subscribe" method="post" action="subscribe.php?step=3">
+
+	<input type="hidden" name="subscription" id="subscription" value="{if isset($only_sub)}{$only_sub}{/if}" />
+	<input type="hidden" name="subscription_id" id="subscription_id" value="{if isset($id)}{$id}{/if}" />
+	<input type="hidden" name="renew" id="renew" value="{$renew}" />
+
+{if $plans_array|@count>1}
+
+<div  id="subscriptions" class="pdiv1 pt30">
+
+	{foreach from=$plans_array item=v name=plan}
+	<div class="plan lfloat" {if $smarty.foreach.plan.index%3!=2}style="margin-right: 20px;"{/if}>
+
+		<div class="plan_title plan_title{$smarty.foreach.plan.index}">
+			<h3>{$v.name}</h3>
+			<div class="small-light">{$v.description}</div>
+		</div>
+		<div class="plan_body">
+
+		<div class="plan_price">{$v.price_curr}</div>
+
+		<div class="plan_options">
+
+		<ul>
+
+		<li>{if $v.subscription_time}{$v.subscription_time}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.days}&nbsp;{$lng.packages.subscription}</li>
+
+		<li>{if $v.no_ads}{$v.no_ads}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.ads}</li>
+
+		<li>{if $v.no_words}{$v.no_words}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.words}</li>
+
+		<li>{$lng.packages.available}&nbsp;{if $v.no_days}{$v.no_days}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.days}</li>
+
+		<li>{$v.no_pictures}&nbsp;{if $v.no_pictures==1}{$lng.packages.picture}{else}{$lng.packages.pictures}{/if}</li>
+
+		{if $ads_settings.enable_featured && $v.featured}<li class="feature">{$lng.packages.featured}</li>{/if}
+		{if $ads_settings.enable_highlited && $v.highlited}<li class="feature">{$lng.listings.highlited}</span></li>{/if}
+		{if $ads_settings.enable_priorities && $v.priority}<li class="feature">{$lng.listings.priority}&nbsp;{$v.priority_name}</li>{/if}
+		{if $ads_settings.enable_video && $v.video}<li class="feature">{$lng.listings.video}</li>{/if}
+
+		</ul>
+		</div>
+		<a href="javascript:;" class="select_subscription gray" id="select_subscription{$v.id}" alt="{$v.id}^{$v.name}^{$v.price_curr}"><div class="plan_button">{$lng.listings.select_plan}</div></a>
+		</div>{* end plan_body *}
+	</div>{* end plan *}
+	{/foreach}
+
+	<div class="clearfix"></div>
+
+</div>
+
+{/if}
+
+	<div class="pt30" id="subscription_selected" {if (!isset($id) || !$id) && (!isset($only_sub) || !$only_sub)}style="display: none;"{/if}>
+
+	<div class="left_form">{$lng.packages.subscription}: </div>
+	<div class="right_form">
+	{if (!isset($id) || !$id) && (!isset($only_sub) || !$only_sub)}
+	
+	<div class="lfloat btn10-right-arrow">
+	<a href="javascript:;" id="change_subscription"><span class="tag">{if isset($subscription_name)}{$subscription_name}{/if} ({if isset($subscription_price)}{$subscription_price}{/if})</span>&nbsp;&nbsp;<strong>|&nbsp;{$lng.listings.change_plan}</strong></a>
+	</div>
+	
+	{else}
+
+	<div class="lfloat btn7">
+	{if isset($subscription_name)}{$subscription_name}{/if} ({if isset($subscription_price)}{$subscription_price}{/if})
+	</div>
+
+	{/if}
+	</div>
+
+	</div> {* end subscription_selected *}
+
+	<div id="payment_details"></div>
+
+</form>
+<div id="payment" style="display: none;"></div>
+
+{/if} {* end if not error *}
+
+</div>
+</div>
+
+{include file="footer.html"}
+
+{/if} {* end step=1 *}
+
+{if $step==2}
+
+<div class="options pt30">
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{$error}</p></div>
+{if !isset($error) || !$error}
+	<input type="hidden" name="full_total" id="full_total" value="{$full_total}"/>
+
+	{if $enable_coupons}
+	<div class="option clearfix" id="div_discount" {if !$total}style="display: none;"{/if}>
+		<div class="option_left">{$lng.listings.enter_coupon} :</div>
+		<div class="option_right"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',0, {$appearance.price_format_decimals})" value="{if isset($discount_code)}{$discount_code}{/if}"/></div>
+	</div>
+	{/if}
+
+
+	{if $credits_allowed}
+	<div class="option clearfix" id="div_credits" {if !$total}style="display: none;"{/if}>
+
+	<input type="hidden" name="credit_value" id="credit_value" value="{$credits_settings.unit}"/>
+	<input type="hidden" name="current_credits" id="current_credits" value="{$current_credits}"/>
+
+	<div class="option_left">{$lng.credits.credits}</div>
+	<div class="option_right"><b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+	<label class="enh_radio chk_container">
+	<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}<span id="not_enough_credits" {if $current_credits==0 || $current_credits>=$needed_credits}style="display: none;"{/if}> ( {$lng.credits.not_enough_credits} ) </span><span id="no_credits" {if $current_credits==0 || $current_credits<$needed_credits}style="display: none;"{/if}> ( <span id="needed_credits">{$needed_credits}</span> <span id="scredit" {if $needed_credits>1}style="display: none;"{/if}>{$lng.credits.scredit}</span><span id="scredits" {if $needed_credits==1}style="display: none;"{/if}>{$lng.credits.scredits}</span> ) </span>
+	<div class="chk_indicator"></div>
+	</label>
+
+	</div>
+	</div>
+	{/if}
+
+	<div class="option clearfix" id="div_total" {if !$total}style="display: none;"{/if}>
+
+	{if $no_processors>1 || ($no_processors<=1 && $credits_allowed)}
+
+	<div class="option_left">{$lng.listings.choose_payment_method} :</div>
+	<div class="option_right">
+	{foreach from=$payment_processors name=pp item=v}
+	<label class="enh_radio chk_container lfloat">
+	<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (!$credits_allowed || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+
+	{* if subscription choose if recurring *}
+
+	{if $v.recurring==2}
+	<label class="enh_checkbox chk_container lfloat ml50">
+	<input type="checkbox" name="recurring{$v.processor_code}" checked="checked" />{$lng.subscribe.recurring}
+	<div class="chk_indicator"></div>
+	</label>
+	{/if}
+	<div class="clearfix"></div>
+
+	{/foreach}
+	</div>
+	{else}
+	<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+	<div class="option_left">{$lng.subscribe.payment_method}:</div>
+	<div class="option_right">{$payment_processors[0].processor_title}</div>
+
+	{/if}
+	<input type="hidden" id="selected_processor" value="{$payment_processors[0].processor_code}"/>
+
+	</div>
+
+	<div class="option option_price clearfix">
+	{$lng.listings.total}: <b>
+	{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+	</div>
+
+	<div class="option option_price clearfix" id="tax_info" style="display: none;">
+	{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;): <b><span id="tax"></span></b>
+	</div>
+
+	<div class="option option_price clearfix" id="total_with_tax_info" style="display: none;">
+	{$lng.general.total_with_tax}:&nbsp;<b><span id="total_with_tax"></span></b>
+	</div>
+
+</div> {* end options *}
+
+<div class="form_footer">
+<div class="buttons rfloat">
+	<input type="submit" class="button negative" name="Cancel" id="Cancel" value="{$lng.general.cancel}" />
+	<input type="submit" class="button positive" name="Submit" id="Submit" value="{$lng.general.submit}" />
+</div>
+<div class="clearfix"></div>
+</div>
+
+{literal}
+<script type="text/javascript">
+$(document).ready(function() {
+
+	// *********** tax value **************
+	{/literal}
+
+	{if $no_processors>1 || ($no_processors==1 && $credits_allowed)}
+	only_processor = 0;
+	{else}
+	only_processor = 1;
+	{/if}
+
+	{if $total}
+
+	if(only_processor)
+		var processor = $('input[name=processor]').val();
+	else 
+		var processor = $('input:radio[name=processor]:checked').val();		
+
+	var total = $("#full_total").val();
+	calculateTax(processor, total);
+
+
+	{/if} {* end if total *}
+
+	{literal}
+
+
+	$('input:radio[name=processor]').change(function() { 
+
+		processor = $('input:radio[name=processor]:checked').val();
+		calculateTax(processor, $("#full_total").val());
+
+		// for embedded payments
+		$("#selected_processor").val(processor);
+		reinit();
+
+	})
+
+	// end tax value
+
+
+});
+</script>
+{/literal}
+{/if} {* end if error *}
+{/if} {* end if step=2 *}

@@ -1,0 +1,37 @@
+<!-- COMPARE -->
+<link href="{$template_path}modules/listings_compare/style.css" rel="stylesheet" type="text/css"/>
+<br/>
+<div id="compare-box"> 
+
+<div class="box-top-white"><div class="box-bottom"><div class="box-left"><div class="box-right"><div class="box-bottom-left"><div class="box-bottom-right"><div class="box-top-left"><div class="box-top-right">
+
+     <h2>{$lng_compare.compare} - {$no_compare} {$lng_compare.items}</h2>
+	<hr/>
+	<table id="cmptable">
+
+	{foreach from=$compare_array item=v}
+
+		<tr id="cmprow{$v.id}"><td><a class="link" href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.id p2=$v.title}{else}{$live_site}/details.php?id={$v.id}{/if}">{$v.title|wordwrap:40:" ":true}</a></td><td align="right"><img src="{$template_path}images/remove.gif" id="bremcmp{$v.id}" class="bremcmpwin remove" /></td></tr>
+
+	{/foreach}
+	{if $no_compare==0}
+	<tr><td colspan="2" id="noitems">{$lng_compare.no_items}</td></tr>
+	{/if}
+
+	</table>
+	<hr/>
+	<div style="display: table; margin: 0 auto;">
+		<div id="clear" class="form_button">
+		<strong><a class="clearcmp gray" href="{$live_site}/modules/listings_compare/remove_compare.php?id=all">{$lng_compare.clear}</a></strong>
+		</div>
+
+		<div id="compare" class="form_button"><strong><a href="{$live_site}/modules/listings_compare/compare.php">{$lng_compare.compare}</a></strong>
+		</div>
+
+	</div>
+
+	</div></div></div></div></div></div></div></div>
+
+</div>
+<div class="clearfix"></div>
+<!-- END COMPARE -->

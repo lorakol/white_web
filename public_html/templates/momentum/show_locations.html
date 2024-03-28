@@ -1,0 +1,260 @@
+{include file="overlay_header.html"}
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/jquery.js"></script>
+<style type="text/css">
+body { background: #fff !important; }
+</style>
+
+<div class="overlay-top-bg">{$lng.location.choose_location}</div>
+
+<div class="pdiv5">
+
+<form name="set_location" id="set_location" method="post" action="">
+
+{* the list is used when deleting a location to clear the next depending locations also *}
+<input type="hidden" name="locations_array" id="locations_array" value="{foreach from=$fields item=v name=f}{if $smarty.foreach.f.index!=0}|{/if}{$v.caption}^{$v.name}{/foreach}" />
+
+{* input fields for each of the location fields *}
+{foreach from=$fields item=v name=f}
+<input type="hidden" name="{$v.caption}" id="{$v.caption}" value="{$location_array[$v.caption]}" />
+<input type="hidden" name="{$v.caption}_id" id="{$v.caption}_id" value="" />
+{if $v.type=="depending"}
+<input type="hidden" name="{$v.caption}_dep_id" id="{$v.caption}_dep_id" value="{$v.dep_id}" />
+<input type="hidden" name="{$v.caption}_table" id="{$v.caption}_table" value="{$v.table}" />
+{/if}
+{/foreach}
+
+
+{foreach from=$fields item=v name=f}
+
+	<div class="loc_holder mb20">
+	<div class="lfloat">{$v.name}</div><div class="delete_location rfloat"><a href='javascript:;' class="link_delete_location" id="delete_{$v.caption}"><img src="{$template_path}images/delete.png" id="img_delete_{$v.caption}" {if !$location_array[$v.caption]}class="low_op"{/if}/></a></div>
+	<div class="clearfix"></div>
+	<hr class="hr1"/>
+
+	<div class="loc_selector" id="div_{$v.caption}">
+	{if $v.type=="depending"}
+
+		<ul class="nolist list1">
+		{if $v.elements|@count>0}
+		{assign var="c" value="1"}
+		{foreach from=$v.elements item=e name=el}
+		<li class="mlink dep_selector{if $location_array[$v.caption]==$e.name} bold underline{/if}" id="{$v.caption}{$e.id}"><span>{$e.name}</span>{if $e.no>0} ({$e.no}) {/if}</li>
+		{if $smarty.foreach.el.index==$c*$v.no_per_column-1}
+		</ul>
+		<ul class="nolist list1">
+		{assign var="c" value=$c+1}
+		{/if}
+		{/foreach}
+		{else}
+		{$lng.location.choose} {$v.name}
+		{/if}
+		</ul>
+		<div class="clearfix"></div>
+	{else}
+
+		<ul class="nolist list1">
+		{assign var="c" value="1"}
+		{foreach from=$v.elements item=e name=el}
+		<li {if $location_array[$v.caption]==$e}class="bold underline"{/if}><span>{$e}</span>{if $v.no[$e]>0} ({$v.no[$e]}) {/if}</li>
+		{if $smarty.foreach.el.index==$c*$v.no_per_column-1}
+		</ul>
+		<ul class="nolist list1">
+		{assign var="c" value=$c+1}
+		{/if}
+		{/foreach}
+		</ul>
+		<div class="clearfix mb20"></div>
+	{/if}
+	</div> {* end loc_selector *}
+	</div> {* end loc_holder *}
+{/foreach}
+
+	<div class="clearfix"></div>
+	<hr class="hr1"/>
+
+	<div class="buttons rfloat mt20">
+		<input type="submit" class="button positive" name="Save" id="Save" value="{$lng.location.save_location}" />
+	</div>
+
+</form>
+</div>{* end pdiv5 *}
+
+{literal}
+<script type="text/javascript">
+jQuery(document).ready(function(){
+
+	{/literal}var choose = "{$lng.location.choose}";{literal}
+	// delete location
+	$(".link_delete_location").click(function(){
+
+		var field = jQuery(this).attr("id").substr(7);
+
+		// empty input field values
+		$("#"+field).val("");
+		$("#"+field+"_id").val("");
+
+		// change the delete button to gray
+		//$("#img_delete_"+field).attr("src", "{/literal}{$template_path}{literal}images/gray_delete.png");
+		$("#img_delete_"+field).addClass("low_op");
+
+		// remove "current" class from the old field
+		jQuery(this).closest('.loc_holder').find('li').removeClass("bold").removeClass("underline");
+
+		emptyNextFields(field);
+
+    });
+
+	// when a location element is clicked
+
+	$(document).on("click", ".dep_selector", function(event){ 
+
+	//$(".dep_selector").on('click', function(event) {
+
+		// get the location field
+		var field = jQuery(this).closest('.loc_selector').attr("id").substr(4);
+		var val_id = jQuery(this).attr("id").substr(field.length);
+		var val_name = jQuery(this).find('span:first').html();
+		
+		emptyNextFields(field);
+		setField(field, val_id, val_name);
+		populateNextFieldList(field, val_id);
+		
+		//alert("field "+field+" val "+val_id);
+		// remove class crt_loc from all li elements
+		jQuery(this).closest('.loc_selector').find('li').removeClass("bold").removeClass("underline");
+		
+		// change css class for that particular field to make it visible
+		jQuery(this).addClass("bold").addClass("underline");
+		
+		// change the delete button
+		//$("#img_delete_"+field).attr("src", "{/literal}{$template_path}{literal}images/black_delete.png");
+		$("#img_delete_"+field).removeClass("low_op");
+
+	});
+
+	function emptyField(f) {
+
+			$("#"+f).val("");
+			$("#"+f+"_id").val("");
+			$("#div_"+f).html("");
+	
+	}
+
+	function getNextField(f) {
+
+		var locations_array_str = $("#locations_array").val();
+		var locations_array = locations_array_str.split("|");
+		var no_loc = locations_array.length;
+		
+		var index = 0;
+		for (var idx=0; idx<no_loc; idx++) {
+			var loc = locations_array[idx].split("^");
+			
+			if(f==loc[0] && idx<no_loc-1) { 
+				loc = locations_array[idx+1].split("^");
+				return loc[0];
+			}  
+		}	
+		return "";
+		
+	}
+
+	function emptyNextFields(f) {
+	
+		var locations_array_str = $("#locations_array").val();
+		var locations_array = locations_array_str.split("|");
+		var no_loc = locations_array.length;
+		
+		var del_index = 0;
+		for (var idx=0; idx<no_loc; idx++) {
+			var loc = locations_array[idx].split("^");
+			if(f==loc[0]) { del_index = idx+1; break; } 
+		}	
+
+		for(idx=del_index; idx<no_loc; idx++ ) {
+
+			var loc = locations_array[idx].split("^");
+			$("#"+loc[0]).val("");
+			$("#"+loc[0]+"_id").val("");
+			$("#div_"+loc[0]).html("<br/>"+choose+" "+loc[1]+"<br/></br>");
+
+			// change the delete button to gray
+			//$("#img_delete_"+loc[0]).attr("src", "{/literal}{$template_path}{literal}images/gray_delete.png");
+			$("#img_delete_"+loc[0]).addClass("low_op")
+			
+		}
+	
+	}
+
+	function setField(f, val_id, val_name) {
+	
+		$("#"+f+"_id").val(val_id);
+		$("#"+f).val(val_name);
+
+	}
+	
+	function populateNextFieldList(f, val) {
+		// val numeric si table
+		var next_field = getNextField(f);
+		if(!next_field) return;
+	
+		var table = $("#"+next_field+"_table").val();
+		
+		//get next field values for field f, value val
+		$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/include/get_info.php?type=dep_value&field="+next_field+"&table="+table+"&val="+val,
+		success: function(data) {
+
+			var str = "<br/>";
+
+			if(data) {
+
+			var arr = data.split("|");
+			var no = arr.length;
+			var no_per_column = Math.ceil((no/3));
+			var loc_name = "";
+			var loc_id = "";
+			var no_elem = "";
+			str = "<ul class='nolist list1'>";
+
+			for(idx=0; idx<no; idx++ ) {
+				split_d=arr[idx].split('^');
+				loc_id=split_d[0];
+				loc_name=split_d[1];
+				no_elem=split_d[2];
+				str+="<li class=\"mlink dep_selector\" id=\""+next_field+loc_id+"\"><span >"+loc_name+"</span>";
+				if(no_elem) str+=" ( "+no_elem+" )";
+				str+="</li>";
+				if( idx%no_per_column==no_per_column-1 ) str+="</ul><ul class='nolist list1'>";
+			}
+			str+="</ul>";
+			} // end if data
+			$("#div_"+next_field).html(str);
+
+
+		}
+	});
+			
+ 		$('html,body').animate({scrollTop:$("#delete_"+next_field).offset().top-20}, 'slow');
+			
+	}
+
+ $("#Save").click(function(event){
+
+		event.preventDefault();
+		$.post("{/literal}{$live_site}{literal}/include/set_location.php", $("#set_location").serialize(), function(data){ 
+			parent.location.reload(true);
+		    parent.$.magnificPopup.instance.close();
+		} );
+		
+	});
+
+
+});
+</script>
+{/literal}
+
+{include file="overlay_footer.html"}

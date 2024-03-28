@@ -1,0 +1,126 @@
+
+function init_gmap_{$v.caption}() {
+
+	markersArray_{$v.caption} = [];
+
+	// get address value
+	address = '';
+	address_html = '';
+	var loc = "{if isset($v.extensions)}{$v.extensions}{/if}";
+
+	if(loc) {
+	var location_fields = loc.split(",");
+
+	for(i=0; i<location_fields.length; i++) {
+		var f = location_fields[i];
+		if(!f) continue;
+		if ($('#'+f).length == 0) continue;
+
+		var t = document.getElementById(f).type;
+		if(t=="text" || t=="textarea")
+			var l = document.getElementById(f).value;
+		else {
+			var selected_index = document.getElementById(f).selectedIndex;
+			var l = document.getElementById(f).options[selected_index].value;	
+		}
+		if(!l) continue;
+		if(address!='') { 
+			address = address + ', ';
+			address_html = address_html + '<br/>';
+		}
+		address = address + l;
+		address_html = address_html + "<b>" + l + "</b>";
+		//address_html = address_html.replace(/(?:\r\n|\r|\n)/g, '<br />');
+
+
+	}
+	} // end if loc
+
+	old=new Array();
+	{if isset($val[$v.caption]) && $val[$v.caption]}old = splitMapsCoord('{$val[$v.caption]}');{/if}
+	if (old.length>0) {
+		var lat = parseFloat(old[0]);
+		var long = parseFloat(old[1]);
+		var h = parseInt(old[2]);
+
+	} else {
+		var lat = {$settings.maps_default_lat};
+		var long = {$settings.maps_default_long};
+		var h = {$settings.maps_default_height};
+	}
+
+	var p = new google.maps.LatLng( lat,long );
+	var myOptions = {
+  		zoom: h,
+  		center: p,
+		panControl: true,
+		zoomControl: true,
+		scaleControl: true,
+		mapTypeControl: true,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+
+	map_{$v.caption} = new google.maps.Map(document.getElementById("gm_{$v.caption}"), myOptions);
+	if(typeof(map_{$v.caption})=='undefined') console.log("null");
+ 
+	{if isset($val[$v.caption]) && $val[$v.caption]}
+
+	var marker = new google.maps.Marker({
+		position: p,
+		map:	map_{$v.caption}
+	});
+	markersArray_{$v.caption}.push(marker);
+	if(address_html) {
+		var infowindow = new google.maps.InfoWindow({
+		content: address_html
+		});
+		infowindow.open(map_{$v.caption}, marker);
+	}
+	{/if}
+
+	// get click coordinates
+	google.maps.event.addListener(map_{$v.caption}, 'click', function(event) 
+	{
+		if (event.latLng) {
+		map_{$v.caption}.panTo(event.latLng);
+		if (markersArray_{$v.caption})
+		{
+			for (i in markersArray_{$v.caption}) {
+			markersArray_{$v.caption}[i].setMap(null);
+			}
+			markersArray_{$v.caption}.length = 0;
+		}
+
+		marker = new google.maps.Marker({
+			position: event.latLng,
+			map:	map_{$v.caption}
+		});
+
+		markersArray_{$v.caption}.push(marker);
+
+		if(address_html) {
+			var infowindow = new google.maps.InfoWindow({
+    				content: address_html
+			});
+			infowindow.open(map_{$v.caption}, marker);
+		}
+
+		var lat = event.latLng.lat();
+		var long = event.latLng.lng();
+
+		var h = map_{$v.caption}.getZoom();
+		if(IsNumeric(lat) && IsNumeric(long) && IsNumeric(h)) document.getElementById("{$v.caption}").value=lat+","+long+","+h;
+	}
+
+     });
+
+	google.maps.event.addListener(map_{$v.caption}, 'zoomend', function(oldLevel, newLevel){
+		var old_val = document.getElementById("{$v.caption}").value;
+		if(old_val) {
+			var arr = old_val.split(",");
+			document.getElementById("{$v.caption}").value=arr[0]+","+arr[1]+","+newLevel;
+		}
+
+     });
+
+} // end init_gmap

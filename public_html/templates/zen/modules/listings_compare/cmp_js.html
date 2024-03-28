@@ -1,0 +1,121 @@
+<script type="text/javascript">
+{literal}
+jQuery(document).ready(function() {
+
+	$(".clearcmp").fancybox({'onClosed': function(){ location.reload(true); }});
+
+	jQuery(document).on("click", ".addcmpwin", function(event){
+
+		var listing_id = event.target.id.substr(3);
+
+		$("#cmp"+listing_id).hide();
+		$("#remcmp"+listing_id).show();
+	{/literal}
+		{if $self_noext=="listings"}
+		// add to compare box
+		var title = $('#title'+listing_id).text();
+
+		var str = "<tr id=\"cmprow"+listing_id+"\"><td><a class=\"link\" href=\"{$live_site}/details.php?id="+listing_id+"\">"+title+"</a></td><td align=\"right\"><img src=\"{$template_path}images/remove.gif\" id=\"bremcmp"+listing_id+"\" class=\"bremcmpwin\" /></td></tr>";
+
+		$('#cmptable tr:last').after(str);
+		$("#noitems").hide();
+		{/if}
+
+	{literal}
+		$.ajax({
+			type		: "GET",
+			cache		: false,
+			url		: "{/literal}{$live_site}{literal}/modules/listings_compare/add_to_compare.php?id="+listing_id,
+			data		: $(this).serializeArray(),
+			success: function(data) {
+
+				$.fancybox(data, { 'autoDimensions'	: false,
+					'width'         		: 630,
+					'height'        		: 'auto',
+					'transitionIn'		: 'none',
+					'transitionOut'		: 'none',
+					'margin'		: '0',
+					'padding'		: '0'{/literal}{if $self_noext=="details"}{literal},
+					'onClosed': function(){ location.reload(true); }
+					{/literal}{/if}{literal}
+				});// end fancybox
+			} // end data
+		});// end ajax
+	});// end click
+
+
+	jQuery(document).on("click", ".remcmpwin", function(event){
+
+		var listing_id = event.target.id.substr(6);
+
+		$("#cmp"+listing_id).show();
+		$("#remcmp"+listing_id).hide();
+
+		{/literal}
+		{if $self_noext=="listings"}
+		// remove table row from compare box
+		$('#cmprow'+listing_id).empty();
+		{/if}
+		{literal}
+
+		$.ajax({
+			type		: "GET",
+			cache		: false,
+			url		: "{/literal}{$live_site}{literal}/modules/listings_compare/remove_compare.php?id="+listing_id,
+			data		: $(this).serializeArray(),
+			success: function(data) {
+
+				$.fancybox(data, { 'autoDimensions'	: false,
+					'width'         		: 630,
+					'height'        		: 'auto',
+					'transitionIn'		: 'none',
+					'transitionOut'		: 'none',
+					'margin'		: '0',
+					'padding'		: '0'{/literal}{if $self_noext=="details"}{literal},
+					'onClosed': function(){ location.reload(true); }
+					{/literal}{/if}{literal}
+				});// end fancybox
+			}//end data
+		});//end ajax
+	});//end click
+
+	{/literal}
+	{if $self_noext=="listings" || $self_noext=="details"}
+	{literal}
+	jQuery(document).on("click", ".bremcmpwin", function(event){ 
+
+		var listing_id = event.target.id.substr(7);
+		if (document.getElementById("cmp"+listing_id) != null)
+			$("#cmp"+listing_id).show();
+		if (document.getElementById("remcmp"+listing_id) != null)
+			$("#remcmp"+listing_id).hide();
+
+		// remove table row from compare box
+		$('#cmprow'+listing_id).empty();
+
+
+		$.ajax({
+			type		: "GET",
+			cache		: false,
+			url		: "{/literal}{$live_site}{literal}/modules/listings_compare/remove_compare.php?id="+listing_id,
+			data		: $(this).serializeArray(),
+			success: function(data) {
+				$.fancybox(data, { 'autoDimensions'	: false,
+					'width'         		: 630,
+					'height'        		: 'auto',
+					'transitionIn'		: 'none',
+					'transitionOut'		: 'none',
+					'margin'		: '0',
+					'padding'		: '0'
+				});// end fancybox
+			}//end data
+		});//end ajax
+	});//end click
+
+	{/literal}
+	{/if}
+	{literal}
+
+});
+{/literal}
+</script>

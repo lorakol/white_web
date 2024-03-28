@@ -1,0 +1,228 @@
+{include file="header.html"}
+
+<link rel="stylesheet" href="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.css">
+<script src="{$live_site}/libs/jQuery/plugins/intlTelInput/intlTelInput.min.js"></script>
+
+<div class="page_title">{$lng.panel.security} > {$lng.panel.security_settings}</div>
+
+<div class="p30">
+<form name="settings" method="post" action="security_settings.php">
+
+<div class="form_container">
+
+{if $error != ""}<div class="error">{$error}</div>{/if}
+{if $successful}<div class="info">{$lng.settings.settings_saved}</div>{/if}
+
+<div class="form_subtitle_bg"><div class="btn1"><strong>{$lng.settings.2fa_admin|replace:" ":"&nbsp;"}</strong></div></div>
+
+<div class="clearfix">
+	<div class="left_form"><img src="{$template_path}images/info.png"  class="tooltip icon" title="{$lng.settings.info.2fa_site_title}" />&nbsp;{$lng.settings.2fa_site_title}</div>
+	<div class="right_form">
+	  <input type="text" name="2fa_site_title" id="2fa_site_title" size="50" value="{if isset($security_settings.2fa_site_title)}{$security_settings.2fa_site_title}{/if}" />
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.enable_2fa}</div>
+	<div class="right_form">
+	  <input type="checkbox" name="admin_enable_2fa" id="admin_enable_2fa" {if $security_settings.admin_enable_2fa==1}checked="checked"{/if} />
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form"><img src="{$template_path}images/info.png"  class="tooltip icon" title="{$lng.settings.info.2fa_enable_sms}" />&nbsp;{$lng.settings.2fa_enable_sms}</div>
+	<div class="right_form">
+	  <input type="checkbox" name="admin_2fa_enable_sms" id="admin_2fa_enable_sms" {if $security_settings.admin_2fa_enable_sms==1}checked="checked"{/if} />
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form"><img src="{$template_path}images/info.png"  class="tooltip icon" title="{$lng.settings.info.admin_phone_number}" />&nbsp;{$lng.settings.admin_phone_number}</div>
+	<div class="right_form">
+	  <input type="text" name="admin_phone_number" id="admin_phone_number" size="50" value="{if isset($security_settings.admin_phone_number)}{$security_settings.admin_phone_number}{/if}" />
+	  <input type="hidden" name="admin_phone_number_hidden" id="admin_phone_number_hidden" value="{if isset($security_settings.admin_phone_number) && $security_settings.admin_phone_number}{$security_settings.admin_phone_number}{/if}" />
+		<div class="information">{$lng.settings.info2.admin_phone_number}</div>
+	</div>
+</div>
+<div class="clearfix">
+	<div class="left_form"><img src="{$template_path}images/info.png"  class="tooltip icon" title="{$lng.settings.info.2fa_secret}" />&nbsp;{$lng.settings.2fa_secret}</div>
+	<div class="right_form">
+	  <input type="text" name="2fa_secret" id="2fa_secret" size="50" readonly value="{if isset($security_settings.admin_2fa_secret)}{$security_settings.admin_2fa_secret}{/if}" />
+
+		<div class="rfloat">
+		<a href="security_settings.php?regenerate_2fa=1" class="button4 btn">{$lng.general.regenerate}</a>
+		</div>
+		
+		{if isset($security_settings.admin_2fa_secret) && $security_settings.admin_2fa_secret}
+		<div class="mt10"><img src="{$qr_code_url}" style="border: 1px solid #777;"></div>
+		<div class="information">{$lng.settings.info.qr_code}</div>
+
+		{/if}
+	  
+	</div>
+</div>
+
+<div class="form_subtitle_bg"><div class="btn1"><strong>{$lng.settings.2fa_users|replace:" ":"&nbsp;"}</strong></div></div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.users_enable_2fa}</div>
+	<div class="right_form">
+	  <input type="checkbox" name="enable_2fa" id="enable_2fa" {if $security_settings.enable_2fa==1}checked="checked"{/if} />
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.2fa_enable_sms}</div>
+	<div class="right_form">
+	  <input type="checkbox" name="2fa_enable_sms" id="2fa_enable_sms" {if $security_settings.2fa_enable_sms==1}checked="checked"{/if} />
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form"><img src="{$template_path}images/info.png"  class="tooltip icon" title="{$lng.settings.info.phone_field}" />&nbsp;{$lng.settings.phone_field}</div>
+	<div class="right_form">
+		<select name="2fa_phone_field" id="2fa_phone_field">
+		<option value=""></option>	
+		{foreach from=$fields item=v}
+			<option value="{$v.caption}" {if $security_settings.2fa_phone_field==$v.caption}selected="selected"{/if}>{$v.name}</option>
+		{/foreach}
+		</select>
+	</div>
+</div>
+
+
+<div class="form_subtitle_bg"><div class="btn1"><strong>{$lng.panel.failed_login_attempts|replace:" ":"&nbsp;"}</strong></div></div>
+
+
+<div class="clearfix cronjob centered" {if $security_settings.block_user_attempts==0 && $security_settings.block_admin_attempts==0}style="display: none;"{/if}>
+	<div class="warning ml20 mr20 mb20">
+		{$lng.settings.security_cron_job|replace:'::CONFIG_ABS_PATH::':$abs_path}
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.block_admin_attempts}</div>
+	<div class="right_form">
+	  <input type="checkbox" name="block_admin_attempts" id="block_admin_attempts" {if $security_settings.block_admin_attempts==1}checked="checked"{/if} />
+	  &nbsp;{$lng.general.after}&nbsp;<input type="text" name="allowed_admin_attempts" id="allowed_admin_attempts" size="6" value="{$security_settings.allowed_admin_attempts}" style="text-align: center" {if $security_settings.block_admin_attempts==0}disabled="disabled"{/if} />
+	  &nbsp;{$lng.settings.failed_attempts}
+	  &nbsp;{$lng.general.for}&nbsp;<input type="text" name="block_admin_attempts_for" id="block_admin_attempts_for" size="6" value="{$security_settings.block_admin_attempts_for}" style="text-align: center" {if $security_settings.block_admin_attempts==0}disabled="disabled"{/if} />&nbsp;{$lng.general.hour_s}
+	</div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.settings.block_user_attempts}</div>
+	<div class="right_form">
+	  <input type="checkbox" name="block_user_attempts" id="block_user_attempts" {if $security_settings.block_user_attempts==1}checked="checked"{/if} />
+	  &nbsp;{$lng.general.after}&nbsp;<input type="text" name="allowed_user_attempts" id="allowed_user_attempts" size="6" value="{$security_settings.allowed_user_attempts}" style="text-align: center" {if $security_settings.block_user_attempts==0}disabled="disabled"{/if} />
+	  &nbsp;{$lng.settings.failed_attempts}
+	  &nbsp;{$lng.general.for}&nbsp;<input type="text" name="block_user_attempts_for" id="block_user_attempts_for" size="6" value="{$security_settings.block_user_attempts_for}" style="text-align: center" {if $security_settings.block_user_attempts==0}disabled="disabled"{/if} />&nbsp;{$lng.general.hour_s}
+	</div>
+</div>
+
+<div class="form_footer">
+	<div class="buttons rfloat"  onClick='{if $demo}alert("{$lng.general.errors.demo}");return false;{/if}'>
+		<span class="positive"><input type="submit" name="Submit" id="Submit" value="{$lng.general.save_changes}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+</div> {* end form_container *}
+</form>
+</div> {* p30 *}
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function(){
+
+	$("#block_admin_attempts").click(function () { 
+
+	    if ($('input#block_admin_attempts').is(':checked')) {
+
+		$("#allowed_admin_attempts" ).prop( "disabled", false );
+		$("#block_admin_attempts_for" ).prop( "disabled", false );
+		
+	
+	    }
+	    else {
+	    
+		$("#allowed_admin_attempts" ).prop( "disabled", true );
+		$("#block_admin_attempts_for" ).prop( "disabled", true );
+		
+		if (!$('input#block_user_attempts').is(':checked')) $(".cronjob" ).hide();
+		
+	    }
+
+      });
+
+      	$("#block_user_attempts").click(function () { 
+
+	    if ($('input#block_user_attempts').is(':checked')) {
+		$("#allowed_user_attempts" ).prop( "disabled", false );
+		$("#block_user_attempts_for" ).prop( "disabled", false );
+		
+	    }
+	    else {
+		$("#allowed_user_attempts" ).prop( "disabled", true );
+		$("#block_user_attempts_for" ).prop( "disabled", true );
+
+		if (!$('input#block_admin_attempts').is(':checked')) $(".cronjob" ).hide();
+		
+	    }
+
+      });
+      
+
+});
+
+{/literal}
+
+$(document).ready(function() {
+	
+	// initialise plugin
+	$("#admin_phone_number").intlTelInput({
+	// Specify the countries to appear at the top of the list.	
+	preferredCountries: [], 
+	geoIpLookup: function(callback) {
+    $.get('https://ipinfo.io', function() {}, "jsonp").always(function(resp) {
+      var countryCode = (resp && resp.country) ? resp.country : "";
+      callback(countryCode);
+    });
+  },
+  utilsScript: "{$live_site}/libs/jQuery/plugins/intlTelInput/utils.js"
+});
+
+
+var reset = function() {
+  $("#admin_phone_number").removeClass("err");
+  $(".err_label").remove();
+};
+
+// on blur: validate
+$("#admin_phone_number").blur(function() {
+
+  if ($.trim($("#admin_phone_number").val())) {
+    if (!$("#admin_phone_number").intlTelInput("isValidNumber")) {
+
+		$("#admin_phone_number").addClass("err");
+		// add as child to first right_form
+		$(".err_label").remove();
+		$("#admin_phone_number").closest( ".right_form").prepend('<label class="err_label">{$lng.listings.errors.invalid_phone}</label>');
+		
+    }
+    else { 
+		//alert($("#{$v.caption}").intlTelInput("getNumber"));
+		$("#admin_phone_number_hidden").val($("#admin_phone_number").intlTelInput("getNumber"));
+	}
+  }
+});
+
+// on keyup / change flag: reset
+$("#admin_phone_number").on("keyup change", reset);
+
+	
+});
+
+</script>
+
+{include file="footer.html"}

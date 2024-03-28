@@ -1,0 +1,9 @@
+{include file="header.html"}
+
+<div id="heading">{$lng_price_drop_alert.remove_alert_for} #{$id} ("{$ad_title}")</div>
+
+{if isset($error) && $error}<div class="error"><p>{$error}</p></div>{/if}
+
+{if isset($info) && $info}<div class="info">{$info}</div>{/if}
+
+{include file="footer.html"}

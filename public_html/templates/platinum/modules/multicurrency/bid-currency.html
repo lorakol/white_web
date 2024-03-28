@@ -1,0 +1,5 @@
+<select name="bid_currency">
+{foreach from=$currencies item=v}
+	<option value="{$v.currency}" {if $mc_default_currency==$v.currency}selected="selected"{/if}>{$v.currency}</option>
+{/foreach}
+</select>

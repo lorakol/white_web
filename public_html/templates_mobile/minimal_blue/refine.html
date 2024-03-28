@@ -1,0 +1,253 @@
+{include file="header.html"}
+
+{if !isset($post_array) || !$post_array}{$post_array=array()}{/if}
+
+<div>
+<form method="post" action="{$live_site}/listings.php" name="refine" id="refine">
+<ul class="list2">
+
+{* ---------------- CATEGORIES ------------------ *}
+<li><h4>{$lng.listings.category}</h4>
+
+<select id="category" name="category" onchange="onQuickSearch(this.form, '{$live_site}'); {if $multi_depending}reloadDep('{$multi_depending}', '{$live_site}');{/if}">
+	<option value="">{$lng.search.all_categories}</option>
+	{foreach from=$categories item=v name=cat}
+	<option value="{$v.id}"{if $v.parent} class="opt_parent"{/if} {if isset($post_array.category_id) && $post_array.category_id==$v.id}selected="selected"{/if}>{$v.str}{$v.name|escape:"html"}</option>
+	{/foreach}
+</select>
+</li>
+
+{foreach from=$fields item=v}
+	{if $v.type=="depending"}
+
+	{* ---------------- depending field 1 ------------------ *}
+	<li {if $v.fieldset!=0} id="li_{$v.depending.caption1}" style="display: none"{/if}>
+	<h4>{$v.depending.name1}</h4>
+		<select name="{$v.depending.caption1}" id="{$v.depending.caption1}" {if $multi_depending && in_array($v.dep_id, ','|explode:$multi_depending)}disabled="disabled"{/if} onchange="selDepending(1, '{$v.depending.caption1}', '{$v.depending.caption2}', '{$v.depending.id}', {if $multi_depending && in_array($v.dep_id, ','|explode:$multi_depending)}this.form.category.value{else}0{/if}, 0, '', 0, '', '{$live_site}', '' )">
+		<option value="">{$v.depending.top_str1}</option>
+		{foreach from=$v.depending.elements item=t}
+		<option value="{$t.name}" {if isset($post_array[$v.depending.caption2]) && $post_array[$v.depending.caption2]==$t.name}selected="selected"{/if}>{$t.name|escape:"html"}</option>
+		{/foreach}
+	</select>
+	<input type="hidden" name="dep_id_{$v.depending.caption1}" id="dep_id_{$v.depending.caption1}" value="" />
+	</li>
+{* ---------------- depending field 2 ------------------ *}
+
+	<li {if $v.fieldset!=0} id="li_{$v.depending.caption2}" style="display: none"{/if}>
+	<h4>{$v.depending.name2}</h4>
+	<select disabled='disabled' name="{$v.depending.caption2}" id="{$v.depending.caption2}" 
+	{if $v.depending.no>=3}onchange="selDepending(2, '{$v.depending.caption2}', '{$v.depending.caption3}', '{$v.depending.id}', 0, 0, '' , 0, '' , '{$live_site}', 'dep_id_{$v.depending.caption1}')"{/if}>
+		<option value="">{$v.depending.top_str2}</option>
+	</select>
+	<input type="hidden" name="dep_id_{$v.depending.caption2}" id="dep_id_{$v.depending.caption2}" value="" />
+	</li>
+{* ---------------- end depending field 2 ------------------ *}
+
+
+{* ---------------- depending field 3 ------------------ *}
+
+	{if $v.depending.no>=3}
+	<li {if $v.fieldset!=0} id="li_{$v.depending.caption3}" style="display: none"{/if}>
+	<h4>{$v.depending.name3}</h4>
+	<select disabled='disabled' name="{$v.depending.caption3}" id="{$v.depending.caption3}" {if $v.depending.no==4}onchange="selDepending(3, '{$v.depending.caption3}', '{$v.depending.caption4}', '{$v.depending.id}', 0, 0, '', 0, '', '{$live_site}', 'dep_id_{$v.depending.caption2}' )"{/if}>
+		<option value="">{$v.depending.top_str3}</option>
+	</select>
+	<input type="hidden" name="dep_id_{$v.depending.caption3}" id="dep_id_{$v.depending.caption3}" value="" />
+	</li>
+	{/if}
+ {* ---------------- end depending field 3 ------------------ *}
+
+
+{* ---------------- depending field 4 ------------------ *}
+
+	{if $v.depending.no==4}
+	<li {if $v.fieldset!=0} id="li_{$v.depending.caption4}" style="display: none"{/if}>
+		<h4>{$v.depending.name4}</h4>
+	<select disabled='disabled' name="{$v.depending.caption4}" id="{$v.depending.caption4}">
+		<option value="">{$v.depending.top_str4}</option>
+	</select>
+	</li>
+	{/if}
+ {* ---------------- end depending field 4 ------------------ *}
+
+	{elseif $v.caption=="zip" && in_array("areasearch",$modules_array)}
+
+	<li {if $v.fieldset!=0} id="li_{$v.caption}" style="display: none"{/if}>
+	<h4>{$lng.areasearch.areasearch}</h4>
+	<span><select name="area">
+		<option value="">{$lng.areasearch.all_locations}</option>
+		<option value="0">{$lng.areasearch.exact_location}</option>
+		{foreach from=$area_list item=l}
+		<option value="{$l}">{$l} {$areasearch_settings.um}</option>
+		{/foreach}
+	</select></span>
+	<span>{$lng.general.of}</span>
+	<span><input type="text" name="zip" size="7" class="defaultText" title="- {$lng.listings.zip} -" {if isset($post_array.zip) && $post_array.zip}value="{$post_array.zip}"{/if}></span>
+	</li>
+
+	{else}
+
+{* ---------------- textbox ------------------ *}
+
+	{if ($v.type=="textbox" && ($v.caption!="zip" || !in_array("areasearch",$modules_array))) || $v.type=="url" || $v.type=="email" || ($v.type=="price" && $ads_settings.enable_price) || !in_array($v.type, $default_fields_types) }
+
+		<li {if $v.fieldset!=0} id="li_{$v.caption}{if $v.search_type==2}_low{/if}" style="display: none"{/if}>
+		<h4>{$v.name}</h4>
+		
+		{if $v.prefix!=""} {$v.prefix} {/if}
+
+		{if $v.type=="price" && $appearance.currency_pos==0}
+		{if $currencies|@count>1}
+
+		<select name="currency">
+			<option value="">-</option>
+			{foreach from=$currencies item=i}
+			<option value="{$i.currency}" {if isset($post_array.currency) && $post_array.currency==$i.currency}selected="selected"{/if}>{$i.currency}</option>
+			{/foreach}
+		</select>
+
+		{else} {$currencies[0].currency}
+		{/if}
+		{/if}
+
+		{if $v.search_type==2}
+
+		{if $v.is_numeric && $v.search_elements}
+		<select id="{$v.caption}_low" name="{$v.caption}_low">
+			<option value="">- {$lng.general.min} -</option>
+			{foreach from=$v.search_elements_array item=t}
+			<option value="{$t|replace:',':''|replace:'.':''}">{$t}</option>
+			{/foreach}
+		</select>
+		<select id="{$v.caption}_high" name="{$v.caption}_high">
+			<option value="">- {$lng.general.max} -</option>
+			{foreach from=$v.search_elements_array item=t}
+			<option value="{$t|replace:',':''|replace:'.':''}">{$t}</option>
+			{/foreach}
+		</select>
+		{else}
+		<input name="{$v.caption}_low" id="{$v.caption}_low" type="text" size="{$v.size}" class="defaultText" title="- {$lng.general.min} -"/>
+		&nbsp;{$lng.advanced_search.to}&nbsp;
+		<input name="{$v.caption}_high" id="{$v.caption}_high" type="text" size="{$v.size}" class="defaultText" title="- {$lng.general.max} -"/>
+		{/if}
+
+		{else}
+
+		<input name="{$v.caption}" id="{$v.caption}" type="text" size="{$v.size}"/>
+		{/if}
+
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		{if $v.type=="price" && $appearance.currency_pos==1}
+		{if $currencies|@count>1}
+
+		<select name="currency">
+			<option value="">-</option>
+			{foreach from=$currencies item=v}
+			<option value="{$v.currency}" {if isset($post_array.currency) && $post_array.currency==$v.currency}selected="selected"{/if}>{$v.currency}</option>
+			{/foreach}
+		</select>
+
+		{else} {$currencies[0].currency}
+		{/if}
+		{/if}
+		</li>
+{* ---------------- menu or radio ------------------ *}
+
+	{elseif $v.type=="menu" || $v.type=="radio" || $v.type=="multiselect"}
+		<li {if $v.fieldset!=0} id="li_{$v.caption}{if $v.search_type==2}_low{/if}" style="display: none"{/if}>
+		<h4>{$v.name}</h4>
+		{if $v.prefix!=""} {$v.prefix} {/if}
+
+		{if $v.search_type==2}
+
+		<select id="{$v.caption}_low" name="{$v.caption}_low">
+			<option value="">- {$lng.general.min} -</option>
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}">{$t}</option>
+			{/foreach}
+		</select>
+		</div>	
+		</li>
+		<li {if $v.fieldset!=0} id="li_{$v.caption}_high" style="display: none"{/if}>
+		<div>
+		<label></label><br/>
+		<select id="{$v.caption}_high" name="{$v.caption}_high">
+			<option value="">- {$lng.general.max} -</option>
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}">{$t}</option>
+			{/foreach}
+		</select>
+
+		{else}
+
+		<select id="{$v.caption}" name="{$v.caption}">
+			<option value="">{$lng.general.all}</option>
+			{foreach from=$v.elements_array item=t}
+			<option value="{$t}">{$t|escape:"html"}</option>
+			{/foreach}
+		</select>
+		{/if}
+
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		</li>
+{* ---------------- date ------------------ *}
+
+	{elseif $v.type=="date"}
+		<li {if $v.fieldset!=0} id="li_{$v.caption}" style="display: none"{/if}>
+		<h4>{$v.name}</h4>
+		{if $v.prefix!=""} {$v.prefix} {/if}
+
+		{if $v.search_type==2}
+
+		{include file="data/date-interval.html"}
+
+		<input name="{$v.caption}_low_vis" id="{$v.caption}_low_vis" type="text" size="{$v.size}" class="defaultText" title="- {$lng.general.min} -" {if $v.categories!=0}disabled="disabled"{/if} />
+		&nbsp;{$lng.advanced_search.to}&nbsp;
+		<input name="{$v.caption}_high_vis" id="{$v.caption}_high_vis" type="text" size="{$v.size}" class="defaultText" title="- {$lng.general.max} -" 
+		{if $v.categories!=0}disabled="disabled"{/if} />
+
+		<input type="hidden" name="{$v.caption}_low" id="{$v.caption}_low" />
+		<input type="hidden" name="{$v.caption}_high" id="{$v.caption}_high" />
+		{else}
+
+		<input name="{$v.caption}_vis" id="{$v.caption}_vis" type="text" size="{$v.size}" {if $v.categories!=0}disabled="disabled"{/if} />
+
+		<input type="hidden" name="{$v.caption}" id="{$v.caption}" />
+		{include file="data/date.html"}
+
+		{/if}
+		{if $v.postfix!=""} {$v.postfix} {/if}
+		</li>
+{* ---------------- checkbox ------------------ *}
+
+	{elseif $v.type=="checkbox"}
+		<li {if $v.fieldset!=0} id="li_{$v.caption}" style="display: none"{/if}>
+		<h4>{$v.name}</h4>
+		<input name="{$v.caption}" type="radio" value="1" class="noborder"/>&nbsp;{$lng.general.Yes}&nbsp;&nbsp;<input name="{$v.caption}" type="radio" value="0" class="noborder"/>&nbsp;{$lng.general.No}
+		</li>
+
+	{/if}
+
+	{/if} {* end if not depending *}
+
+{/foreach}
+
+<li>
+<h4>{$lng.advanced_search.only_ads_with_pic}</h4>
+<input name="with_pic" type="checkbox" class="noborder" {if isset($post_array.with_pic) && $post_array.with_pic==1} checked="checked" {/if}/>
+</li>
+
+<li><h4>{$lng.search.refine_by_keyword}</h4>
+
+<input type="text" name="{$keyword_name}" class="defaultText" title="- {$lng.advanced_search.word} -" style="width: 170px;" value="{if isset($post_array[$keyword_name])}{$post_array[$keyword_name]}{/if}" />
+</li>
+
+<li><div class="buttons"><strong><input type="submit" name="Search" id="Refine" value="{$lng.general.search}" /></strong></div></li>
+
+</ul>
+<div class="clearfix"></div>
+</form>
+
+</div>
+<div class="clearfix"></div>
+{include file="footer.html"}

@@ -1,0 +1,92 @@
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+<div class="hidden auction-details">
+
+{if isset($crt_usr) && $crt_usr!=$listing.user_id}
+{* ------------------------ place bid ------------------------ *}
+
+	<div class="bid_info ma20" style="display: none;">
+		<span class="closebtn" onclick='$(".auction-details").slideUp()'>&times;</span>
+		<span class="content"></span>
+	</div>
+
+	
+	<div class="form2">	
+	<form name="bid_form" id="bid_form" method="post" action="{$live_site}/include/bid.php?acid={$listing.auction.id}&aid={$id}">
+	<ul>
+
+	<li>
+	<label for="bid">{$lng.useraccount.bid}<span class="mandatory"> *</span></label>
+	<input type="text" name="bid" id="bid" class="medium" size="20" />
+	{if in_array("multicurrency",$modules_array)}{include file="modules/multicurrency/bid-currency.html"}
+	{else}
+	&nbsp;{$listing.auction.currency}
+	{/if}
+	</li>
+
+	<li>
+	<label for="bid_message">{$lng.useraccount.message_to_seller}</label>
+	<textarea rows="3" name="bid_message" id="bid_message"></textarea>
+	</li>
+	
+	<li>
+	<div class="buttons">
+	<span class="positive"><input type="submit" name="Bid" id="Bid" value="{$lng.useraccount.place_bid}" /></span>
+	</div>
+	</li>
+	</ul>
+
+	</form>
+	</div>
+
+{else} 
+{* ------------------------ view bids ------------------------ *}
+
+	<div class="rfloat"><a id="delac" class="med-btn btn1" href="javascript:;" >{$lng.useraccount.remove_auction|replace:" ":"&nbsp;"}</a></div>
+	<div class="clearfix"></div>
+
+	{if !$listing.auction.no_bids}
+	<div class="bid_info ma20">
+		<span class="closebtn" onclick='$(".auction-details").slideUp()'>&times;</span>
+		<span class="content">{$lng.useraccount.no_bids_for_auction}</span>
+	</div>
+	{/if}
+	
+	{if isset($listing.bids)}
+		{foreach from=$listing.bids item=v name=bloop}
+
+		<div class="p10">
+	
+		<div class="price">{$v.bid}</div>
+		<div class="small">{$lng.useraccount.placed_on}: {$v.date_nice} {$lng.general.by} {$v.contact}</div> 
+		<p>{$v.message}</p>
+		<a href="{$live_site}/mailto.php?id={$v.user_id}&aid={$id}" class="bmailto med-btn btn2" id="bmailto{$v.user_id}_{$id}">{$lng.general.contact}</a>
+		
+		</div>
+
+	{/foreach}
+	{/if}
+
+{/if}
+
+</div>
+
+{literal}
+
+<script>
+
+$(document).ready(function() {
+
+$("#delac").click(function(event){
+
+	var url_str="{/literal}{$live_site}/include/actions.php?action=delete&object=auction&id={$listing.auction.id}{literal}";
+
+	$.get( url_str, function( data ) {
+		location.reload(true);
+	});
+
+});
+
+});
+
+</script>
+{/literal}

@@ -1,0 +1,51 @@
+{include file="header.html"}
+<div id="page_content">
+
+<div class="dcenter button1"><a href="javascript:;" class="show_login">{$lng.navbar.login}</a></div>
+<div class="dcenter">or</div>
+
+<div class="div_login" style="display: none;">
+{if $error}<div class="error"><p>{$error}</p></div>{/if}
+<form name="login" method="post" action="login.php?loc=new_listing.php">
+<label>{$lng.login.username}:</label>
+<input name="username" type="text" style="width: 250px;" maxlength="255" /><br/>
+
+<label>{$lng.login.password}:</label>
+<input name="password" type="password" style="width: 250px;" maxlength="255"/><br/>
+
+<label><input type="checkbox" name="remember" id="remember" />&nbsp;{$lng.remember_me}</label><br/>
+
+{if $captcha}
+<p>{$lng.users.image_verification_info}</p>
+<input name="number" type="text" /><br/>
+<img src="{$live_site}/include/random_image.php" alt="" /><br/><br/>
+{/if}
+
+<div class="buttons"><strong><input type="submit" name="Login" id="Login" value="{$lng.login.login}" /></strong></div>
+</form>
+
+<hr/>
+
+{* -------- connect ---------- *}
+{if in_array("connect", $modules_array)}
+{include file="modules/connect/connect.html"}
+{/if}
+{* -------- end connect ---------- *}
+
+<p>{$lng.login.forgot_pass}&nbsp;<a href="password_recovery.php">{$lng.login.click_here}</a></p>
+</div> {* end div_login *}
+
+<div class="dcenter button1"><a href="{$live_site}/new_listing.php">{$lng.listings.post_without_login}</a></div>
+
+
+</div>
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function() {
+$(".show_login").click(function() { $(".div_login").show(); });
+});
+{/literal}
+</script>
+
+{include file="footer.html"}

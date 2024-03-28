@@ -1,0 +1,18 @@
+<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$listing.id p2=$listing.title}{else}{$live_site}/details.php?id={$listing.id}{/if}"><h1 class="gmaps_title">{$listing.title|wordwrap:40:" ":true}</h1></a>
+<div style="padding-left: 10px;">
+
+<div class="small">{if $ads_settings.show_ad_date_for_everybody==1}{$lng.listings.added_on}&nbsp;{$listing.date_nice}{/if} {if $ads_settings.enable_stock==1}| {$lng.listings.stock_no}: #{$listing.stock}{/if}</div>
+
+{if $listing.price>=0}<h2>{$listing.price_curr}</h2>{/if}
+{if $data_set=="cars" && ($listing.make || $listing.model)}<h3>{$listing.make} {$listing.model}</h3>{/if}
+
+<div id="description">
+<p>
+	{$listing.description}
+</p>
+
+</div>
+
+<div style="float: right; margin: 10px 20px 10px 0; font-weight: bold;"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$listing.id p2=$listing.title}{else}{$live_site}/details.php?id={$listing.id}{/if}">{$lng.listings.see_full_listing}</a></div>
+
+</div>

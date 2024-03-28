@@ -1,0 +1,4 @@
+{capture name=some_content assign=title_field}title_{$crt_lang}{/capture}
+	<input id="tab_popular" type="radio" name="tabs" {if !$ck}checked{/if}>
+	<label for="tab_popular">{$popular_ads[$title_field]}</label>
+	

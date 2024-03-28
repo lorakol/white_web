@@ -1,0 +1,75 @@
+{include file="header.html"}
+
+{if $action=="confirm" || $action=="unsubscribe"}
+<br/><br/><br/>
+{/if}
+{if isset($error) && $error}<div class="error"><p>{$error}</p></div>{/if}
+{if isset($info) && $info}<div class="info"><p>{$info}</p></div>{/if}
+
+{if $action=="confirm" || $action=="unsubscribe"}
+<br/><br/><br/>
+{/if}
+
+{if $action=="view"}
+	<div id="page_content">
+	<h1>{$lng.alerts.email_alert} {$lng.general.for}: {$str_search}</h1>
+	{if $no_listings>0}
+
+	{include file="paginator.html"}
+
+	{foreach name="listings" from=$listings_array item=v}
+		{include file="short_listing.html"}
+		{if !$v.featured && !$v.highlited}<hr/>{/if}
+	{/foreach}
+
+	{include file="listings_js.html"}
+
+	{* if listings_compare *}
+	{if in_array("listings_compare", $modules_array)}
+	{include file="modules/listings_compare/cmp_js.html"}
+	{/if}
+
+	<div class="clearfix"></div>
+	{include file="paginator.html"}
+	{else}
+	<div class="info"><p>{$lng.alerts.no_listings}</p></div>
+	{/if}
+	</div>
+
+{/if}
+
+{if $action=="user"}
+
+<div id="heading">{$lng.alerts.email_alerts}</div>
+
+<div class="clearfix"></div>
+
+{foreach from=$alerts item=v}
+
+<div class="classified_nl">
+
+<div class="classifieds_content">
+<h3>{$v.search_str}</h3>
+{$lng.alerts.frequency}: {if $v.frequency==0}{$lng.alerts.immediately}{elseif $v.frequency==1}{$lng.alerts.daily}{else}{$lng.alerts.weekly}{/if}&nbsp;|&nbsp;{$lng.alerts.started_on}:&nbsp;{$v.date_nice}&nbsp;|&nbsp;{if $v.active}<span class="green">{$lng.listings.active}</span>{else}<span class="red">{$lng.listings.inactive}</span>{/if}
+</div>
+
+<div class="clearfix"></div>
+
+<div class="icons">
+<a href="javascript:;" onclick="onDeleteAlert({$v.id})"><img src="{$template_path}images/delete.gif" alt="Delete" /></a>
+</div>
+
+<div class="clearfix"></div>
+</div>
+{/foreach}
+
+{if !$alerts|@count}
+	<div class="p10">
+	{$lng.alerts.no_alerts}
+	</div>
+{/if}
+
+<div class="clearfix"></div>
+
+{/if}
+{include file="footer.html"}

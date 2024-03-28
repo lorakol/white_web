@@ -1,0 +1,112 @@
+	{* ------ right banners ------- *}
+	{if in_array('right',$banners_positions)}
+	{banner->getTemplateBanners p1='right' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{if $array_banners|@count}
+	{assign var="rbwidth" value="0"}
+	{foreach from=$array_banners item=v}
+	{if $v.filename && $v.extension!='swf'}
+	{if $rbwidth<$v.size[0]}
+	{assign var="rbwidth" value="{$v.size[0]}"}
+	{/if}
+	{/if}
+	{/foreach}
+	</td>
+	<td class="right_banners" valign="top" {if $rbwidth}width="{$rbwidth}"{else}width="150"{/if}>
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners">{include file="banner.html"}</div>
+	{/foreach}
+	{/if}{/if}
+	{* ------- end right banners ------- *}
+	
+	{if in_array('left',$banners_positions) || in_array('right',$banners_positions)}</td></tr></table>{/if}
+    </div>
+    <!-- end: #main -->
+
+	{* ------ footer banners ------- *}
+	{if in_array('footer',$banners_positions)}
+	{banner->getTemplateBanners p1='footer' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{if $array_banners|@count}<div class="clearfix"></div><div class="dcenter"><table align="center"><tr><td>{/if}
+	{foreach from=$array_banners item=v}
+	<div class="hor_banners">{include file="banner.html"}</div>
+	{/foreach}
+	{if $array_banners|@count}</td></tr></table></div><div class="clearfix"></div>{/if}{/if}
+	{* ------- end footer banners ------- *}
+<br/>
+    <!-- begin: #footer -->
+    <div id="footer">
+
+<div id="footer-share"></div>
+
+{* -------- social networks ---------- *}
+{if in_array("social_networks", $modules_array)}
+{include file="modules/social_networks/sn_buttons.html"}
+{/if}
+{* -------- end social networks ---------- *}
+
+<div id="footer-nav">
+	<a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.contact}{else}contact.php{/if}">{$lng.navbar.contact}</a>&nbsp;
+	{foreach from=$sec_navbar item=cp }
+	|&nbsp;
+	{if $cp.type==1}
+	<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeCustomPageLink p1=$cp.id p2=$cp.title p3=$cp.slug}{else}{$live_site}/content.php?id={$cp.id}{/if}" {if $cp.blank==1}target="_blank"{/if}>
+	{else}<a href="{$cp.hreflink}" {if $cp.blank==1}target="_blank"{/if}>
+	{/if}
+	{$cp.title}</a>
+	{/foreach}
+	<br/>
+	<span>{$appearance.footer_text}</span>
+</div>
+
+</div>
+    <!-- end: #footer -->
+
+</div>
+{if $is_mobile}
+	<div class="dcenter"><div class="form_button back">
+		<strong><a href="javascript:;" onclick="document.cookie='mobile=1; path=/; expires='+exdate.toUTCString()+'; {if $settings.enable_locations && $settings.enable_subdomains}domain={$main_domain};{/if}';window.location.reload( false );">{$lng.general.mobile_version}</a></strong>
+	</div></div>
+{/if}
+<!-- end: #page -->
+</div>
+
+<div class="clearfix"></div>
+{if $appearance.show_footer_categ}
+	<div id="footer_categories">{$footer_links}</div>
+    <!-- end: #footer_categories -->
+{/if}
+
+{if $appearance.show_footer==1 && $appearance.footer_pic!=''}
+<div id="footer_image">
+		{if $appearance.footer_pic_link!=''}<a href="{$appearance.footer_pic_link}" target="_blank">{/if}
+		{if $appearance.footer_is_flash}
+		<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+		codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,79,0"
+		id="{$appearance.footer_pic}" width="{$appearance.footer_pic_width}" height="{$appearance.footer_pic_height}">
+		<param name="movie" value="images/{$appearance.footer_pic}">
+		<param name="bgcolor" value="#FFFFFF">
+		<param name="quality" value="high">
+		<param name="allowscriptaccess" value="samedomain">
+		<embed type="application/x-shockwave-flash"
+			pluginspage="http://www.macromedia.com/go/getflashplayer"
+			name="{$appearance.footer_pic}"
+			width="{$appearance.footer_pic_width}" height="{$appearance.footer_pic_height}"
+			src="images/{$appearance.footer_pic}"
+			quality="high"
+			swliveconnect="true"
+			allowscriptaccess="samedomain">
+		<noembed>
+		</noembed>
+		</embed>
+		</object>
+
+		{else}
+		<img src="{$live_site}/images/{$appearance.footer_pic}" alt="" />
+		{/if}	
+		{if $appearance.footer_pic_link!=''}</a>{/if}
+</div>
+{/if}	
+
+{if isset($bottom_content)}{$bottom_content}{/if}
+
+</body>
+</html>

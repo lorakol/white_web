@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>{$page_info.title}</title>
+<meta http-equiv="Content-Type" content="text/html; charset={$appearance.charset}">
+<meta name="description" content="{$page_info.meta_description}">
+<meta name="keywords" content="{$page_info.meta_keywords}">
+<meta name="robots" content="index, follow">
+
+<link rel="stylesheet" type="text/css" href="{$template_path}css/style{if $text_direction=="rtl"}-rtl{/if}.css" />
+<link href="{$template_path}modules/listings_compare/style.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/jquery.js"></script>
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+</head>
+<body style="text-align: left; background: #fff;">
+
+<div class="wait"></div>
+
+<div id="form_container" style="width: 600px;">
+<h1>{$lng_comments.make_a_comment}</h1>
+
+{if $comments_settings.html_editor}
+
+<script type="text/javascript" src="{$live_site}/libs/nicEdit/nicEdit.min.js"></script>
+<script type="text/javascript">
+
+{literal}
+	jQuery(document).ready(function () {
+	myNicEditor = new nicEditor({iconsPath : '{/literal}{$live_site}{literal}/libs/nicEdit/nicEditorIcons.gif', buttonList : ['bold','italic','underline', 'left', 'center', 'right', 'justify', 'ul', 'ol', 'indent', 'outdent', 'forecolor', 'bgcolor', 'hr', 'fontSize', 'fontFormat']}).panelInstance('comments_content');
+	});
+{/literal}
+</script>
+
+{/if}
+
+		<div id="comments_info" class="info1" style="display: none;"></div>
+
+		<form name="comments_form" id="comments_form" method="post" action="{$live_site}/modules/comments/add_comment.php?post=1&id={$id}">
+
+		<div id="comments_div" class="small_form">
+		<ul>
+
+		{if $comments_settings.use_name}
+		<li>
+		<label>{$lng_comments.name}<span class="mandatory"> *</span></label>
+		<input name="comments_name" id="comments_name" type="text" size="30" {if isset($current_user) && isset($current_user[$settings.contact_name_field]) && $current_user[$settings.contact_name_field]}value="{$current_user[$settings.contact_name_field]}"{/if} />
+		</li>
+		{/if}
+
+		{if $comments_settings.use_email}
+		<li>
+		<label>{$lng_comments.email}{if $comments_settings.use_email==1}<span class="mandatory">*</span>{/if}</label>
+		<input name="comments_email" id="comments_email" type="text" size="30" {if isset($current_user) && $current_user.email}value="{$current_user.email}"{/if} />
+		</li>
+		{/if}
+
+		{if $comments_settings.use_website}
+		<li>
+		<label>{$lng_comments.website}{if $comments_settings.use_website==1}<span class="mandatory">*</span>{/if}</label>
+		<input name="comments_website" id="comments_website" type="text" size="30" {if isset($current_user) && isset($current_user.website) && $current_user.website}value="{$current_user.website}"{/if} />
+		</li>
+		{/if}
+		
+		<li><br/><textarea name="comments_content" id="comments_content" rows="5" style="width: 500px;"></textarea></li>
+
+		{capture name=some_content assign=field_name}terms_{$crt_lang}{/capture}
+		{if $comments_settings[$field_name]}<li><p>{$comments_settings[$field_name]}</p></li>{/if}
+
+		{if $comments_settings.captcha==1 || ($comments_settings.captcha==2 && !$logged_in)}
+		<li>
+		{if $settings.enable_recaptcha}
+		{include file="data/recaptcha.html" extension="_comm"}
+		{else}
+		{include file="data/random_image.html"}
+		{/if}
+		</li>
+		{/if}
+		</ul>
+		<br/>
+
+		<div class="buttons">
+		<strong><input type="submit" name="AddComment" id="AddComment" value="{$lng_comments.submit_comment}" /></strong>
+		</div>
+
+		</div>
+		</form>
+		<div class="clearfix"></div>
+
+
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+
+jQuery(document).ready(function() {
+
+	$("#comments_info").hide();
+
+var options = { 
+
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  function(formData, jqForm, options) {var queryString = $.param(formData);  return true;  }, 
+        success:       successResponse 
+ 
+   }; 
+
+function beforeSerialize(jqForm, options) {
+
+	$("body").addClass("loading");
+
+	{/literal}{if $comments_settings.html_editor}{literal}
+	// capturing nicEditor content
+	for(var i=0;i<myNicEditor.nicInstances.length;i++){myNicEditor.nicInstances[i].saveContent();}
+	{/literal}{/if}{literal}
+
+	// return false to cancel submit
+
+}
+
+
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			$("body").removeClass("loading");
+
+			if(ret.response==1) {
+
+				$("#comments_info").html("<p>"+ret.info+"</p>");
+				$("#comments_info").show();
+				$("#comments_div").slideUp(1000);
+				$('html,body').animate({scrollTop:$("#comments_info").offset().top}, 'slow');
+
+				var cwebsite = $("#comments_website").val();
+				var cname = $("#comments_name").val();
+				var content = $("#comments_content").val();
+
+				// if added and don't have to be approved, rewrite the comments with the last one.
+				{/literal}
+
+				{if $comments_settings.admin_verification==0 || ($comments_settings.admin_verification==2 && $logged_in)}
+				var str='';
+
+				str+='<div class="comments"><table cellpadding="0" cellspacing="0" width="100%"><tr>';
+				{if $comments_settings.logo_field && isset($current_user) && $current_user[$comments_settings.logo_field]}str+='<td valign="middle" width="100"><div class="clogo"><a href="{$live_site}/user_listings.php?id={$current_user.id}"><img src="{$live_site}/uploads/{$comments_settings.logo_field}/{$current_user[$comments_settings.logo_field]}"></a></div></td>';{/if}
+				str+='<td><div class="comment_odd">';
+				{if $comments_settings.use_name && cname}str+='<div class="cname">'+cname+'</div>';{/if}
+				str+='<div class="cdate">{$smarty.now|date_format}</div><p class="ccontent">'+content.replace(/\n/g,"<br/>")+'</p>';
+				{if $comments_settings.use_website && cwebsite}str+='<div><a href="'+cwebsite+'">'+cwebsite+'</a></div>';{/if}
+				str+='</div></td></tr></table></div>';
+				
+				parent.$("#comments_container").prepend(str);
+
+				{/if}
+				{literal}
+				return;
+
+			}
+
+			// response = 0 -> there are errors
+			$("#comments_info").hide();
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+				$("#"+err_field).addClass("err");
+
+				{/literal}{if $comments_settings.html_editor}{literal}
+				// nicEditor fix
+				if(err_field=="comments_content") { 
+					$("#comments_content_elm").addClass("err");
+					$("#"+err_field).closest( "li" ).prepend('<label class="err_label">'+err_string+'</label>');
+				}
+				else 
+				{/literal}{/if}{literal}
+					$("#"+err_field).before('<label class="err_label">'+err_string+'</label>');
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err_label:first").offset().top}, 'slow');
+
+			{/literal}{if  $settings.enable_recaptcha && ($comments_settings.captcha==1 || ($comments_settings.captcha==2 && !$logged_in))}
+			// reload recaptcha
+			gReCaptchaReset("_comm");
+			{/if}{literal}
+
+
+} 
+
+ $('#comments_form').ajaxForm(options);
+
+$(document).on("click", "a#newad", function(){ 
+
+	$("#comments_div").fadeIn(1000);
+	$("#comments_info").hide();
+
+	// empty previous fields data
+	$("#comments_name").val("{/literal}{if isset($current_user) && isset($current_user[$settings.contact_name_field]) && $current_user[$settings.contact_name_field]}{$current_user[$settings.contact_name_field]}{/if}{literal}");
+	$("#comments_email").val("{/literal}{if isset($current_user) && $current_user.email}{$current_user.email}{/if}{literal}");
+	$("#comments_website").val("{/literal}{if isset($current_user) && isset($current_user.website) && $current_user.website}{$current_user.website}{/if}{literal}");
+	{/literal}{if $comments_settings.html_editor}{literal}
+	$("#comments_content_elm").html("");
+	{/literal}{/if}{literal}
+		$("#comments_content").val("");
+	$("#comments_number").val("");
+
+	// clean all fields possible err class
+	$(".err").removeClass("err");
+	// remove all err_labels
+	$(".err_label").remove();
+
+	{/literal}{if  $settings.enable_recaptcha && ($comments_settings.captcha==1 || ($comments_settings.captcha==2 && !$logged_in))}
+	// reload recaptcha
+	onloadRCCallback("_comm");
+	{/if}{literal}
+
+});
+
+});
+
+//]]>
+</script>
+{/literal}
+</div>
+<br/><br/>
+</body>
+</html>

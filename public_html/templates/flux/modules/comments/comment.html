@@ -1,0 +1,22 @@
+
+	<div class="comment {if !$v.comment_active}disabled{/if}" id="comment{$v.comment_id}">
+	<table cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+	{if isset($v.logo) && $v.logo}<td valign="top" class="pr10" width="80"><a href="{if $v.store}{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$v.user_id p2=$v[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$v.user_id}{/if}{else}{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=$v.user_id p2=$v[$settings.contact_name_field]}{else}{$live_site}/user_listings.php?id={$v.user_id}{/if}{/if}"><img src="{$live_site}/uploads/{$comments_settings.logo_field}/{$v.logo}"></a></td>{/if}
+	<td valign="top">
+	<div class="dialogbox">
+		<div class="body">
+			<span class="tip tip-left"></span>
+			<div class="message">
+				{if $comments_settings.use_name}<div class="bold{if ($comments_settings.allow_owner_delete || $comments_settings.allow_owner_edit || $comments_settings.allow_owner_activate) && $crt_usr==$listing.user_id} lfloat{/if}">{$v.name|wordwrap:40:" ":true}</div>{/if}
+				{if ($comments_settings.allow_owner_delete || $comments_settings.allow_owner_edit || $comments_settings.allow_owner_activate) && $crt_usr==$listing.user_id}
+					<div class="rfloat">{if $comments_settings.allow_owner_edit}<img src="{$template_path}/images/edit.png"  class="mlink gray tooltip editcomm" id="editcomm{$v.comment_id}" title="{$lng.general.edit}"/>{/if}{if $comments_settings.allow_owner_delete}<img src="{$template_path}/images/delete1.png" class="mlink gray tooltip delcomm" id="delcomm{$v.comment_id}"  title="{$lng.general.delete}" />{/if}{if $comments_settings.allow_owner_activate}<img src="{$template_path}/images/switch-off.png"  class="mlink gray tooltip enablecomm {if $v.comment_active}hidden{/if}" id="enablecomm{$v.comment_id}" title="{$lng.useraccount.enable}"/>{/if}{if $comments_settings.allow_owner_activate}<img src="{$template_path}/images/switch-on.png"  class="mlink gray tooltip disablecomm {if !$v.comment_active}hidden{/if}" id="disablecomm{$v.comment_id}" title="{$lng.useraccount.disable}"/>{/if}</div><div class="clearfix"></div>
+				{/if}
+				<div class="small">{$v.date_nice}</div>
+				<p>{$v.content|wordwrap:50:" ":true}</p>
+				{if $v.website && $comments_settings.use_website}<div><a href="{$v.website}">{$v.website}</a></div>{/if}
+			</div>
+		</div>
+	</div>	
+	</td></tr></table>
+	</div>

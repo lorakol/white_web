@@ -1,0 +1,14 @@
+<div id="tagcloud">
+{if $tag_cloud_title}<div class="box-heading top-box-text"><div class="box-heading-left"><div class="box-heading-right">{$tag_cloud_title}</div></div></div>
+{/if}
+
+{if !$tag_cloud_title}
+	<div class="box-top-white"><div class="box-bottom"><div class="box-left"><div class="box-right"><div class="box-bottom-left"><div class="box-bottom-right"><div class="box-top-left"><div class="box-top-right">
+{else}
+	<div class="box2-bottom-gray"><div class="box-left"><div class="box-right"><div class="box-bottom-left"><div class="box2-bottom-right">
+{/if}
+	{foreach from=$tag_cloud_array item=v}
+		<span class="{$v.class}"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$sef_keyword p2=$v.word}{else}{$live_site}/listings.php?{$sef_keyword}={$v.word|urlencode}{/if}">{$v.word}</a></span>
+	{/foreach}
+	</div></div></div></div></div>{if !$tag_cloud_title}</div></div></div>{/if}
+</div>

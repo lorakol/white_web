@@ -1,0 +1,186 @@
+{include file="header.html"}
+{include file="modules/auto_repost/js/auto_repost_js.html"}
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="wait"></div>
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng_repost.repost_your_ad} <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id}{else}{$live_site}/details.php?id={$id}{/if}"> #{$id}</a></h1></div>
+</div>
+
+<div class="page_bounds">
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{if isset($error) && $error}{$error}{/if}</p></div>
+
+<form name="auto_repost" id="auto_repost" method="post" action="auto_repost.php?id={$id}&step=2" class="main">
+
+<div class="wbg p30">
+
+<input type="hidden" name="full_total" id="full_total" value="{$rp_settings.price}"/>
+
+<div class="options pt30">
+
+<div class="option clearfix">
+	<label class="option_left">{$lng.listings.listing} ID #{$id}</label>
+	<div class="option_right">
+
+	<div class="med-btn btn1 inline">
+	<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id}{else}{$live_site}/details.php?id={$id}{/if}" target="_blank">{$lng.general.view}</a>
+	</div>
+	
+	</div>
+</div>
+
+<div class="option clearfix">
+	<label class="option_left">{$lng_repost.price_per_repost}</label>
+	<div class="option_right">
+		<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$rp_settings.price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		<input type="hidden" id="price_per_repost" name="price_per_repost" value="{$rp_settings.price}" />
+	</div>
+</div>
+
+<div class="option clearfix">
+	<label class="option_left">{$lng_repost.repost}</label>
+	<div class="option_right">
+		<select name="no_reposts" id="no_reposts" onclick="adjustRepostsTotal(this.form, {$rp_settings.price}, {$appearance.price_format_decimals} )">
+			{for $i=1 to 20}
+			<option value="{$i}">{$i}</option>
+			{/for}
+		</select>&nbsp;{$lng_repost.times}
+	</div>
+</div>
+
+<div class="option clearfix">
+	<label class="option_left">{$lng_repost.every}</label>
+	<div class="option_right">
+		<select name="repost_period" id="repost_period" onclick="adjustRepostsSchedule(this.form)">
+			{for $i=1 to 23}
+			<option value="{$i}">{$i}</option>
+			{/for}
+		</select>&nbsp;
+		<input type="radio" name="repost_period_um" value="d" checked />&nbsp;{$lng_repost.days}&nbsp;&nbsp;
+		<input type="radio" name="repost_period_um" value="h" />&nbsp;{$lng_repost.hours}
+		
+	</div>
+</div>
+
+<div class="option clearfix">
+	<label class="option_left">{$lng_repost.specific_period}</label>
+	<div class="option_right">
+	<label class="enh_checkbox chk_container">
+		<input type="checkbox" class="noborder" name="specific_period" id="specific_period" onchange="onSpecific()" />
+		<div class="chk_indicator"></div>
+	</label>
+	</div>
+</div>
+
+<div id="between" class="option clearfix" style="display: none;">
+	<label class="option_left">{$lng_repost.between}</label>
+	<div class="option_right">
+	<select name="starting_hour" id="starting_hour">
+		{for $var=1 to 11}
+		<option value="{$var}" {if $var==9}selected{/if}>{$var}&nbsp;AM</option>
+		{/for}
+		<option value="12">12&nbsp;PM</option>
+		{for $var=1 to 11}
+		<option value="{12+$var}">{$var}&nbsp;PM</option>
+		{/for}
+		<option value="0">12&nbsp;AM</option>
+	</select>
+	&nbsp;{$lng_repost.and}&nbsp;
+	<select name="ending_hour" id="ending_hour">
+		{for $var=1 to 11}
+		<option value="{$var}">{$var}&nbsp;AM</option>
+		{/for}
+		<option value="12">12&nbsp;PM</option>
+		{for $var=1 to 11}
+		<option value="{12+$var}" {if $var==10}selected{/if}>{$var}&nbsp;PM</option>
+		{/for}
+		<option value="0">12&nbsp;AM</option>
+	</select>
+	</div>
+</div>
+
+<div id="schedule" class="option clearfix">
+	<label class="option_left">{$lng_repost.reposts_schedule}</label>
+	<div class="option_right" id="schedule_content"></div>
+</div>
+
+{if $enable_coupons}
+<div class="option clearfix" id="div_discount" {if !$total}style="display: none;"{/if}>
+	<label class="option_left">{$lng.listings.enter_coupon} :</label>
+	<div class="option_right"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" value="{if isset($discount_code) && $discount_code}{$discount_code}{/if}"/></div>
+</div>
+{/if}
+
+{if $credits_allowed && (!isset($nologin) || !$nologin)}
+<div class="option clearfix" id="div_credits" {if !$total}style="display: none;"{/if}>
+
+<input type="hidden" name="credit_value" id="credit_value" value="{$credits_settings.unit}"/>
+<input type="hidden" name="current_credits" id="current_credits" value="{$current_credits}"/>
+
+	<label class="option_left">{$lng.credits.credits}</label>
+	<div class="option_right"><b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+	
+	<label class="enh_radio chk_container">	
+		<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}<span id="not_enough_credits" {if $current_credits==0 || $current_credits>=$needed_credits}style="display: none;"{/if}> ( {$lng.credits.not_enough_credits} ) </span><span id="no_credits" {if $current_credits==0 || $current_credits<$needed_credits}style="display: none;"{/if}> ( <span id="needed_credits">{$needed_credits}</span> <span id="scredit" {if $needed_credits>1}style="display: none;"{/if}>{$lng.credits.scredit}</span><span id="scredits" {if $needed_credits==1}style="display: none;"{/if}>{$lng.credits.scredits}</span> ) </span>
+		<div class="chk_indicator"></div>
+	</label>
+
+</div>
+</div>
+{/if}
+
+<div class="option clearfix" id="div_total" {if !$total}style="display: none;"{/if}>
+
+{if $no_processors>1 || ($no_processors<=1 && $credits_allowed)}
+
+<label class="option_left">{$lng.listings.choose_payment_method} :</label>
+<div class="option_right">
+{foreach from=$payment_processors name=pp item=v}
+	<label class="enh_radio chk_container">
+		<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (!$credits_allowed || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+		<div class="chk_indicator"></div>
+	</label>
+{/foreach}
+</div>
+{else}
+<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+<label class="option_left">{$lng.subscribe.payment_method}:</label>
+<div class="option_right">{$payment_processors[0].processor_title}</div>
+
+{/if}
+<input type="hidden" id="selected_processor" value="{$payment_processors[0].processor_code}"/>
+
+</div>
+
+<br/>
+
+<div class="option_price price top_price">
+{$lng.listings.total}: <b>
+{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+</div>
+
+<div class="option_price price" id="tax_info" style="display: none;">
+<b>{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;):</b> <b><span id="tax"></span></b>
+</div>
+
+<div class="option_price price" id="total_with_tax_info" style="display: none;">
+<b>{$lng.general.total_with_tax}:&nbsp;<span class="price" id="total_with_tax"></span></b>
+</div>
+
+</div> {* end options *}
+
+</div> {* end wbg *}
+<div class="form_footer mb40">
+	<input class="button negative" type="submit" name="Cancel" id="Cancel" value="{$lng.general.cancel}" />
+	<input class="button positive" type="submit" name="Submit" id="Submit" value="{$lng.general.submit}" />
+</div>
+
+</form>
+<div id="payment" style="display: none;"></div>
+
+</div>{* end page_bounds *}
+
+{include file="footer.html"}

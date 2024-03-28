@@ -1,0 +1,111 @@
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<div class="page_bounds mb40">
+
+<form name="bulk" method="post" action="bulk_uploads.php" enctype="multipart/form-data">
+
+<div class="heading form_heading"><div class="lfloat">{$lng.useraccount.bulk_uploads}</div><a href="{$live_site}/content.php?id={$ie_settings.custom_page_id}" target="_blank" class="button rfloat mt10 mr10">{$lng.general.help}</a></div>
+
+<div class="wbg p30">
+<div class="form_container">
+
+{if isset($error) && $error}<div class="error"><p>{$error}</p></div>{/if}
+<div class="status"></div>
+<div id="ti" class="on_top_info" style="display: none;"></div>
+
+<div class="fel">
+	<input type="file" name="{$ie_settings.bulk_type}_import_file"/>
+</div>
+
+<div class="fel">
+	<select name="{$ie_settings.bulk_type}_category" id="{$ie_settings.bulk_type}_category">
+		<option value="">{$lng.listings.category}</option>
+		{foreach from=$bulk_categories item=v name=cat}
+
+		{if $v.parent==1}
+		<optgroup label="{$v.str}{$v.name}">
+		{else}
+		<option value="{$v.id}">{$v.str}{$v.name}</option>
+		{if ( $smarty.foreach.cat.index!=$bulk_categories|@count-1 && $v.parent_id!=$bulk_categories[$smarty.foreach.cat.iteration].parent_id) || ($smarty.foreach.cat.index==$bulk_categories|@count && $v.parent_id!=0)}
+		</optgroup>
+		{/if}
+		{/if}
+		{/foreach}
+	</select>
+</div>
+
+</div> {* end form_container *}
+
+</div>{* end wbg *}
+
+<div class="form_footer mb40">
+<input type="submit" class="button wide_button positive" name="Submit" id="Submit" value="{$lng.general.upload}" />
+</div>
+
+</form>
+
+</div>
+
+<script type="text/javascript">
+
+	var added = "{$lng.ie.added}";
+	var listing="{$lng.listings.listing}";
+	var status = "{$lng.ie.bulk_upload_status}";
+	var success = "{$lng.ie.successfully}";
+	var failed = "{$lng.ie.failed}";
+	var type="{$type}";
+	
+{if $import_id}
+	$(document).ready(function() {
+
+		import_id="{$import_id}";
+		$("body").addClass("loading");
+		if(type=="csv") start=1; else start=-1;
+		bulkUpload(import_id, start);
+
+	});
+	{literal}
+	function bulkUpload(import_id, line) {
+		$.ajax({
+			method: "get",
+			url: "include/import_element.php?type="+type+"&import_id="+import_id+"&line="+line,
+			beforeSend: function() {  },
+			complete: function() { },
+			success: function(returnedData)
+			{
+				var split=returnedData.split("|");
+				if(split[0]!=0) { 
+					
+					if(split[1]) {
+
+						$(".on_top_info").html(listing+" #"+split[1]+" "+added);
+						
+						var el = document.getElementById('ti');
+						el.style.animation = 'none';
+						el.offsetHeight;
+						el.style.animation = null; 
+
+						if(!$(".on_top_info").is(":visible")) $(".on_top_info").show();
+					}
+
+					bulkUpload(import_id, split[0]); 
+				}
+				else { 
+				    $("body").removeClass("loading");
+				    
+				    $(".info").html(status+' '+split[1]+' '+success+', '+split[2]+' '+failed);
+				    $(".info").show();
+				}
+			}
+		});
+	}
+	{/literal}
+
+	
+{/if}
+
+</script>
+
+{include file="footer.html"}

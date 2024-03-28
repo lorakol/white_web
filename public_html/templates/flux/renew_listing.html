@@ -1,0 +1,465 @@
+{if !$step}
+{include file="header.html"}
+{include file="data/magnific-popup.html"}
+{include file="js/renew_listing_js.html"}
+
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="wait"></div>
+
+<div class="page_bounds">
+<div class="page_title"><h1>{$lng.navbar.renew_listing} <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$id}{else}{$live_site}/details.php?id={$id}{/if}"> #{$id}</a></h1></div>
+</div>
+
+<div class="page_bounds">
+
+<form name="renewad" id="renewad" method="post" action="renew_listing.php?id={$id}&step=3{if isset($key) && $key}&key={$key}{/if}" enctype="multipart/form-data">
+<input type="hidden" name="group" id="group" value="{if isset($group)}{$group}{/if}" />
+<input type="hidden" name="package" id="package" value="" />
+<input type="hidden" name="subscription" id="subscription" value="" />
+
+<div id="renewad_plans">
+{if $subscriptions|@count}
+
+<div  id="active_subscriptions">
+
+<div class="heading form_heading">{$lng.listings.choose_active_subscription}</div>
+
+<div class="wbg p30 mb40">
+
+	{foreach from=$subscriptions item=v name=plan}
+	<div class="plan listings_plan">
+
+		<div class="plan_title plan_title{$smarty.foreach.plan.index}">{$v.package_name}</div>
+
+		<div class="plan_body">
+
+			<div class="plan_details">
+
+				{$lng.subscriptions.remaining_ads}: <span>{if $v.ads_left==-1}{$lng.general.unlimited}{else}{$v.ads_left}{/if}</span><br>
+				{$lng.subscriptions.date_start}: <span>{$v.date_start_nice}</span><br>
+				{if $v.date_renew!='' && $v.date_renew_nice}{$lng.subscriptions.date_renew}: <span>{$v.date_renew_nice}</span><br>{/if}
+				{$lng.subscriptions.date_end}: <span>{if $v.date_end!='' && $v.date_end_nice}{$v.date_end_nice}{else}{$lng.general.never}{/if}</span><br>
+
+			</div>
+
+			<div class="plan_option">
+
+				<span>{$v.no_pictures}</span>&nbsp;{if $v.no_pictures==1}{$lng.packages.picture}{else}{$lng.packages.pictures}{/if}<br>
+
+				{if $ads_settings.enable_featured && $v.featured}<span>{$lng.packages.featured}</span><br>{/if}
+				{if $ads_settings.enable_highlited && $v.highlited}<span>{$lng.listings.highlited}</span><br>{/if}
+				{if $ads_settings.enable_priorities && isset($v.priority_name) && $v.priority_name}<span>{$lng.listings.priority}&nbsp;{$v.priority_name}</span><br>{/if}
+				{if $ads_settings.enable_urgent && $v.urgent}<span>{$lng.listings.urgent}</span><br>{/if}
+				{if $ads_settings.enable_video && $v.video}<span>{$lng.listings.video}</span><br>{/if}
+				{if $ads_settings.enable_url && $v.url}<span>{$lng.listings.url}</span><br>{/if}
+
+			</div> {* end plan_option *}
+
+		</div> {* end plan_body *}
+
+		<div class="plan_bottom"><a href="javascript:;" class="select_subscription plan_button"  id="select_subscription{$v.usr_pkg}" alt="{$v.package_id}^{$v.package_name}^{$v.details}^{$v.no_words}">{$lng.listings.select_subscription}</a></div>
+
+	</div>{* end plan *}
+
+	{/foreach}
+	<div class="clearfix"></div>
+
+	<div id="or_choose_plan" class="mt20">
+
+		{$lng.general.or}&nbsp;<a href="javascript:;" class="button" id="choose_plan">{$lng.newad.choose_a_new_plan}</a>
+
+	</div>{* end or_choose_plan *}
+
+</div> {* end wbg *}
+
+</div>{* end active_subscriptions *}
+
+{/if} {* end subscriptions count *}
+
+
+<div {if $subscriptions|@count}style="display: none;"{/if}  id="available_plans">
+
+<div class="heading form_heading">{$lng.listings.choose_plan}</div>
+
+<div class="wbg p30 mb40">
+
+	{foreach from=$plans_array item=v name=plan}
+	<div class="plan listings_plan">
+
+		<div class="plan_title plan_title{$smarty.foreach.plan.index}">{$v.name}</div>
+
+		<div class="plan_body">
+
+		<div class="plan_details">
+
+		<div class="price">{$v.price_curr}</div>
+
+		<div>{$v.description}</div>
+
+		</div>
+
+		<div class="plan_option">
+
+			{if $v.type=="sub"}
+				<span>{if $v.subscription_time}{$v.subscription_time}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.days}&nbsp;{$lng.packages.subscription}<br>
+
+				<span>{if $v.no_ads}{$v.no_ads}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.ads}<br>
+
+			{/if}
+
+			<span>{if $v.no_words}{$v.no_words}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.words}<br>
+
+			{$lng.packages.available}&nbsp;<span>{if $v.no_days}{$v.no_days}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.days}<br>
+
+			<span>{$v.no_pictures}</span>&nbsp;{if $v.no_pictures==1}{$lng.packages.picture}{else}{$lng.packages.pictures}{/if}<br>
+
+			{if $ads_settings.enable_featured && $v.featured}<span>{$lng.packages.featured}</span><br>{/if}
+			{if $ads_settings.enable_highlited && $v.highlited}<span>{$lng.listings.highlited}</span><br>{/if}
+			{if $ads_settings.enable_priorities && $v.priority}<span>{$lng.listings.priority}&nbsp;{$v.priority_name}</span><br>{/if}
+			{if $ads_settings.enable_urgent && $v.urgent}<span>{$lng.listings.urgent}</span><br>{/if}
+			{if $ads_settings.enable_video && $v.video}<span>{$lng.listings.video}</span><br>{/if}
+			{if $ads_settings.enable_url && $v.url}<span>{$lng.listings.url}</span><br>{/if}
+
+		</div>
+
+		</div>{* end plan_body *}
+
+		<div class="plan_bottom"><a href="javascript:;" class="plan_button select_plan" id="select_plan{$v.id}" alt="{$v.name}^{$v.no_words}">{$lng.listings.select_plan}</a></div>
+
+	</div>{* end plan *}
+	{/foreach}
+
+	<div class="clearfix"></div>
+
+	{if isset($subscriptions) && $subscriptions|@count}
+	<div id="or_choose_subscription" class="mt20">
+
+		{$lng.general.or}&nbsp;<a href="javascript:;" class="button" id="choose_subscription">{$lng.listings.choose_active_subscription}</a>
+
+	</div> {* end or_choose_subscription *}
+
+	{/if}
+
+</div> {* end wbg *}
+
+</div>{* end available_plans *}
+</div> {* end renewad_plans *}
+
+	<div id="plan_selected" style="display: none;">
+
+	<div class="heading form_heading">{$lng.listings.package}</div>
+
+	<div class="wbg p30">
+
+		<div class="current_selection"><span class="tag"></span>&nbsp;&nbsp;<a href="#plan_details" id="view_plan_info" class="light">[{$lng.newad.view_info}]</a></div>
+
+		<div class="change_selection"><a href="javascript:;" class="button mtm10" id="change_plan">{$lng.listings.change_plan}</a></div>
+		<div class="clearfix"></div>
+
+	</div> {* end wbg *}
+	</div>{* end plan_selected *}
+
+	<div id="subscription_selected" style="display: none;">
+
+	<div class="heading form_heading">{$lng.packages.subscription}</div>
+
+	<div class="wbg p30">
+
+		<div class="current_selection"><span class="tag"></span><br/><span class="details"></span>
+		&nbsp;<a href="#plan_details" id="view_sub_info" class="light">[{$lng.newad.view_info}]</a></div>
+
+		<div class="change_selection"><a href="javascript:;" class="button" id="choose_plan">{$lng.newad.choose_a_new_plan}</a></div>
+		<div class="clearfix"></div>
+
+	</div> {* end wbg *}
+	</div> {* end subscription_selected *}
+
+	<div class="hidden"><div id="plan_details"></div></div>
+	<div id="renewad_details"></div>
+</form>
+
+<div id="payment" style="display: none;"></div>
+
+</div> {* end page_bounds *}
+
+{include file="footer.html"}
+{/if} {* end if first step *}
+
+
+{if $step==2}
+{include file="js/renew_listing_js.html" step=2}
+
+<!-- EXTRA OPTIONS -->
+<div class="heading form_heading">{$lng.listings.extra_options}</div>
+<div class="wbg p30">
+
+<div class="options clearfix">
+{if $subscription}
+	<div class="options_left mb30">{$lng.packages.subscription}</div>
+	<div class="options_right heading2"><b><span class="tag">{$plan_name}</span></b>&nbsp;<a href="#plan_details" id="view_plan_info1" class="light">[{$lng.newad.view_info}]</a></div>
+{else}
+	<div class="options_left heading2 mb30">{$lng.listings.package} <b><span class="tag">{$plan_name}</span></b></div>
+	<div class="options_right">{$plan_amount}&nbsp;<a href="#plan_details" id="view_plan_info1" class="light">[{$lng.newad.view_info}]</a></div>
+{/if}
+</div>
+
+{if $ads_settings.enable_featured}
+
+<div class="clearfix options">
+	<label class="options_left enh_checkbox chk_container">
+		<input type="hidden" name="featured_val" id="featured_val" value=""/>
+		<input type="checkbox" onclick="changeFeaturedPlan(this.form, {$appearance.price_format_decimals} )" name="enable_featured" id="enable_featured" {if $featured}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading2">{$lng.listings.featured}</div>
+		<div class="light">{$ads_settings.featured_description}{if $ads_settings.featured_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.featured_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="options_right">
+		{if $featured}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			<select name="featured" id="featured" onchange="changeFeaturedPlan(this.form, {$appearance.price_format_decimals})" disabled="disabled">
+				{foreach from=$featured_plans item=v name=fp}
+				<option  value="{$v.id}" title="{$v.amount}" {if $featured==$v.id}selected="selected"{/if} >{$v.no_days} {$lng.days} - {if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$v.amount_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</option>
+				{/foreach}
+			</select>
+		{/if}
+	</div>
+</div>
+
+{/if}
+
+{if $ads_settings.enable_highlited}
+
+<div class="clearfix options">
+	<label class="options_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.highlited_price}, document.renewad.highlited, {$appearance.price_format_decimals} )" name="highlited" {if $highlited}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading2">{$lng.listings.highlited}</div>
+		<div class="light">{$ads_settings.highlited_description}{if $ads_settings.highlited_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.highlited_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="options_right">
+		{if $highlited}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			{if $ads_settings.highlited_expires>0}{$ads_settings.highlited_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.highlited_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}
+	</div>
+</div>
+
+{/if}
+
+{if $ads_settings.enable_priorities}
+
+<div class="clearfix options">
+	<label class="options_left enh_checkbox chk_container">
+		<input type="hidden" name="pri" id="pri" value=""/>
+		<input type="checkbox" onclick="changePriority(this.form, {$appearance.price_format_decimals} )" name="enable_priority" id="enable_priority" {if $priority}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading2">{$lng.listings.priority}</div>
+		<div class="light">{$ads_settings.priorities_description}{if $ads_settings.priorities_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.priorities_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="options_right">
+		{if $priority}
+			<div class="small-btn activebutton icon">{$lng.listings.active}&nbsp;-&nbsp;{$options.priority_name}</div>
+		{else}
+			<select name="priority" id="priority" onclick="changePriority(this.form, {$appearance.price_format_decimals})" disabled="disabled">
+				{foreach from=$priorities item=v}
+				<option  value="{$v.order_no}" title="{$v.price}" {if $priority==$v.order_no}selected="selected"{/if} >{$v.name} - {if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$v.price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</option>
+				{/foreach}
+			</select>
+		{/if}
+	</div>
+</div>
+{/if}
+
+{if $ads_settings.enable_urgent}
+
+<div class="clearfix options">
+	<label class="options_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.urgent_price}, document.renewad.urgent, {$appearance.price_format_decimals} )" name="urgent" {if $urgent}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading2">{$lng.listings.urgent}</div>
+		<div class="light">{$ads_settings.urgent_description}{if $ads_settings.urgent_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.urgent_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="options_right">
+		{if $urgent}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			{if $ads_settings.urgent_expires>0}{$ads_settings.urgent_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.urgent_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}
+	</div>
+</div>
+
+{/if}
+
+{if $ads_settings.enable_video}
+
+<div class="clearfix options">
+	<label class="options_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.video_price}, document.renewad.video, {$appearance.price_format_decimals} ); onVideo();" name="video" id="video" {if $video}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading2">{$lng.listings.video}</div>
+		<div class="light">{$ads_settings.video_description}{if $ads_settings.video_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.video_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="options_right">
+		{if $video}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			{if $ads_settings.video_expires>0}{$ads_settings.video_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.video_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}
+	</div>
+	<div class="clearfix"></div>
+	<div class="clearfix ml50" id="video_div"{if !$video} style="display: none;"{/if}>
+		<div>{$lng.listings.video_code}</div>
+		<div><textarea name="video_code" cols="70" rows="2" id="video_code">{if isset($video_code)}{$video_code}{/if}</textarea></div>
+	</div>
+
+</div>
+
+{/if}
+
+{if $ads_settings.enable_url}
+
+<div class="clearfix options">
+	<label class="options_left enh_checkbox chk_container">
+		<input type="checkbox" onclick="adjustTotal(this.form, {$ads_settings.url_price}, document.renewad.url, {$appearance.price_format_decimals}); onUrl();" name="url" id="url" {if $url}checked="checked" disabled="disabled"{/if}/>
+		<div class="chk_indicator"></div>
+		<div class="heading2">{$lng.listings.url}</div>
+		<div class="light">{$ads_settings.url_description}{if $ads_settings.url_example}&nbsp;&nbsp;<a href="{$live_site}/images/{$ads_settings.url_example}" class="imgfield">{$lng.listings.view_example}</a>{/if}</div>
+	</label>
+	<div class="options_right">
+		{if $options.url}
+			<div class="small-btn activebutton icon">{$lng.listings.active}</div>
+		{else}
+			{if $ads_settings.url_expires>0}{$ads_settings.url_expires}&nbsp;{$lng.days}&nbsp;-&nbsp;{/if}<span class="bold">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.url_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span>
+		{/if}
+	</div>
+
+	<div class="clearfix"></div>
+	<div class="clearfix ml50" id="url_div"{if !$url} style="display: none;"{/if}>
+		<div>{$lng.listings.site_url}</div>
+		<div><input type="text" name="site_url" size="50" id="site_url" value="{if isset($site_url)}{$site_url}{/if}" /></div>
+	</div>
+</div>
+
+{/if}
+
+	<input type="hidden" name="full_total" id="full_total" value="{$total}"/>
+
+	{if $enable_coupons}
+	<div class="option clearfix" id="div_discount" {if !$total}style="display: none;"{/if}>
+		<div class="option_left">{$lng.listings.enter_coupon} :</div>
+		<div class="option_right"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',0, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',0, {$appearance.price_format_decimals})" value="{if isset($discount_code)}{$discount_code}{/if}"/></div>
+	</div>
+	{/if}
+
+	{if isset($credits_allowed) && $credits_allowed && !$nologin}
+	<div class="option clearfix" id="div_credits" {if !$total}style="display: none;"{/if}>
+
+	<input type="hidden" name="credit_value" id="credit_value" value="{$credits_settings.unit}"/>
+	<input type="hidden" name="current_credits" id="current_credits" value="{$current_credits}"/>
+
+	<div class="option_left">{$lng.credits.credits}</div>
+	<div class="option_right"><b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+
+	<label class="enh_radio chk_container">
+		<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}<span id="not_enough_credits" {if $current_credits==0 || $current_credits>=$needed_credits}style="display: none;"{/if}> ( {$lng.credits.not_enough_credits} ) </span><span id="no_credits" {if $current_credits==0 || $current_credits<$needed_credits}style="display: none;"{/if}> ( <span id="needed_credits">{$needed_credits}</span> <span id="scredit" {if $needed_credits>1}style="display: none;"{/if}>{$lng.credits.scredit}</span><span id="scredits" {if $needed_credits==1}style="display: none;"{/if}>{$lng.credits.scredits}</span> ) </span>
+		<div class="chk_indicator"></div>
+	</label>
+
+	</div>
+	</div>
+	{/if}
+
+	<div class="option clearfix" id="div_total" {if !$total}style="display: none;"{/if}>
+
+	{if $no_processors>1 || ($no_processors<=1 && isset($credits_allowed) && $credits_allowed)}
+
+	<div class="option_left">{$lng.listings.choose_payment_method} :</div>
+	<div class="option_right">
+	{foreach from=$payment_processors name=pp item=v}
+	<label class="enh_radio chk_container">
+	<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (!isset($credits_allowed) || !$credits_allowed || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+
+	{* if subscription choose if recurring *}
+
+	{if isset($is_subscription) && $is_subscription && $v.recurring==2}&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="recurring{$v.processor_code}" checked="checked" />&nbsp;&nbsp;{$lng.subscribe.recurring}{/if}
+
+	<div class="chk_indicator"></div>
+	</label>
+	{/foreach}
+	</div>
+	{else}
+	<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+	<div class="option_left">{$lng.subscribe.payment_method}:</div>
+	<div class="option_right">{$payment_processors[0].processor_title}</div>
+
+	{/if}
+	<input type="hidden" id="selected_processor" value="{$payment_processors[0].processor_code}"/>
+
+	</div>
+
+	<div class="option_price price top_price">
+	{$lng.listings.total}: <b>
+	{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+	</div>
+
+	<div class="option_price price" id="tax_info" style="display: none;">
+	{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;): <b><span id="tax"></span></b>
+	</div>
+
+	<div class="option_price price" id="total_with_tax_info" style="display: none;">
+	{$lng.general.total_with_tax}:&nbsp;<b><span id="total_with_tax"></span></b>
+	</div>
+
+
+	</div> {* end wbg *}
+
+	<div class="form_footer mb40">
+		<input type="submit" class="button wide_button negative" name="Cancel" id="Cancel" value="{$lng.general.cancel}" />
+		<input type="submit" class="button wide_button positive" name="Submit" id="Submit" value="{$lng.general.submit}" />
+	<div class="clearfix"></div>
+	</div>
+
+{/if}{* end step3 *}
+
+{* listing plan details *}
+{if $step=="4"}
+
+	<div class="ma20 plan" style="width: 400px;">
+
+		<div class="plan_title">{$plan.name}</div>
+		<div class="plan_body">
+
+			<div class="plan_price">{$plan.price_curr}</div>
+
+			<div class="plan_option">
+
+			{if $plan.type=="sub"}
+			<span>{if $plan.subscription_time}{$plan.subscription_time}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.days}&nbsp;{$lng.packages.subscription}<br>
+
+			<span>{if $plan.no_ads}{$plan.no_ads}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.ads}<br>
+
+			{/if}
+
+			<span>{if $plan.no_words}{$plan.no_words}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.words}<br>
+
+			{$lng.packages.available}&nbsp;<span>{if $plan.no_days}{$plan.no_days}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.days}<br>
+
+			<span>{$plan.no_pictures}</span>&nbsp;{if $plan.no_pictures==1}{$lng.packages.picture}{else}{$lng.packages.pictures}{/if}<br>
+
+			{if $ads_settings.enable_featured && $plan.featured}<span>{$lng.packages.featured}</span><br>{/if}
+			{if $ads_settings.enable_highlited && $plan.highlited}<span>{$lng.listings.highlited}</span></li>{/if}
+			{if $ads_settings.enable_priorities && $plan.priority}<span>{$lng.listings.priority}&nbsp;{$plan.priority_name}</span><br>{/if}
+			{if $ads_settings.enable_urgent && $plan.urgent}<span>{$lng.listings.urgent}</span><br>{/if}
+			{if $ads_settings.enable_video && $plan.video}<span>{$lng.listings.video}</span><br>{/if}
+			{if $ads_settings.enable_url && $plan.url}<span>{$lng.listings.url}</span><br>{/if}
+
+			</div> {* end plan_options *}
+		</div> {* end plan_body *}
+
+	</div>{* end plan *}
+
+{/if}

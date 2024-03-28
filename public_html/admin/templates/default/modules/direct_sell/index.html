@@ -1,0 +1,126 @@
+{include file="header.html"}
+
+
+<div class="page_title"><a href="{$live_site}/{$admin_folder}/modules.php">{$lng.panel.modules}</a> > {$lng_ds.direct_sell}</div>
+
+<div class="p30">
+<form method="post" action="" name="ds" id="ds" enctype="multipart/form-data">
+
+<div class="form_container">
+
+{if isset($error) && $error}<div class="error">{$error}</div>{/if}
+{if isset($info) && $info}<div class="info">{$info}</div>{/if}
+
+<div class="clearfix">
+	<div class="left_form">{$lng_ds.enable_paypal}</div>
+	<div class="right_form">
+	<input type="hidden" name="enable_paypal" value="1" />
+	<input type="checkbox" name="enable_paypal_chk" {*{if $ds_settings.enable_paypal}*}checked{*{/if}*} readonly /></div>
+</div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng.categories.allowed_groups_list}</div>
+	<div class="right_form">
+		<input type="radio" name="choose_group" id="choose_group1" value="all" {if $ds_settings.groups=='0'}checked="checked"{/if} onchange="onChooseGroup(this.form)" onclick="onChooseGroup(this.form)" />&nbsp;{$lng.custom_fields.all_groups}
+		&nbsp;&nbsp;<input type="radio" name="choose_group" id="choose_group2" value="choose" {if $ds_settings.groups!='0'}checked="checked"{/if} onchange="onChooseGroup(this.form)" onclick="onChooseGroup(this.form)"/>&nbsp;{$lng.custom_fields.choose_groups}
+	</div>
+</div>
+
+<div class="clearfix" id="div_groups" style="display: none">
+	<div class="left_form">&nbsp;</div>
+	<div class="right_form">
+	<select multiple="multiple" size=8 name="groups[]" id="groups" class="mselect">
+		{foreach from=$groups_list item=v}
+			<option value="{$v.id}" {if in_array($v.id, $ds_settings.groups_array)}selected{/if}>{$v.name}</option>
+		{/foreach}
+		{if $settings.nologin_enabled}<option value="1000">{$lng.packages.not_logged_in}</option>{/if}
+	</select>
+	</div>
+</div>
+
+<br/>
+<div class="clearfix">
+	<div class="left_form">{$lng_ds.edit_ds_terms}</div>
+	<div class="right_form">
+		<div class="buttons lfloat">
+			<span class="positive"><a href="{$edit_settings_ds_terms_link}" target="_blank">{$lng.settings.edit_settings}</a></span>
+		</div>
+		&nbsp;&nbsp;
+		<div class="buttons lfloat">
+			<span class="positive"><a href="{$edit_content_ds_terms_link}" target="_blank">{$lng.navbar.edit_content}</a></span>
+		</div>
+
+	</div>
+</div>
+
+<br/>
+
+<div class="form_subtitle_bg"><div class="btn1"><strong>{$lng.panel.mail_templates|replace:" ":"&nbsp;"}</strong></div></div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng_ds.announce_order_to_seller_email}</div>
+	<div class="right_form">
+		<div class="buttons lfloat">
+			<span class="positive"><a href="{$edit_announce_order_to_seller_link}" target="_blank">{$lng.general.edit}</a></span>
+		</div>
+	</div>
+</div>
+
+<br/>
+<div class="clearfix">
+	<div class="left_form">{$lng_ds.confirm_order_to_buyer_email}</div>
+	<div class="right_form">
+		<div class="buttons lfloat">
+			<span class="positive"><a href="{$edit_confirm_order_to_buyer_link}" target="_blank">{$lng.general.edit}</a></span>
+		</div>
+	</div>
+</div>
+
+<br/>
+<div class="clearfix">
+	<div class="left_form">{$lng_ds.order_processed_email}</div>
+	<div class="right_form">
+		<div class="buttons lfloat">
+			<span class="positive"><a href="{$edit_order_processed_link}" target="_blank">{$lng.general.edit}</a></span>
+		</div>
+	</div>
+</div>
+
+<br/>
+<div class="form_subtitle_bg"><div class="btn1"><strong>{$lng.panel.info_templates|replace:" ":"&nbsp;"}</strong></div></div>
+
+<div class="clearfix">
+	<div class="left_form">{$lng_ds.confirm_order_to_buyer_info}</div>
+	<div class="right_form">
+		<div class="buttons lfloat">
+			<span class="positive"><a href="{$edit_confirm_order_to_buyer_info_link}" target="_blank">{$lng.general.edit}</a></span>
+		</div>
+	</div>
+</div>
+
+<br/>
+<div class="clearfix">
+	<div class="left_form">{$lng_ds.disclaimer_for_buyers_info}</div>
+	<div class="right_form">
+		<div class="buttons lfloat">
+			<span class="positive"><a href="{$edit_disclaimer_for_buyers_info_link}" target="_blank">{$lng.general.edit}</a></span>
+		</div>
+	</div>
+</div>
+
+<div class="form_footer">
+	<div class="buttons rfloat" {if $demo}onClick="alert('{$lng.general.errors.demo}');return false;"{/if}>
+		<span class="positive"><input type="submit" name="Submit" id="Submit" value="{$lng.general.submit}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<script>
+onChooseGroup(document.forms["ds"]);
+</script>
+
+</div> {* end form_container *}
+</form>
+</div> {* p30 *}
+
+{include file="footer.html"}

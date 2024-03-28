@@ -1,0 +1,59 @@
+	<div class="cdbtns">
+	<a href="javascript:;" id="contact_user" class="cf cdbtn"><div class="wide_btn1 mb20"><img src="{$template_path}images/email.png" />{$lng.contact.contact_via_email}</div></a>
+	
+	{if in_array("price_extra",$modules_array) && ( isset($pe_settings[$listing.fieldset]) || isset($pe_settings[0]) ) && $listing.negotiable==1}
+		{include file="modules/price_extra/user_contact.html"}
+	{/if}
+
+	</div>
+	
+	<form name="contact_details" id="contact_details" method="post" action="{$live_site}/mailto.php?post=1&aid={$listing.id}&id={if $listing.user_id}{$listing.user_id}{else}0{/if}">
+
+	<div id="contact_form" class="form2">
+
+	<div id="mailto_info" class="info" style="display: none;">
+		<span class="closebtn" onclick='$("#mailto_info").hide();'>&times;</span>
+		<span class="content"></span>
+	</div>
+
+	<div id="contact" class="hidden cf_form">
+	<div class="heading">{$lng.general.contact}</div>
+	<ul>
+	<li>
+	<label for="name">{$lng.contact.name}<span class="mandatory">*</span></label>
+	<input type="text" id="name" name="name" value="{if isset($crt_usr_sett)}{$crt_usr_sett[$settings.contact_name_field]}{/if}" />
+	</li>
+
+	<li>
+	<label for="email">{$lng.contact.email}<span class="mandatory">*</span></label>
+	<input type="text" id="email" name="email" value="{if isset($crt_usr_sett)}{$crt_usr_sett.email}{/if}" />
+	</li>
+
+	<li>
+	<label for="phone">{$lng.contact.phone}</label>
+	<input type="text" id="phone" name="phone" aria-required="true" required/>
+	</li>
+
+	<li>
+	<label for="comments">{$lng.contact.comments}<span class="mandatory">*</span></label>
+	<textarea name="comments" id="comments" rows="4"></textarea>
+	</li>
+	</ul>
+
+	{if $settings.contact_captcha}
+	{if $settings.enable_recaptcha}
+	<div class="mb20">
+	{include file="data/recaptcha.html"}
+	</div>
+	{else}
+	{include file="data/random_image.html"}
+	{/if}
+	{/if}
+
+	<div class="buttons">
+	<input type="submit" class="button" name="ContactSeller" id="ContactSeller" value="{$lng.general.send}" />
+	</div>
+	</div> {* end contact *}
+
+	</div> {* end contact_form *}
+	</form>

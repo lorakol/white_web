@@ -1,0 +1,149 @@
+<div class="wdiv-top">
+	<div class="lfloat fs120">{$lng.listings.contact_info}</div>
+	<div class="rfloat">
+
+	{* -------- dealer page -------- *}
+	{if isset($listing.user.store) && $listing.user.store>0}
+	<a class="user_listings" href="{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$listing.user_id p2=$listing.user[$settings.contact_name_field]}{else}{$live_site}/store.php?id={$listing.user_id}{/if}">
+	<div class="btn4">{$lng.listings.view_store|replace:" ":"&nbsp;"}</div>
+	</a>
+
+	{* -------- more listings --------- *}
+	{elseif $listing.user_id && $ads_settings.show_more_link && (!$listing.sold || !$ads_settings.hide_contact_when_sold) && (!$listing.rented || !$ads_settings.hide_contact_when_rented)}
+
+	<a class="user_listings" href="{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=$listing.user_id p2=$listing.user.url_name p3=1}{else}{$live_site}/user_listings.php?id={$listing.user_id}&page=1{/if}">
+	<div class="btn4">{$lng.listings.more_listings|replace:" ":"&nbsp;"}</div>
+	</a>
+	{/if} 
+
+
+	</div>
+</div>
+<div class="wdiv" style="border-top: 0;">
+
+	{* contact information *}
+
+	{* logo *}
+	{foreach $special_user_fields.logo as $logo}
+
+	{capture name=pb assign=pb}pb_{$logo.caption}{/capture}
+	
+	{if (isset($listing.user[$logo]) && $listing.user[$logo])}
+	<div class="mb10"><img src="{$live_site}/uploads/{$logo}/{$listing.user[$logo]}" /></div>
+	{/if}
+	{/foreach}
+
+	
+	{if isset($listing.site_url) && $listing.site_url && $ads_settings.enable_url}
+	<div class="fdesc"><span class="aw"><img src="{$template_path}images/website_url.png" /></span><span class="aw"><a href="{$listing.site_url}" class="more" target="_blank" rel="nofollow">{$listing.site_url}</a></span></div>
+	{/if}
+	
+	{foreach from=$user_fields_array item=v}
+	{capture name=some_content assign=pub_field}pb_{$v.caption}{/capture}
+	{if isset($listing.user[$v.caption]) && $listing.user[$v.caption]  && ($v.public==1 || ($v.public==2 && $listing.user[$pub_field]==1 )) && $v.type!="google_maps" && (($v.type!="textarea" && $v.type!="htmlarea") || $listing.user_id==0) && $v.type!="youtube"}
+
+	<div class="fdesc">
+	<span>{$v.name}:</span>
+	{if $v.type=='url'}<a href="{$listing.user[$v.caption]}" target="_blank" rel="nofollow" class="more">{/if}
+
+	{if $v.type=="date"}
+
+	{$listing.user.vis[$v.caption]}
+
+	{elseif $v.type=="multiselect"}
+
+	{", "|implode:$listing.user[$v.caption]}
+
+	{elseif $v.type=="checkbox"}
+
+	{if $listing.user[$v.caption]==1}{$lng.general.Yes}{else}{$lng.general.No}{/if}
+
+	{elseif $v.type=="checkbox_group"}
+
+	{foreach from=$listing.user[$v.caption] item=t name=check}
+		<div class="lfloat check_on" >{$t}</div>
+		
+	{/foreach}
+	<div class="clearfix"></div>
+
+	{elseif $v.type=="user_email"}
+
+	<span class="aw"><img src="{$template_path}images/email.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$listing.user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_email}</a>
+
+	{elseif $v.type=="phone"}
+
+	<span class="aw"><img src="{$template_path}images/phone.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$listing.user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_phone}</a>
+
+	{elseif $v.type=="whatsapp"}
+
+	<span class="aw"><img src="{$template_path}images/whatsapp.png" /></span><span class="aw bold dark" id="span_{$v.caption}">{$listing.user[$v.caption]|substr:0:2}********</span>&nbsp;<a href="javascript:;" class="more" id="show_{$v.caption}">{$lng.listings.show_whatsapp}</a>
+
+	{elseif $v.type!="file" && $v.type!="image"}
+
+	{$listing.user[$v.caption]}
+	
+
+	{* ------------ rating ------------ *}
+	{if in_array("ratings",$modules_array) && $ratings_settings.rate_users && $v.caption==$settings.contact_name_field}
+	&nbsp;
+	{section name=loop start=0 loop=5 step=1}
+	<img src="{$template_path}modules/ratings/css/images/star{if $listing.user.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />
+	{/section}
+
+	{/if}
+	{* ------------ end rating ------------ *}
+
+	
+	{else}
+
+	{if $v.type=="file" && $listing.user[$v.caption]}
+	<a href="{$live_site}/uploads/{$v.caption}/{$listing.user[$v.caption]}"><img src="{$template_path}/images/download.png" class="tooltip mbm7" alt="" title="{$lng.general.download}"/></a><div class="clearfix"></div>
+	{/if}
+
+	{if $v.type=="image" && $listing.user[$v.caption]}<a href="{$live_site}/uploads/{$v.caption}/{$listing.user[$v.caption]}" class="imgfield"><img src="{$template_path}images/camera.png" alt="" /></a><div class="clearfix"></div>{/if}
+
+	{/if}
+
+	{if $v.type=='url'}</a>{/if}
+	</div>
+	{/if}
+	{/foreach}
+</div>
+
+{if $listing.user_id==0}
+
+{capture name=str assign=str}{strip}
+	{foreach from=$user_fields_array item=v}
+	{if isset($listing.user[$v.caption])  && $v.public && ($v.type=="google_maps" || $v.type=="youtube")}
+
+	{if $v.type=='youtube' }
+
+	<div class="heading heading_large heading1">{$v.name}</div>
+	<div class="heading_large_under heading1-under"></div>
+
+	<div class="pb30">{$listing.user[$v.caption]}</div>
+	
+
+	{/if} {* end youtube *}
+
+	{if $v.type=='google_maps' }
+
+	<div class="heading heading_large heading1">{$v.name}</div>
+	<div class="heading_large_under heading1-under"></div>
+	
+	<div id="gm_{$v.caption}" class="map pb30"></div>
+
+	{/if} {* end map *}
+
+
+	{/if}
+	{/foreach}
+{/strip}{/capture}
+
+{if $str}
+<div class="wdiv space10" style="border-top: 0;">
+{$str}
+</div>
+{/if}
+
+{/if}{* end if !user_id *}

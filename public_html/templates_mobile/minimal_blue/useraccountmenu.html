@@ -1,0 +1,52 @@
+{include file="header.html"}
+	<ul class="list">
+
+		<li><a href="{$live_site}/useraccount.php">{$lng.useraccount.statistics}</a></li>
+
+		{if $crt_usr_sett.post_ads}
+		<li><a href="{$live_site}/my_listings.php">{$lng.useraccount.browse_your_listings}</a></li>
+		{/if}
+
+		<li><a href="{$live_site}/account_info.php?sub=acc_info">{$lng.useraccount.modify_account_info}</a></li>
+
+		{if $is_aff}
+
+		<li><a href="{$live_site}/affiliate_revenue.php">{$lng.affiliates.revenue_history}</a></li>
+		<li><a href="{$live_site}/affiliate_payments_history.php">{$lng.affiliates.payments_history}</a></li>
+
+		{/if}
+
+
+		{if $crt_usr_sett.post_ads}
+
+		<li><a href="{$live_site}/order_history.php">{$lng.useraccount.order_history}</a></li>
+
+		{if $subscription_exists}<li><a href="{$live_site}/subscriptions.php">{$lng.useraccount.subscriptions}</a></li>{/if}
+
+		{if $settings.internal_messaging}
+		<li><a href="{$live_site}/messages.php">{$lng.useraccount.messages}</a></li>
+		{/if}
+
+		{/if}
+
+		{if $ads_settings.alerts_enabled}
+		<li><a href="{$live_site}/alerts.php?action=user&id={$crt_usr}">{$lng.alerts.email_alerts}</a></li>
+		{/if}
+
+		{if $ads_settings.saved_searches_enabled}
+		<li><a href="{$live_site}/saved_searches.php?id={$crt_usr}">{$lng.useraccount.saved_searches}</a></li>
+		{/if}
+
+		<li><a href="{$live_site}/account_info.php?sub=change_pass">{$lng.useraccount.change_password}</a></li>
+
+		{if $settings.users_can_ask_account_removal}
+		<li><a href="{$live_site}/account_info.php?sub=remove_account">{$lng.useraccount.request_removal}</a></li>
+		{/if}
+
+		{if $is_mod}
+		<li><a href="{$live_site}/{$admin_folder}">{$lng.navbar.administrator_panel}</a></li>
+		{/if}
+
+	</ul>
+
+{include file="footer.html"}

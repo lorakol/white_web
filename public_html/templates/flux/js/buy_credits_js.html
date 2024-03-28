@@ -1,0 +1,212 @@
+{if $step==1}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+
+
+function loadScript(url, callback, attributes){
+
+    var script = document.createElement("script")
+    script.type = "text/javascript";
+
+    if (script.readyState){  //IE
+        script.onreadystatechange = function(){
+            if (script.readyState == "loaded" ||
+                    script.readyState == "complete"){
+                script.onreadystatechange = null;
+                callback();
+            }
+        };
+    } else {  //Others
+        script.onload = function(){
+            callback();
+        };
+    }
+
+    script.src = url;
+	
+	for (var key in attributes) {
+		script.setAttribute(key, attributes[key]);
+	}
+	
+    document.getElementsByTagName("head")[0].appendChild(script);
+}
+
+{literal}
+$(document).ready(function () {
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading");},
+        beforeSubmit:  function(formData, jqForm, options) { 
+		//var queryString = $.param(formData); 
+		if($("#buy_credits").find("input[type='submit']:focus").attr("id")=="Cancel") {
+			location.href='useraccount.php';
+			return false;
+		}
+		return true;  
+	},
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1) {
+
+				// go to payment page
+				var selected_processor = $('#selected_processor').val();
+
+		$("#checkout-form").html("");
+
+		if(selected_processor=="iyzico") {
+		    $("body").addClass("loading");
+		    $( '<div id="checkout-form"><div id="iyzipay-checkout-form" class="responsive"></div></div>' ).insertAfter( "#buy_credits" );
+		    $("#buy_credits").hide();
+		}
+
+				$("#payment").html(ret.payment_form);
+
+				if(selected_processor=="klarna" || selected_processor=="tpay" || selected_processor=="iyzico") {
+					$("body").removeClass("loading");
+					$("#payment").slideDown();
+					$('html,body').animate({scrollTop:$("#payment").offset().top}, 'slow');
+					$(".form_footer").hide();
+					$("#payment_form").submit();
+				}
+				else 
+					$("#payment_form").submit();
+		if(selected_processor=="iyzico") 
+		    $("body").removeClass("loading");
+
+				return;
+			}
+
+			// response = 0 -> show the error
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+
+			$("body").removeClass("loading"); 
+
+} 
+
+//initialize the AJAX form
+ $('#buy_credits').ajaxForm(options);
+
+$(document).on("click", ".select_plan", function(){ 
+
+	// get current selected plan
+	var plan_no = parseInt(jQuery(this).attr("id").substr(11));
+
+	var det = jQuery(this).attr("alt");
+	var split_res=det.split("^");
+	var plan_no = split_res[0];
+	var plan_name = split_res[1];
+	var plan_price = split_res[2];
+
+	// set value for selected plan
+	$("#plan").val(plan_no);
+
+	$("#plans").slideUp();
+
+	$("#plan_selected span.tag").html(plan_name+" ( "+plan_price+" )");
+	$("#plan_selected").slideDown();
+
+	loadPayment( plan_no);
+	reinit();
+
+
+}); // end select_plan click
+
+$(document).on("click", "#change_plan", function(){ 
+
+	// empty plan value
+	$("#plan").val(0);
+
+	// show plans box
+	$("#plan_selected").slideUp();
+	$("#plans").slideDown();
+
+	// hide payment_details form
+	$("#payment_details").html("");
+	$("#payment_details").show();
+
+}); // end change plan
+
+}); // end document ready
+
+
+function loadPayment (plan_no) {
+
+	$.ajax({
+		type		: "GET",
+		cache		: false,
+		url		: "{/literal}{$live_site}{literal}/buy_credits.php?step=2&plan="+plan_no,
+		data		: $(this).serializeArray(),
+		success: function(data) {
+			$("#payment_details").html(data);
+		}// end data
+	}); // end ajax
+
+}
+
+{/literal}
+
+{if isset($only_plan) && $only_plan}
+loadPayment ({$only_plan});
+{/if}
+
+</script>
+
+{/if} {* end if step=1 *}
+
+{if $step==2}
+{literal}
+<script>
+$(document).ready(function() {
+
+	// *********** tax value **************
+	{/literal}
+
+	{if $no_processors>1}
+	only_processor = 0;
+	{else}
+	only_processor = 1;
+	{/if}
+
+	{if $total}
+
+	if(only_processor)
+		var processor = $('input[name=processor]').val();
+	else 
+		var processor = $('input:radio[name=processor]:checked').val();		
+
+	var total = $("#full_total").val();
+	calculateTax(processor, total);
+
+
+	{/if} {* end if total *}
+
+	{literal}
+
+
+	$('input:radio[name=processor]').change(function() { 
+
+		processor = $('input:radio[name=processor]:checked').val();
+		calculateTax(processor, $("#full_total").val());
+
+		// for embedded payments
+		$("#selected_processor").val(processor);
+		reinit();
+
+	})
+
+	// end tax value
+
+
+});
+{/literal}
+</script>
+{/if}

@@ -1,0 +1,79 @@
+<div class="hidden dark-bg auction-details pdiv6 mt20">
+
+{if isset($crt_usr) && $crt_usr!=$listing.user_id}
+{* ------------------------ place bid ------------------------ *}
+
+	<div class="bid_info ma20" style="display: none"></div>
+
+	<div class="form2">	
+	<form name="bid_form" id="bid_form" method="post" action="{$live_site}/include/bid.php?acid={$listing.auction.id}&aid={$id}">
+
+	<ul>
+
+	<li>
+	<label>{$lng.useraccount.bid}<span class="mandatory"> *</span></label>
+	<input type="text" name="bid" id="bid" size="20" />
+	{if in_array("multicurrency",$modules_array)}{include file="modules/multicurrency/bid-currency.html"}
+	{else}
+	&nbsp;{$listing.auction.currency}
+	{/if}
+	</li>
+
+	<li>
+	<label>{$lng.useraccount.message_to_seller}</label>
+	<textarea rows="3" name="bid_message" id="bid_message"></textarea>
+	</li>
+	
+	<li>
+	<div class="buttons">
+	<strong><input type="submit" name="Bid" value="{$lng.useraccount.place_bid}" /></strong>
+	</div>
+	</li>
+	</ul>
+
+	</form>
+	</div>
+
+{else} 
+{* ------------------------ view bids ------------------------ *}
+
+	<div class="rfloat mt10"><a id="delac" href="javascript:;"><div class="buttonwrapper"><div class="gray-button-left"><span class="gray-button-right">{$lng.useraccount.remove_auction|replace:" ":"&nbsp;"}</span></div></div></a></div>
+	<div class="clearfix"></div>
+
+	{if !$listing.auction.no_bids}<div class="info"><p>{$lng.useraccount.no_bids_for_auction}</p></div>{/if}
+
+{if isset($listing.bids)}
+{foreach from=$listing.bids item=v name=bloop}
+
+	<div class="bid {if $smarty.foreach.bloop.index%2}even_bid{/if}">
+	<div class="lfloat mr10"><span class="bid_price">{$v.bid}</span>&nbsp;&nbsp;<span class="small1">{$lng.useraccount.placed_on}: {$v.date_nice} {$lng.general.by} {$v.contact}</span></div><div class="lfloat"> <a href="javascript:;" class="bmailto" id="bmailto{$v.user_id}_{$id}"><div class="buttonwrapper"><div class="gray-button-left"><span class="gray-button-right">{$lng.general.contact}</span></div></div></a></div><div class="clearfix"></div>
+	{$v.message}
+	</div>
+
+{/foreach}
+{/if}
+
+{/if}
+
+</div>
+
+{literal}
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+$("#delac").click(function(event){
+
+	var url_str="{/literal}{$live_site}/include/actions.php?action=delete&object=auction&id={$listing.auction.id}{literal}";
+
+	$.get( url_str, function( data ) {
+		location.reload(true);
+	});
+
+});
+
+});
+
+</script>
+{/literal}

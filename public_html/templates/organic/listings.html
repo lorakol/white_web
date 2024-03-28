@@ -1,0 +1,162 @@
+{include file="header.html"}
+{include file="data/fancybox.html"}
+
+{literal}
+<style type="text/css">
+
+.class-content { {/literal}margin-{if $text_direction!="rtl"}left{else}right{/if}: {$ads_settings.thmb_width+10}px; {literal}}
+.cp { {/literal}width: {$ads_settings.thmb_width+10}px; margin-{if $text_direction!="rtl"}left{else}right{/if}: -{$ads_settings.thmb_width+10}px; {literal}}
+
+
+</style>
+{/literal}
+
+      <!-- begin: #refine_col - first float column -->
+      <div id="refine_col">
+        <div id="first_left_content" class="clearfix"> 
+	{include file="refine.html"}
+	<div class="clearfix"></div>
+	<br/><!--[if lte IE 7]>&nbsp;<![endif]-->
+
+	{if $ads_settings.saved_searches_enabled}{include file="save_search_box.html"}<div class="clearfix"></div>{/if}
+
+	{* if listings_compare *}
+
+	{if in_array("listings_compare", $modules_array)}
+	{include file="modules/listings_compare/compare_box.html"}
+	{/if}
+
+	{* end if listings_compare *}
+
+	{* ------ listings1 banners ------- *}
+	{if in_array('listings1',$banners_positions)}
+	{banner->getTemplateBanners p1='listings1' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{if $array_banners|@count}<br/><div class="dcenter" style="float: left;">{/if}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners">{include file="banner.html"}</div>
+	{/foreach}
+	{if $array_banners|@count}</div><div class="clearfix"></div>{/if}{/if}
+	{* ------- end listings1 banners ------- *}
+
+       </div>
+      </div>
+      <!-- end: #refine_col -->
+      <!-- begin: #ads_col -->
+      <div id="ads_col">
+        <div id="right_content" class="clearfix"> 
+
+	{if isset($info) && $info}
+	<div class="info"><p>{$info}</p></div>
+	{/if}
+
+	{* ------ listings2 banners ------- *}
+	{if in_array('listings2',$banners_positions)}
+	{banner->getTemplateBanners p1='listings2' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{if $array_banners|@count}<div class="dcenter">{/if}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners">{include file="banner.html"}</div>
+	{/foreach}
+	{if $array_banners|@count}</div><div class="clearfix"></div><br/>{/if}{/if}
+	{* ------- end listings2 banners ------- *}
+
+	{if $no_listings>0}
+
+	{include file="paginator.html"}
+	{include file="order_listings.html"}
+
+	{/if}
+	
+	{if $ads_settings.search_by_account_type}
+	<ul id="account_type_tab">
+	<li>
+	<a href="{$acctype_link|replace:'##acctype##':'all'}" {if !isset($post_array.account_type) || !$post_array.account_type || $post_array.account_type|lower=='all'}class="current"{/if}>{$lng.general.all}</a>
+	</li>
+	<li>
+	<a href="{$acctype_link|replace:'##acctype##':'private'}" {if isset($post_array.account_type) && $post_array.account_type|lower=='private'}class="current"{/if}>{$lng.search.private}</a>
+	</li>
+	<li>
+	<a href="{$acctype_link|replace:'##acctype##':'professional'}" {if isset($post_array.account_type) && $post_array.account_type|lower=='professional'}class="current"{/if}>{$lng.search.professional}</a>
+	</li>
+	</ul>
+	<div class="clearfix"></div>
+	{/if} {* end search_by_account_type *}
+
+	{if $no_listings>0}
+	{if $ads_settings.enable_map_search}
+	{include file="listings_map.html"}
+	{/if}
+
+{if $post_array.show=="list"}
+	{foreach name="listings" from=$listings_array item=v}
+		{include file="short_listing.html"}
+		{if !$v.featured && !$v.highlited}<hr/>{/if}
+
+		{if ($smarty.foreach.listings.index+1)==$appearance.ads_per_page/2|ceil && $smarty.foreach.listings.index!=$listings_array|@count-1}
+		{* ------ listings4 banners ------- *}
+		{if in_array('listings4',$banners_positions)}
+		{banner->getTemplateBanners p1='listings4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+		{if $array_banners|@count}<div class="clearfix" style="margin: 10px 0 10px 0;"></div><div class="dcenter">{/if}
+		{foreach from=$array_banners item=v}
+		<div class="vert_banners">{include file="banner.html"}</div>
+		{/foreach}
+		{if $array_banners|@count}</div>{/if}{/if}
+		{* ------- end listings4 banners ------- *}
+		{/if}
+
+	{/foreach}
+{else}
+	<table id="table_gallery" width="100%" cellpadding="4" cellspacing="4">
+	<tr>
+	{foreach name="listings" from=$listings_array item=v}
+		{include file="short_listing_gallery.html"}
+
+		{if $smarty.foreach.listings.index==$listings_array|@count-1 && $listings_array|@count<4}
+		{section name=loop start=$listings_array|@count loop=4-$listings_array|@count step=1}
+		<td width="25%" style="border: 0">&nbsp;</td>
+		{/section}
+		{/if}
+
+		{if ($smarty.foreach.listings.index+1) % 4 == 0 && $smarty.foreach.listings.index < $no_listings-1}</tr><tr>{/if}
+	{/foreach}
+	</tr>
+	</table>
+{/if}
+
+	{include file="listings_js.html"}
+
+	<div class="clearfix"></div>
+	{include file="paginator.html"}
+
+{else}
+	<div class="info"><p>{$lng.advanced_search.no_results}</p></div>
+{/if}
+
+	{* if listings_compare *}
+	{if in_array("listings_compare", $modules_array)}
+	{include file="modules/listings_compare/cmp_js.html"}
+	{/if}
+
+	{if $ads_settings.alerts_enabled}<br/>{include file="email_alert_box.html"}{/if}
+        </div>
+
+	{* ------ listings3 banners ------- *}
+	{if in_array('listings3',$banners_positions)}
+	{banner->getTemplateBanners p1='listings3' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+	{if $array_banners|@count}<div class="dcenter">{/if}
+	{foreach from=$array_banners item=v}
+	<div class="vert_banners">{include file="banner.html"}</div>
+	{/foreach}
+	{if $array_banners|@count}</div><div class="clearfix"></div>{/if}{/if}
+	{* ------- end listings3 banners ------- *}
+
+
+        <div class="ie_clearing">&nbsp;</div>
+        <!-- End: IE Column Clearing -->
+      </div>
+      <!-- end: #ads_col -->
+
+    {if in_array("latest_visited", $modules_array) && $no_latest_visited}
+    {include file="modules/latest_visited/listings.html"}
+    {/if}
+      
+{include file="footer.html"}

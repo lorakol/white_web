@@ -1,0 +1,14 @@
+<div class="lgbox overlay_window p30">
+
+<div id="gm_{$v.caption}" class="wmap centered"></div>
+
+<script type="text/javascript">
+{if $settings.map_type=="gmaps"}
+init_gmap_{$v.caption}();
+{else}
+init_osm_{$v.caption}();
+{/if}
+
+</script>
+
+</div>

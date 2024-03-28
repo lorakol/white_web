@@ -1,0 +1,28 @@
+
+<script>
+$(document).ready(function() {
+	$(".view_offer").click(function(){
+		var oid = jQuery(this).attr("id").substr(10);
+		$( "#offers_list"+oid ).toggle("slow");
+		
+	});
+	$('a.ocontact').magnificPopup({
+		type: 'ajax',
+		showCloseBtn: true,
+		closeBtnInside:true
+	});
+
+});
+
+function onDeleteOffer(id, str) {
+
+	if (myConfirm(str)==false) return;
+	var url_str="modules/price_extra/actions.php?action=delete_offer&id="+id;
+
+	$.get( url_str, function( data ) {
+		$("#offer"+id).fadeOut();
+	});
+
+}
+
+</script>

@@ -1,0 +1,91 @@
+{include file="header.html"}
+
+<div class="page_title"><a href="{$live_site}/{$admin_folder}/modules.php">{$lng.panel.modules}</a> > <a href="{$live_site}/{$admin_folder}/modules/social_networks/">{$lng_sn.social_networks}</a></div>
+
+<div class="p30">
+
+<div class="form_container" style="padding-top: 0px !important">
+
+<form method="post" action="fb_access_token_helper.php" name="helper" id="helper">
+
+<div class="error" style="display: none">{$error}</div>
+<div class="info" style="display: none">{$info}</div>
+{*<div class="warning">{$lng_sn.notice}</div>*}
+
+<input type="hidden" name="fb_appid" value="{$fb_appid}" />
+<input type="hidden" name="fb_secret" value="{$fb_secret}" />
+<input type="hidden" name="fb_pageid" value="{$fb_pageid}" />
+
+<div class="at">
+<div class="form_subtitle_bg"><div class="btn1"><strong>{$lng_sn.access_token_helper|replace:" ":"&nbsp;"}</strong></div>{$lng_sn.info.access_token_helper}</div>
+
+<p class="p30">{$lng_sn.step1}:<br/><a class="blue" href="https://developers.facebook.com/tools/explorer" target="_blank">https://developers.facebook.com/tools/explorer</a></p>
+
+<p class="p30">{$lng_sn.step2}</p>
+
+<div class="clearfix">
+	<div class="left_form">{$lng_sn.code}</div>
+	<div class="right_form"><textarea name="access_token" id="access_token" rows="4" cols="70"></textarea></div>
+</div>
+
+<div class="form_footer">
+	<div class="buttons rfloat" {if $demo}onClick="alert('{$lng.general.errors.demo}');return false;"{/if}>
+		<span class="positive"><input type="submit" name="Submit" id="Submit" value="{$lng_sn.get_fb_access_token}" /></span>
+	</div>
+	<div class="buttons">
+		<span class="negative"><input type="submit" name="Cancel" id="Cancel" value="{$lng.general.cancel}" /></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+
+</form>
+</div> {* end form_container *}
+</div> {* end p30 *}
+
+{literal}
+<script type="text/javascript">
+
+$(document).ready(function() {
+$(".info").hide();
+$(".error").hide();
+$(".warning").hide();
+
+ $("#Submit").click(function(event){
+
+	event.preventDefault();
+	
+var access_token = $("#access_token").val();
+if(!access_token) {
+		$(".error").show();
+		$(".error").html("<p>{/literal}{$lng_sn.error.code}{literal}</p>");
+		$('html,body').animate({scrollTop:$(".error").offset().top}, 'slow');
+}
+else {
+	$.post( "get_fb_access_token.php", $( "#helper" ).serialize(), function(responseText) {
+		var ret = JSON.parse(responseText);
+
+		if(ret.response==1) {
+			$(".info").html("<p>"+ret.info+"</p>");
+			$(".info").show();
+			$(".error").hide();
+			$(".error").html("<p></p>");
+			if(ret.expires==1) $(".warning").show();
+			$('html,body').animate({scrollTop:$(".info").offset().top}, 'slow');
+			return;
+		}
+		// response = 0 -> there are errors
+		$(".info").hide();
+		$(".error").show();
+		$(".error").html("<p>"+ret.error+"</p>");
+		$('html,body').animate({scrollTop:$(".error").offset().top}, 'slow');
+
+	} );
+} // end if no access token
+});// end on click
+
+}); // end document ready
+</script>
+{/literal}
+
+{include file="footer.html"}

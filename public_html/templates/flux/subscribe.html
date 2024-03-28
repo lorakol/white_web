@@ -1,0 +1,202 @@
+{if $step==1}
+{include file="header.html"}
+{include file="js/subscribe_js.html" step=1}
+
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="wait"></div>
+
+<div class="page_bounds">
+<div class="page_title"><h1>{if !isset($renew) || !$renew}{$lng.navbar.subscribe}{else}{$lng.subscribe.renew_subscription}{/if}</h1></div>
+</div>
+
+<div class="page_bounds">
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{if isset($error)}{$error}{/if}</p></div>
+{if !isset($error) || !$error}
+
+<form name="subscribe"  id="subscribe" method="post" action="subscribe.php?step=3" class="main">
+
+	<input type="hidden" name="subscription" id="subscription" value="{if isset($only_sub)}{$only_sub}{/if}" />
+	<input type="hidden" name="subscription_id" id="subscription_id" value="{if isset($id)}{$id}{/if}" />
+	<input type="hidden" name="renew" id="renew" value="{$renew}" />
+
+<div class="heading form_heading">{$lng.listings.choose_subscription}</div>
+
+<div class="wbg p30 mb40">
+
+{if $plans_array|@count>1}
+
+<div  id="subscriptions">
+
+	{foreach from=$plans_array item=v name=plan}
+	<div class="plan listings_plan">
+
+		<div class="plan_title plan_title{$smarty.foreach.plan.index}">{$v.name}</div>
+		<div class="plan_body">
+
+			<div class="plan_details">
+
+			<div class="price">{$v.price_curr}</div>
+
+			<div>{$v.description}</div>
+
+			</div>
+
+		<div class="plan_option">
+
+		<span>{if $v.subscription_time}{$v.subscription_time}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.days}&nbsp;{$lng.packages.subscription}<br>
+
+		<span>{if $v.no_ads}{$v.no_ads}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.ads}<br>
+
+		<span>{if $v.no_words}{$v.no_words}{else}{$lng.general.unlimited}{/if}</span>&nbsp;{$lng.packages.words}<br>
+
+		{$lng.packages.available}&nbsp;<span>{if $v.no_days}{$v.no_days}{else}{$lng.general.unlimited}{/if}&nbsp;{$lng.packages.days}</span><br>
+
+		<span>{$v.no_pictures}</span>&nbsp;{if $v.no_pictures==1}{$lng.packages.picture}{else}{$lng.packages.pictures}{/if}<br>
+
+		{if $ads_settings.enable_featured && $v.featured}<span>{$lng.packages.featured}</span><br>{/if}
+		{if $ads_settings.enable_highlited && $v.highlited}<span>{$lng.listings.highlited}</span><br>{/if}
+		{if $ads_settings.enable_priorities && $v.priority}<span>{$lng.listings.priority}&nbsp;{$v.priority_name}</span><br>{/if}
+		{if $ads_settings.enable_video && $v.video}<span>{$lng.listings.video}</span><br>{/if}
+
+		</div>
+
+		</div>{* end plan_body *}
+
+		<div class="plan_bottom"><a href="javascript:;" class="plan_button select_subscription" id="select_subscription{$v.id}" alt="{$v.id}^{$v.name}^{$v.price_curr}">{$lng.listings.select_plan}</a></div>
+
+	</div>{* end plan *}
+
+	{/foreach}
+
+	<div class="clearfix"></div>
+
+</div>
+
+{/if}
+
+	<div id="subscription_selected" {if (!isset($id) || !$id) && (!isset($only_sub) || !$only_sub)}style="display: none;"{/if}>
+
+	{if (!isset($id) || !$id) && (!isset($only_sub) || !$only_sub)}
+
+	<div class="current_selection"><span class="tag">{if isset($subscription_name)}{$subscription_name}{/if} ({if isset($subscription_price)}{$subscription_price}{/if})</span></div>
+	<div class="change_selection"><a href="javascript:;" class="button mtm10" id="change_subscription">{$lng.listings.change_plan}</a></div>
+	<div class="clearfix"></div>
+
+	{else}
+
+	{if isset($subscription_name)}{$subscription_name}{/if} ({if isset($subscription_price)}{$subscription_price}{/if})
+
+	{/if}
+
+	</div> {* end subscription_selected *}
+
+</div> {* end wbg *}
+
+<div id="payment_details"></div>
+
+</form>
+<div id="payment" style="display: none;"></div>
+
+{/if} {* end if not error *}
+</div> {* end page_bounds *}
+
+{include file="footer.html"}
+
+{/if} {* end step=1 *}
+
+{if $step==2}
+
+<div class="wbg p30">
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{$error}</p></div>
+
+{if !isset($error) || !$error}
+	<input type="hidden" name="full_total" id="full_total" value="{$full_total}"/>
+
+	{if $enable_coupons}
+	<div class="option clearfix" id="div_discount" {if !$total}style="display: none;"{/if}>
+		<div class="option_left">{$lng.listings.enter_coupon} :</div>
+		<div class="option_right"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',0, {$appearance.price_format_decimals})" value="{if isset($discount_code)}{$discount_code}{/if}"/></div>
+	</div>
+	{/if}
+
+
+	{if isset($credits_allowed) && $credits_allowed}
+	<div class="option clearfix" id="div_credits" {if !$total}style="display: none;"{/if}>
+
+	<input type="hidden" name="credit_value" id="credit_value" value="{$credits_settings.unit}"/>
+	<input type="hidden" name="current_credits" id="current_credits" value="{$current_credits}"/>
+
+	<div class="option_left">{$lng.credits.credits}</div>
+	<div class="option_right"><b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+
+	<label class="enh_radio chk_container">
+	<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}<span id="not_enough_credits" {if $current_credits==0 || $current_credits>=$needed_credits}style="display: none;"{/if}> ( {$lng.credits.not_enough_credits} ) </span><span id="no_credits" {if $current_credits==0 || $current_credits<$needed_credits}style="display: none;"{/if}> ( <span id="needed_credits">{$needed_credits}</span> <span id="scredit" {if $needed_credits>1}style="display: none;"{/if}>{$lng.credits.scredit}</span><span id="scredits" {if $needed_credits==1}style="display: none;"{/if}>{$lng.credits.scredits}</span> ) </span>
+	<div class="chk_indicator"></div>
+	</label>
+	</div>
+	</div>
+	{/if}
+
+	<div class="option clearfix" id="div_total" {if !$total}style="display: none;"{/if}>
+
+	{if $no_processors>1 || ($no_processors<=1 && isset($credits_allowed) && $credits_allowed)}
+
+	<div class="option_left">{$lng.listings.choose_payment_method} :</div>
+	<div class="option_right">
+	{foreach from=$payment_processors name=pp item=v}
+	<label class="enh_radio chk_container lfloat">
+	<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (empty($credits_allowed) || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+	<div class="chk_indicator"></div>
+	</label>
+
+	{* if subscription choose if recurring *}
+
+	{if $v.recurring==2}
+	<label class="enh_checkbox chk_container lfloat ml50">
+	<input type="checkbox" name="recurring{$v.processor_code}" checked="checked" />{$lng.subscribe.recurring}
+	<div class="chk_indicator"></div>
+	</label>
+	{/if}
+	<div class="clearfix"></div>
+
+	{/foreach}
+	</div>
+	{else}
+	<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+	<div class="option_left">{$lng.subscribe.payment_method}:</div>
+	<div class="option_right">{$payment_processors[0].processor_title}</div>
+
+	{/if}
+	<input type="hidden" id="selected_processor" value="{$payment_processors[0].processor_code}"/>
+
+	</div>
+
+	<div class="option_price price top_price">
+	{$lng.listings.total}: <b>
+	{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$total}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+	</div>
+
+	<div class="option_price price" id="tax_info" style="display: none;">
+	{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;): <b><span id="tax"></span></b>
+	</div>
+
+	<div class="option_price price" id="total_with_tax_info" style="display: none;">
+	{$lng.general.total_with_tax}:&nbsp;<b><span id="total_with_tax"></span></b>
+	</div>
+
+</div> {* end wbg *}
+
+<div class="form_footer mb40">
+	<input type="submit" class="button wide_button negative" name="Cancel" id="Cancel" value="{$lng.general.cancel}" />
+	<input type="submit" class="button wide_button positive" name="Submit" id="Submit" value="{$lng.general.submit}" />
+<div class="clearfix"></div>
+</div>
+
+{include file="js/subscribe_js.html" step=2}
+{/if} {* end if error *}
+
+{/if} {* end if step=2 *}

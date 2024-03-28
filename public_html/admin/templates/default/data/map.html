@@ -1,0 +1,5 @@
+{if $settings.map_type=="gmaps"}
+    {include file="data/gmap.html" v=$v val=$tmp}
+{else}
+    {include file="data/osm.html" v=$v val=$tmp}
+{/if}

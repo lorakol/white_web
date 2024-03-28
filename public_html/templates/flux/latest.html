@@ -1,0 +1,93 @@
+<section id="latest_ads">
+    <div class="tab_content fbr_inv" id="latest_tab_content">
+
+			<div>
+
+			{section name=loop start=0 loop=$no_latest step=1}
+
+			{capture name=some_content assign=details_url}{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$latest[loop].id p2=$latest[loop].title p3='' p4=$latest[loop].category_id p5=$latest[loop].slug}{else}{$live_site}/details.php?id={$latest[loop].id}{/if}{/capture}
+
+			<a href="{$details_url}">	
+			<div class="box-container">
+			<div class="fbox box clearfix{*{if $v.highlited && $ads_settings.enable_highlited} highlited{/if}*}">
+
+				<img id="fpic{$latest[loop].id}" src="{$live_site}/{$latest[loop].medImage}" alt="{if $latest[loop].image_id}{$latest[loop].title|strip_tags:false|substr:0:100}{/if}" />
+
+				{if $latest[loop].sold}<div class="ribbon ribbon_sold"><span>{$lng.listings.sold}</span></div>{/if}
+				{if $latest[loop].rented}<div class="ribbon ribbon_rented"><span>{$lng.listings.rented}</span></div>{/if}
+
+				{if in_array("acategories", $modules_array) && in_array($latest[loop].category_id, $ac_settings.array_categories_list)}
+				<div id="ac{$latest[loop].id}" class="ac_over">{$lng.general.click_to_view}</div>
+				{/if}
+
+				<h3 class="ltitle">{if $data_set=="cars" && ((isset($latest[loop].make) && $latest[loop].make) || (isset($latest[loop].model) && $latest[loop].model))}{$latest[loop].make} {$latest[loop].model}{else}{if $appearance.charset=="UTF-8"}{$latest[loop].title|mb_truncate:30:"...":"UTF-8"}{else}{$latest[loop].title|truncate:30:"...":false}{/if}{/if}</h3>
+
+				<div class="lloc">{$latest[loop].location_str}</div>
+
+				{if $ads_settings.enable_price}
+
+					{if in_array("price_extra",$modules_array) && ( isset($pe_settings[$latest[loop].fieldset]) || isset($pe_settings[0]) )}
+
+						{include file="modules/price_extra/gallery_listing.html" pe_listing=$latest[loop]}
+
+					{else}
+
+						{if !empty($latest[loop].price) && $latest[loop].price>=0}<div class="lprice">{$latest[loop].price_curr}</div>{/if}
+
+					{/if}
+
+				{/if} {* end if enable price *}
+
+				{if !in_array($latest[loop].id, $fav_array)}
+				<div class="starfav addtofav tooltip make-fav" id="fav{$latest[loop].id}" title="{$lng.listings.add_to_favourites}"></div>
+				{else}
+				<div class="starfav remfav tooltip rem-fav" id="fav{$latest[loop].id}" title="{$lng.listings.remove_favourite}"></div>
+				{/if}
+
+{*				
+				{if $v.urgent && $ads_settings.enable_urgent}<div class="clearfix"></div><div class="mt5"><span class="urgent sq-btn sq-btn1">{$lng.listings.urgent}</span></div>{/if}
+*}
+			</div>
+			</div>
+			</a>
+		{/section}
+		<div class="clearfix"></div>
+
+		</div>
+	</div>
+
+	{if $no_latest}
+		<div><a href="{$live_site}/{if $seo_settings.enable_mod_rewrite}{$sef_links.recent_ads}{else}recent_ads.php{/if}"><h2 class="view_more">{$lng.listings.view_all_latest}</h2></a></div>
+		<div class="clearfix"></div>
+	{/if}
+
+	<hr/>
+</section>
+
+
+<script>
+//<![CDATA[
+jQuery(document).ready(function() {
+
+	if($('#tab_latest').is(':checked')) {
+		$('#latest_tab_content').imagesLoaded( function() {
+			startMasonryLatest();
+		});
+	}
+
+});
+
+$('input:radio[name="tabs"]').change(function() { if ($(this).attr("id") == 'tab_latest') startMasonryLatest(); });
+
+
+function startMasonryLatest() {
+
+$('#latest_tab_content').masonry({
+  // options
+  itemSelector: '.box-container'
+});
+
+}
+
+//]]>
+</script>

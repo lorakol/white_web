@@ -1,0 +1,4 @@
+{if $listing.price>0 || ($listing.price==0 && $pe_settings[$listing.fieldset].use_free==0)}<li class="heading"><div class="price">{$listing.price_curr}{if $listing.price>0 && $pe_settings[$listing.fieldset].use_negotiable==1 && $listing.negotiable==1}&nbsp;{$pe_settings[$listing.fieldset].lang[$crt_lang].negotiable}{/if}</div></li>
+{elseif $listing.price==0 && $pe_settings[$listing.fieldset].use_free==1}<li class="heading"><div class="price">{$pe_settings[$listing.fieldset].lang[$crt_lang].free}</div></li>
+{elseif $listing.price==-1 && $pe_settings[$listing.fieldset].use_tags==1 && $listing.price_tag}<li class="heading"><div class="price">{$listing.price_tag}</div></li>
+{/if}

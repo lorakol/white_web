@@ -1,0 +1,19 @@
+<section id="tagcloud">
+    <div class="tab_content">
+	{foreach from=$tag_cloud_array item=v}
+		<span class="{$v.class}"><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$sef_keyword p2=$v.word}{else}{$live_site}/listings.php?{$sef_keyword}={$v.word|urlencode}{/if}">{$v.word}</a></span>
+	{/foreach}
+</div>
+</section>
+
+{*
+<style type="text/css">
+
+.tc_smallest { font-size: 0.9em; }
+.tc_small { font-size: 1.1em; }
+.tc_medium { font-size: 1.3em; }
+.tc_large { font-size: 1.6em; }
+.tc_largest { font-size: 1.8em; }
+
+</style>
+*}

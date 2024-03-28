@@ -1,0 +1,42 @@
+{include file="header.html"}
+	<div id="page_content">
+	<h1>{$lng.navbar.recent_ads}</h1>
+	{if $no_listings>0}
+
+	{include file="paginator.html"}
+	{include file="order_listings.html"}
+
+	{foreach name="listings" from=$listings_array item=v}
+		{include file="short_listing.html"}
+		{if !$v.featured && !$v.highlited}<hr/>{/if}
+
+		{if ($smarty.foreach.listings.index+1)==$appearance.ads_per_page/2|ceil && $smarty.foreach.listings.index!=$listings_array|@count-1}
+		{* ------ listings4 banners ------- *}
+		{if in_array('listings4',$banners_positions)}
+		{banner->getTemplateBanners p1='listings4' p2=$section p3=$cat p4=$bloc assign='array_banners'}
+		{if $array_banners|@count}<div class="clearfix" style="margin: 10px 0 10px 0;"></div><div class="dcenter">{/if}
+		{foreach from=$array_banners item=v}
+		<div class="vert_banners">{include file="banner.html"}</div>
+		{/foreach}
+		{if $array_banners|@count}</div>{/if}{/if}
+		{* ------- end listings4 banners ------- *}
+		{/if}
+	{/foreach}
+
+	{include file="data/fancybox.html"}
+	{include file="listings_js.html"}
+
+	{* if listings_compare *}
+	{if in_array("listings_compare", $modules_array)}
+	{include file="modules/listings_compare/cmp_js.html"}
+	{/if}
+
+	<div class="clearfix"></div>
+	{include file="paginator.html"}
+	{else}
+	<br/><br/><br/><br/>
+	<div class="info"><p>{$lng.listings.no_recent_ads}</p></div>
+	<br/><br/><br/><br/>
+	{/if}
+	</div>
+{include file="footer.html"}

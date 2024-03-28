@@ -1,0 +1,281 @@
+
+
+{literal}
+<script>
+//<![CDATA[
+
+$(document).ready(function() {
+
+
+$('.tooltip').powerTip({
+	placement: 'n'
+});
+
+var options = {
+       // target:        '#output1',   // target element(s) to be updated with server response
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  beforeSubmit,  // pre-submit callback
+        success:       successResponse  // post-submit callback
+
+    };
+
+function beforeSerialize(jqForm, options) {
+
+	$("body").addClass("loading");
+
+	if (typeof data_htmlarea !== 'undefined')
+	for(var i=0;i<data_htmlarea.nicInstances.length;i++){ data_htmlarea.nicInstances[i].saveContent(); }
+
+	// international phones errors
+	var extra_phone_error = recheckIntlPhone();
+	if(extra_phone_error.length>0) {
+
+		// clean all fields possible err class
+		$(".err").removeClass("err");
+		// remove all err_labels
+		$(".err_label").remove();
+
+		for (var i = 0, len = extra_phone_error.length; i < len; i++) {
+
+			$("#"+extra_phone_error[i]).addClass("err");
+			// add as child before form element
+			$("#"+extra_phone_error[i]).first().before('<label class="err_label">{/literal}{$lng.listings.errors.invalid_phone}{literal}</label>');
+
+		}
+
+		$("body").removeClass("loading");
+
+		// move the page to the first err_label element
+		$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+		return false;
+
+	} // end international phone error
+
+}
+
+// pre-submit callback
+function beforeSubmit(formData, jqForm, options) {
+
+    // formData is an array; here we use $.param to convert it to a string to display it
+    // but the form plugin does this for you automatically when it submits the data
+    var queryString = $.param(formData);
+    return true;
+
+}
+
+// post-submit callback
+function successResponse(responseText, statusText, xhr, $form)  {
+
+	var ret = JSON.parse(responseText);
+
+	if(ret.response==1) {
+
+		// clean all fields possible err class
+		$(".err").removeClass("err");
+		// remove all err_labels
+		$(".err_label").remove();
+
+		// show info message and hide form
+		$(".info").slideUp();
+		$("#account_info").find("span.content").html("<p>"+ret.info+"</p>");
+		$("#account_info").slideDown();
+
+		// move the page to the info label
+		$('html,body').animate({scrollTop:$("#account_info").offset().top}, 'slow');
+
+		$("body").removeClass("loading");
+
+		return;
+
+	}
+
+	// response = 0 -> there are errors in submit ad process
+	var no_err = ret.error.length;
+	var err_field, err_string;
+
+	// clean all fields possible err class
+	$(".err").removeClass("err");
+
+	// remove all err_labels
+	$(".err_label").remove();
+
+	// mark each field with error
+	for (var idx=0;idx<no_err;idx++) {
+
+		err_field = ret.error[idx].field;
+		err_string = ret.error[idx].error;
+
+		$("#"+err_field).addClass("err");
+		// add as child before form element
+		$("#"+err_field).first().before('<label class="err_label">'+err_string+'</label>');
+
+
+	}
+
+	// move the page to the first err_label element
+	$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+	$("body").removeClass("loading");
+
+}
+
+var options_pass = {
+       // target:        '#output1',   // target element(s) to be updated with server response
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { var queryString = $.param(formData); return true;  },
+        success:       successResponse_pass  // post-submit callback
+
+    };
+
+
+// post-submit callback
+function successResponse_pass(responseText, statusText, xhr, $form)  {
+
+	var ret = JSON.parse(responseText);
+
+	$("body").removeClass("loading");
+
+	if(ret.response==1) {
+
+		// show info message and hide form
+		$(".info").slideUp();
+		$("#pass_info").find("span.content").html("<p>"+ret.info+"</p>");
+		$("#pass_info").slideDown();
+
+		// move the page to the info label
+		$('html,body').animate({scrollTop:$("#pass_info").offset().top}, 'slow');
+
+		return;
+
+	}
+
+	// response = 0 -> there are errors in submit ad process
+	var no_err = ret.error.length;
+	var err_field, err_string;
+
+	// clean all fields possible err class
+	$(".err").removeClass("err");
+
+	// remove all err_labels
+	$(".err_label").remove();
+
+	// mark each field with error
+	for (var idx=0;idx<no_err;idx++) {
+
+		err_field = ret.error[idx].field;
+		err_string = ret.error[idx].error;
+
+		$("#"+err_field).addClass("err");
+		// add as child before form element
+		$("#"+err_field).first().before('<label class="err_label">'+err_string+'</label>');
+
+
+	}
+
+	// move the page to the first err_label element
+	$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+}
+
+var options_remove = {
+       // target:        '#output1',   // target element(s) to be updated with server response
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { var queryString = $.param(formData); return true;  },
+        success:       successResponse_remove  // post-submit callback
+
+    };
+
+var options_2fa = {
+       // target:        '#output1',   // target element(s) to be updated with server response
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { var queryString = $.param(formData); return true;  },
+        success:       successResponse_2fa  // post-submit callback
+
+    };
+
+
+// post-submit callback
+function successResponse_remove(responseText, statusText, xhr, $form)  {
+
+	var ret = JSON.parse(responseText);
+
+	$("body").removeClass("loading");
+
+	if(ret.response==1) {
+
+		// show info message and hide form
+		$(".info").slideUp();
+		$("#removal_info").find("span.content").html("<p>"+ret.info+"</p>");
+		$("#removal_info").slideDown();
+		return;
+
+	}
+}
+function successResponse_2fa(responseText, statusText, xhr, $form)  {
+
+	var ret = JSON.parse(responseText);
+
+	$("body").removeClass("loading");
+
+	if(ret.response==1) {
+
+		// show info message and hide form
+		$(".info").slideUp();
+		$("#2fa_info").find("span.content").html("<p>"+ret.info+"</p>");
+		$("#2fa_info").slideDown();
+		return;
+
+	}
+}
+
+//initialize the AJAX form
+$('#account_form').ajaxForm(options);
+$('#pass_form').ajaxForm(options_pass);
+$('#acc_removal_form').ajaxForm(options_remove);
+$('#2fa_form').ajaxForm(options_2fa);
+
+$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+
+	{/literal}
+	var gmaps_on = {if $gmaps}1{else}0{/if};
+	// initialize google maps
+	if (gmaps_on) {
+		{if $settings.map_type=="gmaps"}
+		if(!places && !dsearch) load_gmaps();
+		{else}
+		init_osm();
+		{/if}
+	}	
+	{literal}
+
+
+});
+
+$("#user_slug").blur(function(){
+
+	$.post("{/literal}{$live_site}{literal}/include/user_slug_checker.php", $( "#account_form" ).serialize() , function(data){
+
+		data_split = data.split("|");
+		var slug_encoded = data_split[0];
+		var error = data_split[1];
+		var info = data_split[2];
+		$("#user_slug").val(slug_encoded);
+		if(info) {
+			$("#slug_available").html(info);
+			$("#slug_available").show();
+			$("#slug_error").hide();
+			$("#store_url").html(slug_encoded);
+		}
+		else if(error) {
+			$("#slug_error").html(error);
+			$("#slug_error").show();
+			$("#slug_available").hide();
+		}
+
+	});
+
+});
+//]]>
+</script>
+{/literal}

@@ -1,0 +1,64 @@
+{include file="header.html"}
+{include file="data/ui.html"}
+
+<div id="heading">{$lng.messages.message_history}</div>
+
+<div>
+
+{foreach from=$messages_array item=v}
+<div class="{if isset($v.to) && $v.to==$crt_usr}msg_odd{else}msg_even{/if} p10">
+
+	<div class="small">
+	{if $v.from!=$crt_usr}
+	{$lng.messages.from}: {if $v.from}{$v.contact_name}, {$v.email}{else}{$v.from_email}{/if} {$lng.messages.on}: {$v.date_nice}, #{$v.msg_id}
+	{else}
+	(#{$v.msg_id}) {$lng.messages.to}: {if $v.to}{$v.to_contact_name}, {$v.to_email}{else}{$v.to_email}{/if} {$lng.messages.on}: {$v.date_nice}
+	{/if}
+	</div>
+
+	<p>{$v.message}</p>
+
+	{if $v.ad_id}{$lng.messages.started_for_listing}: <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.ad_id p2=$v.title}{else}{$live_site}/details.php?id={$v.ad_id}{/if}" target="_blank">{$v.title}</a>{/if}
+
+	{if $v.to == $crt_usr}
+	<div class="form_button"><strong><a href="{$live_site}/reply.php?id={$v.msg_id}">{$lng.general.reply}</a></span></div>
+	{/if}
+
+</div>
+
+{/foreach}
+
+<div class="form_button m10"><strong><a href="messages.php">{$lng.general.back}</a></strong></div>
+
+
+
+</div>{* end p10 *}
+
+<script type="text/javascript">
+{literal}
+
+$(document).ready(function() {
+$("a.freply").click(function(event){
+var msg_id = jQuery(this).attr("id").substr(3);
+	$.fancybox({
+		'width'         		: 600,
+		'height'        		: 500,
+		'transitionIn'		: 'none',
+		'transitionOut'		: 'none',
+		'margin'		: '0',
+		'padding'		: '0',
+		'titleShow'		: false,
+		'type'			: 'iframe',
+		'href'			: '{/literal}{$live_site}/reply.php?id='+msg_id+'{literal}',
+			'onClosed': function() {
+				parent.location.reload(true);
+			}
+
+	});
+});
+
+});
+{/literal}
+</script>
+
+{include file="footer.html"}

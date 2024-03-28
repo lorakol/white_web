@@ -1,0 +1,23 @@
+<div id="useraccount">
+<ul>
+<li><a href="useraccount.php">{$lng.useraccount.statistics}</a></li>
+<li>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="new_listing.php">{$lng.useraccount.submit_ad}</a></li>
+<li>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="my_listings.php">{$lng.useraccount.browse_your_listings}</a></li>
+{if $subscription_exists}<li>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="subscriptions.php">{$lng.useraccount.subscriptions}</a></li>{/if}
+<li>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="account_info.php">{$lng.useraccount.modify_account_info}</a></li>
+<li>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="order_history.php">{$lng.useraccount.order_history}</a></li>
+{if $user.bulk_uploads}
+<li>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="bulk_uploads.php">{$lng.useraccount.bulk_uploads}</a></li>
+{/if}
+{if $settings.internal_messaging}
+<li>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="{$live_site}/messages.php">{$lng.useraccount.messages}</a></li>
+{/if}
+{if $ads_settings.alerts_enabled}
+<li>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="{$live_site}/alerts.php?action=user&id={$user.id}">{$lng.alerts.email_alerts}</a></li>
+{/if}
+{if $ads_settings.saved_searches_enabled}
+<li>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="{$live_site}/saved_searches.php?id={$user.id}">{$lng.useraccount.saved_searches}</a></li>
+{/if}
+</ul>
+</div>
+<div class="clearfix"></div>

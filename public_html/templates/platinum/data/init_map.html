@@ -1,0 +1,5 @@
+{if $settings.map_type=="gmaps"}
+init_gmap_{$v.caption}{if isset($prefix)}{$prefix}{/if}();
+{else}
+init_osm_{$v.caption}{if isset($prefix)}{$prefix}{/if}();
+{/if}

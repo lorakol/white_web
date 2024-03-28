@@ -1,0 +1,65 @@
+          <!-- CATEGORIES -->
+          <div id="tree_categories"> 
+
+            <div class="category_column">
+			{foreach from=$array_categories item=v name=cat}
+			{if !isset($v.parent_id) || !$v.parent_id}
+			
+			<a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/listings.php?category={$v.id}{/if}">	
+			<span class="catparent" id="parent{$v.id}">
+
+			{if $v.icon}<img src="{$live_site}/images/categories/{$v.icon}" alt="{$v.name}" />{/if}
+			<span class="catname">{$v.name}{if $v.ads && $appearance.categ_count_ads}({$v.ads}){/if}</span>
+			</span>
+			</a>
+
+			{if $smarty.foreach.cat.index!=$categories|@count-1}<ul>
+			<li class="allcat" {if $v.level}class="level{$v.level}"{/if}><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/listings.php?category={$v.parent_id}{/if}">{$lng.listings.all_ads}</a></li>
+			{/if}
+			{else}
+			<li {if $v.level}class="level{$v.level}"{/if}><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeSearchCategoryLink p1=$v.id p2=$v.name p3=$v.slug}{else}{$live_site}/listings.php?category={$v.id}{/if}">{$v.name} {if $v.ads && $appearance.categ_count_ads}({$v.ads}){/if}</a></li>
+			{/if}
+
+			{capture name=some_content assign=next_index}{$smarty.foreach.cat.index+1}{/capture}
+			{if isset($array_categories.$next_index) && !$array_categories.$next_index.parent_id && $smarty.foreach.cat.index!=0 && $smarty.foreach.cat.index!=$categories|@count-1}</ul>{/if}
+
+			{if $smarty.foreach.cat.index==$categories|@count-1 && $v.parent_id}
+			</ul>
+			{/if}
+
+			{if $v.last && $smarty.foreach.cat.index!=$categories|@count-1}
+			</div><div class="category_column">
+			{/if}
+			{/foreach}
+            </div>
+
+          </div>
+          <!-- end CATEGORIES -->
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function(){
+
+	// click on category parent will open subcategories list
+	$('.catparent').on('click', function(event) { 
+
+		if(window.innerWidth<700) {
+
+			var id = $(this).attr('id');
+			var path = {/literal}"{$template_path}/images/";{literal}
+
+			// view next ul
+			if($(this).parent().next( "ul" ).is(":visible")) {
+				$(this).parent().next( "ul" ).slideUp();
+			}
+			else {
+				$(this).parent().next( "ul" ).slideDown();
+			}
+			return false; // do not manage other click events
+		}
+	});
+
+
+});
+{/literal}
+</script>

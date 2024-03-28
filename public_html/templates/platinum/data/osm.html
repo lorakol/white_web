@@ -1,0 +1,106 @@
+var osm_marker;
+
+function init_osm_{$v.caption}() {
+//console.log("init_osm");
+	// get address value
+	address = '';
+	address_html = '';
+	var loc = "{if isset($v.extensions)}{$v.extensions}{/if}";
+
+	if(loc) {
+	var location_fields = loc.split(",");
+
+	for(i=0; i<location_fields.length; i++) {
+		var f = location_fields[i];
+		if(!f) continue;
+		if ($('#'+f).length == 0) continue;
+
+		var t = document.getElementById(f).type;
+		if(t=="text" || t=="textarea")
+			var l = document.getElementById(f).value;
+		else {
+			var selected_index = document.getElementById(f).selectedIndex;
+			var l = document.getElementById(f).options[selected_index].value;	
+		}
+		if(!l) continue;
+		if(address!='') { 
+			address = address + ', ';
+			address_html = address_html + '<br/>';
+		}
+		address = address + l;
+		address_html = address_html + "<b>" + l + "</b>";
+		//address_html = address_html.replace(/(?:\r\n|\r|\n)/g, '<br />');
+
+
+	}
+	} // end if loc
+
+
+	old=new Array();
+	{if isset($val[$v.caption]) && $val[$v.caption]}old = splitMapsCoord('{$val[$v.caption]}');{/if}
+	if (old.length>0) {
+		var lat = parseFloat(old[0]);
+		var long = parseFloat(old[1]);
+		var h = parseInt(old[2]);
+
+	} else {
+		var lat = {$settings.maps_default_lat};
+		var long = {$settings.maps_default_long};
+		var h = {$settings.maps_default_height};
+
+	}
+
+	var map_{$v.caption} = L.map("gm_{$v.caption}").setView([lat, long], h);
+
+     // set map tiles source
+    L.tileLayer('https://tile.openstreetmap.org/{literal}{z}/{x}/{y}{/literal}.png', {
+     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+      maxZoom: 18,
+    }).addTo(map_{$v.caption});
+ 
+	{if isset($val[$v.caption]) && $val[$v.caption]}
+	osm_marker = L.marker([lat, long]).addTo(map_{$v.caption});
+
+	if(address_html) {
+		osm_marker.bindPopup(address_html).openPopup();
+	}
+	{/if}
+
+	map_{$v.caption}.on('click', function(event) {
+		//alert("Lat, Lon : " + event.latlng.lat + ", " + event.latlng.lng)
+		//alert(map_{$v.caption}.getZoom());
+		
+		if(event.latlng) {
+			var lat = event.latlng.lat;
+			var long = event.latlng.lng;
+
+			var h = map_{$v.caption}.getZoom();
+			
+			map_{$v.caption}.panTo(event.latlng);
+			
+			if (typeof osm_marker !== 'undefined') map_{$v.caption}.removeLayer(osm_marker); 
+			osm_marker = L.marker([event.latlng.lat, event.latlng.lng]).addTo(map_{$v.caption});
+
+			if(address_html) {
+				osm_marker.bindPopup(address_html).openPopup();
+			}
+			
+			if(IsNumeric(lat) && IsNumeric(long) && IsNumeric(h)) document.getElementById("{$v.caption}").value=lat+","+long+","+h;
+		
+		} // end if latlng
+		
+	});
+
+	map_{$v.caption}.on('zoomend', function() {
+		
+		var old_val = document.getElementById("{$v.caption}").value;
+		var newLevel = map_{$v.caption}.getZoom();
+		if(old_val) {
+			var arr = old_val.split(",");
+			document.getElementById("{$v.caption}").value=arr[0]+","+arr[1]+","+newLevel;
+		}
+
+		
+	});
+
+} // end init_osm

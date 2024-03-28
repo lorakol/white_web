@@ -1,0 +1,22 @@
+{if $v.content}
+	{capture name=var_use_title assign=var_use_title}{$prefix}use_title{/capture}
+	{capture name=var_logo_field assign=var_logo_field}{$prefix}logo_field{/capture}
+	{capture name=var_use_website assign=var_use_website}{$prefix}use_website{/capture}
+	<div class="comments">
+	<table cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+	{if isset($v.logo) && $v.logo}<td valign="middle" width="100"><div class="clogo"><img src="{$live_site}/uploads/{$ratings_settings.$var_logo_field}/{$v.logo}"></div></td>{/if}
+	<td>
+	<div class="{cycle values="comment_even,comment_odd"}">
+		<div class="lfloat">{section name=loop start=0 loop=5 step=1}
+		<img src="{$live_site}/modules/ratings/css/images/star{if $v.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />
+		{/section}</div>
+		{if isset($v.title) && $v.title && $ratings_settings.$var_use_title}<div class="cname lfloat">&nbsp;{$v.title} </div>{/if}
+		<div class="clearfix"></div>
+		<div class="cdetails">{if $ratings_settings.use_name}{$lng.general.by}&nbsp;{$v.name}&nbsp;{/if}<span class="cdate">{$lng.messages.on}&nbsp;{$v.date_nice}</span></div>
+		<p class="ccontent">{$v.content}</p>
+		{if isset($v.website) && $v.website && $ratings_settings.$var_use_website}<div><a href="{$v.website}">{$v.website}</a></div>{/if}
+	</div>
+	</td></tr></table>
+	</div>
+{/if}

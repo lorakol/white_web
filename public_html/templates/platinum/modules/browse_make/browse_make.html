@@ -1,0 +1,68 @@
+	{if $browse_make_settings.type!="single" &&  $bm_makes.no_fieldsets}
+	<div>
+		<ul id="make_tabnav">
+		{foreach name="master_loc" from=$bm_makes.values item=v}
+		<li><a id="make_tab{$v.id}" href="javascript:;" onclick="onChangeMake('{$v.id}', '{$bm_makes.table1}', '{$live_site}')" {if $smarty.foreach.master_loc.index==0}class="active"{/if}>{$v.name}</a></li>
+		{/foreach}
+		</ul>
+	</div>
+	{/if}
+
+	<div id="makes-box"> 
+	{capture name=some_content assign=title_field}title_{$crt_lang}{/capture}
+
+	{if ($browse_make_settings.type=="single" || !$bm_makes.no_fieldsets) && $browse_make_settings[$title_field]}
+	<h2>{$browse_make_settings[$title_field]}</h2>
+	{/if}
+	<div class="box-top-gray"><div class="box-bottom"><div class="box-left"><div class="box-right"><div class="box-bottom-left"><div class="box-bottom-right"><div class="box-top-left"><div class="box-top-right">
+
+		{if $browse_make_settings.type=="single"}
+		
+			<table cellpadding="0" cellspacing="0" width="100%">
+			<tr><td valign="top">
+			<ul>
+			{foreach name=list from=$bm_makes.elements item=t}
+				{capture name=sfield assign=field2}{$t|replace:'/':'--'|urlencode}{/capture}
+				<li><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$bm_makes.caption p2=$field2}{else}{$live_site}/listings.php?{$bm_makes.caption}={$field2}{/if}">{$t|escape:"html"}</a></li>
+				{if ($smarty.foreach.list.index+1)%$bm_makes.no_each_row==0 && $smarty.foreach.list.index && $smarty.foreach.list.index!=$bm_makes.no_elements-1}
+			</ul>
+			</td>
+
+			<td valign="top">
+			<ul>
+				{/if}
+			{/foreach}
+			</ul>
+			</td></tr>
+			</table>
+		
+
+		{else}
+		{foreach name=loc1 from=$bm_makes.values item=v}
+
+			<div class="makediv" id="make1_{$v.id}" {if $smarty.foreach.loc1.index!=0}style="display: none; "{/if}>
+			<table cellpadding="0" cellspacing="0" width="100%">
+			<tr><td valign="top">
+			<ul>
+			{foreach name=list from=$v.elements item=t}
+				{capture name=sfield assign=field2}{$t|replace:'/':'--'|urlencode}{/capture}
+				<li><a href="{if $seo_settings.enable_mod_rewrite}{seo->makeKeyValueLink p1=$bm_makes.caption p2=$field2}{else}{$live_site}/listings.php?{$bm_makes.caption}={$field2}{/if}">{$t|escape:"html"}</a></li>
+				{if ($smarty.foreach.list.index+1)%$v.no_each_row==0 && $smarty.foreach.list.index && $smarty.foreach.list.index!=$v.no_elements-1}
+			</ul>
+			</td>
+
+			<td valign="top">
+			<ul>
+				{/if}
+			{/foreach}
+			</ul>
+			</td></tr>
+			</table>
+			</div>
+		{/foreach}
+		{/if}
+
+	</div></div></div></div></div></div></div></div>
+
+          </div>
+

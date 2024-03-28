@@ -1,0 +1,38 @@
+<li class="classified">
+
+{capture name=some_content assign=dealer_url}
+{if $v.store}
+{if $seo_settings.enable_mod_rewrite}{seo->makeDealerLink p1=$v.id p2=$v.contact_name}{else}{$live_site}/store.php?id={$v.id}{/if}
+{else}
+{if $seo_settings.enable_mod_rewrite}{seo->makeUserListingsLink p1=$v.id p2=$v.contact_name}{else}{$live_site}/user_listings.php?id={$v.id}{/if}
+{/if}
+{/capture}
+
+	<a href="{$dealer_url}">
+
+	{if $dealers_page_settings.logo_field && $v[$dealers_page_settings.logo_field]}
+	<div class="lfloat mr10">
+	<img src="{$live_site}{if $dealers_page_settings.logo_field=="store_banner"}/images/store/{$v[$dealers_page_settings.logo_field]}{else}/uploads/{$dealers_page_settings.logo_field}/{$v[$dealers_page_settings.logo_field]}{/if}" class="pic" alt="{$v[$dealers_page_settings.name_field]}" width="100" />
+	</div>{* end lfloat *}
+	{/if}
+
+	<div class="lfloat">
+
+		{* contact name *}
+		<h3>{$v[$dealers_page_settings.name_field]}</h3>
+
+		{* ratings *}
+		{if in_array("ratings",$modules_array)}
+		<div class="inline lpdiv2" style="width: 100px;">{include file="modules/ratings/stars.html"}</div>
+		{/if}
+
+
+		{* extra fields *}
+		{foreach from=$dealers_page_settings.details_fields_array item=t}
+			{if $v[$t]}<div><span class="light">{$field_names[$t]}: </span>{$v[$t]}</div>{/if}
+		{/foreach}
+
+	</div> {* end classifieds_content *}
+	</a>
+
+</li> {* end classified *}

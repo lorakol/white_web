@@ -1,0 +1,49 @@
+{include file="header.html"}
+{include file="data/fancybox.html"}
+<div class="heading"><h1>{$lng.messages.message_history}</h1></div>
+<div id="browse">
+
+{foreach from=$messages_array item=v}
+<div class="{if $v.to==$crt_usr}msg_received{else}msg_sent{/if}">
+
+	{if $v.from!=$crt_usr}
+	<h4>{$lng.messages.from}: {if $v.from}{$v.contact_name}, <span class="current">{$v.email}</span>{else}<span class="current">{$v.from_email}</span>{/if}{if $v.from_phone}, {$v.from_phone}{/if} {$lng.messages.on}: {$v.date_nice}</h4>
+	{else}
+	<h4>{$lng.messages.to}: {if $v.to}{$v.to_contact_name}, <span class="current">{$v.to_email}</span>{else}<span class="current">{$v.to_email}</span>{/if} {$lng.messages.on}: {$v.date_nice}</h4>
+	{/if}
+
+	<p>{$v.message}</p>
+
+	{if $v.ad_id}<div class="small">{$lng.messages.started_for_listing}: <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$v.ad_id p2=$v.title}{else}{$live_site}/details.php?id={$v.ad_id}{/if}" style="color: #197fc9" target="_blank">{$v.title}</a></div>{/if}
+
+	{if isset($v.to) && $v.to==$crt_usr}<div><a href="javascript:;" style="color: #197fc9" class="freply" id="msg{$v.msg_id}">{$lng.general.reply}</a></div>{/if}
+</div>
+
+{/foreach}
+<div style="float: right"><a href="messages.php" style="color: #197fc9">{$lng.general.back}</a></div>
+</div>
+
+<script type="text/javascript">
+{literal}
+
+$(document).ready(function() {
+$("a.freply").click(function(event){
+var msg_id = jQuery(this).attr("id").substr(3);
+	$.fancybox({
+		'width'         		: 630,
+		'height'        		: 500,
+		'transitionIn'		: 'none',
+		'transitionOut'		: 'none',
+		'margin'		: '0',
+		'padding'		: '10',
+		'titleShow'		: false,
+		'type'			: 'iframe',
+		'href'			: '{/literal}{$live_site}/reply.php?id='+msg_id+'{literal}'
+	});
+});
+
+});
+{/literal}
+</script>
+
+{include file="footer.html"}

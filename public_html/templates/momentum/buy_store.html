@@ -1,0 +1,215 @@
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<div class="error" {if !isset($error) || !$error}style="display: none;"{/if}><p>{if isset($error)}{$error}{/if}</p></div>
+{if !isset($error) || !$error}
+
+<script type="text/javascript" src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+<div class="main1 box">
+<div class="page_title heading"><h1>{$lng.useraccount.buy_store}</h1></div>
+
+<div class="form_container">
+<script src="https://js.stripe.com/v3/"></script>
+<script type="text/javascript">
+{literal}
+$(document).ready(function () {
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { 
+		//var queryString = $.param(formData); 
+		if($("#buy_store").find("input[type='submit']:focus").attr("id")=="Cancel") {
+			location.href='useraccount.php';
+			return false;
+		}
+
+		return true;  
+	},
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1) {
+
+				// go to payment page
+				var selected_processor = $('#selected_processor').val();
+
+				$("#payment").html(ret.payment_form);
+
+				if(selected_processor=="iyzico") {
+				    $("body").removeClass("loading");
+				}
+				else 
+				if(selected_processor=="klarna") {
+					$("body").removeClass("loading");
+					$("#payment").slideDown();
+					$('html,body').animate({scrollTop:$("#payment").offset().top}, 'slow');
+					$(".form_footer").hide();
+				}
+				else 
+					$("#payment_form").submit();
+
+				return;
+			}
+
+			// response = 0 -> show the error
+			$(".error").html("<p>"+ret.error+"</p>");
+			$(".error").show();
+
+			$("body").removeClass("loading"); 
+
+} 
+
+//initialize the AJAX form
+ $('#buy_store').ajaxForm(options);
+
+// *********** tax value **************
+{/literal}
+
+{if $no_processors>1 || ($no_processors==1 && isset($credits_allowed) && $credits_allowed)}
+only_processor = 0;
+{else}
+only_processor = 1;
+{/if}
+
+{if $total}
+
+if(only_processor)
+	var processor = $('input[name=processor]').val();
+else 
+	var processor = $('input:radio[name=processor]:checked').val();		
+
+var total = $("#full_total").val();
+calculateTax(processor, total);
+
+
+{/if} {* end if total *}
+
+{literal}
+
+
+$('input:radio[name=processor]').change(function() { 
+
+	processor = $('input:radio[name=processor]:checked').val();
+	calculateTax(processor, $("#full_total").val());
+
+	// for embedded payments
+	$("#selected_processor").val(processor);
+	reinit();
+
+})
+
+// end tax value
+
+
+}); // end document ready
+
+{/literal}
+
+</script>
+
+<form name="buy_store" id="buy_store" method="post" action="buy_store.php?step=2">
+
+<input type="hidden" name="full_total" id="full_total" value="{$ads_settings.store_price}"/>
+
+<div class="options pt30">
+
+	<div class="option clearfix">
+		<div class="option_left">{$lng.listings.price}:</div>
+		<div class="option_right"><span class="price">{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}{$ads_settings.store_price_formatted}{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</span></div>
+	</div>
+
+	<div class="option clearfix">
+		<div class="option_left">{$lng.general.available}:</div>
+		<div class="option_right">{if $ads_settings.store_availability}{$ads_settings.store_availability} {$lng.packages.days}{else}{$lng.general.unlimited}{/if}</div>
+	</div>
+
+	{if $enable_coupons}
+	<div class="option clearfix" id="div_discount">
+		<div class="option_left">{$lng.listings.enter_coupon} :</div>
+		<div class="option_right"><input type="text" name="discount_code" id="discount_code" onkeyup="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" onpaste="getDiscount(this.form, 'ads',{if $no_processors>1}1{else}0{/if}, {$appearance.price_format_decimals})" value="{if isset($discount_code)}{$discount_code}{/if}"/></div>
+	</div>
+	{/if}
+
+	{if isset($credits_allowed) && $credits_allowed}
+	<div class="option clearfix" id="div_credits" {if !$total}style="display: none;"{/if}>
+
+	<input type="hidden" name="credit_value" id="credit_value" value="{$credits_settings.unit}"/>
+	<input type="hidden" name="current_credits" id="current_credits" value="{$current_credits}"/>
+
+	<div class="option_left">{$lng.credits.credits}</div>
+	<div class="option_right"><b>{if $current_credits>0}{$lng.credits.you_currently_have} <span class="price">{$credits_formatted} {if $current_credits==1}{$lng.credits.scredit}{else}{$lng.credits.scredits}{/if}</span>{else}{$lng.credits.you_currently_have_no_credits}{/if}</b><br/>
+	<label class="enh_radio chk_container">
+	<input type="radio" class="noborder" name="processor" value="credits"  {if $current_credits>=$needed_credits}checked="checked"{else}disabled="disabled"{/if}/> &nbsp;&nbsp;{$lng.credits.pay_using_credits}<span id="not_enough_credits" {if $current_credits==0 || $current_credits>=$needed_credits}style="display: none;"{/if}> ( {$lng.credits.not_enough_credits} ) </span><span id="no_credits" {if $current_credits==0 || $current_credits<$needed_credits}style="display: none;"{/if}> ( <span id="needed_credits">{$needed_credits}</span> <span id="scredit" {if $needed_credits>1}style="display: none;"{/if}>{$lng.credits.scredit}</span><span id="scredits" {if $needed_credits==1}style="display: none;"{/if}>{$lng.credits.scredits}</span> ) </span>
+	<div class="chk_indicator"></div>
+	</label>
+	</div>
+	</div>
+	{/if}
+
+	<div class="option clearfix" id="div_total">
+
+	{if $no_processors>1 || ($no_processors<=1 && isset($credits_allowed) && $credits_allowed)}
+
+	<div class="option_left">{$lng.listings.choose_payment_method} :</div>
+	<div class="option_right">
+	{foreach from=$payment_processors name=pp item=v}
+	<label class="enh_radio chk_container">
+	<input type="radio" class="noborder" name="processor" value="{$v.processor_code}" {if $smarty.foreach.pp.index==0 && (!isset($credits_allowed) || !$credits_allowed || $current_credits<$needed_credits)}checked="checked"{/if}/> &nbsp;&nbsp;{$v.processor_title}
+	<div class="chk_indicator"></div>
+	</label>
+
+	{/foreach}
+	</div>
+	{else}
+	<input type="hidden" name="processor" value="{$payment_processors[0].processor_code}"/>
+
+	<div class="option_left">{$lng.subscribe.payment_method}:</div>
+	<div class="option_right">{$payment_processors[0].processor_title}</div>
+
+	{/if}
+	<input type="hidden" id="selected_processor" value="{$payment_processors[0].processor_code}"/>
+
+	</div>
+
+	<div class="option option_price clearfix">
+	{$lng.listings.total}: <b>
+	{if $appearance.currency_pos==0}{$appearance.default_currency}{/if}<span id="total" style="border: 0px;">{$ads_settings.store_price}</span>{if $appearance.currency_pos==1}{$appearance.default_currency}{/if}</b>
+	</div>
+
+	<div class="option option_price clearfix" id="tax_info" style="display: none;" style="text-align: right">
+	<b>{$lng.general.tax}&nbsp;(&nbsp;<span id="tax_str"></span>&nbsp;):</b> <b><span id="tax"></span></b>
+	</div>
+
+	<div class="option option_price clearfix" id="total_with_tax_info" style="display: none;" style="text-align: right">
+	<b>{$lng.general.total_with_tax}:&nbsp;<span id="total_with_tax"></span></b>
+	</div>
+
+</div> {* end options *}
+
+<div class="form_footer">
+<div class="buttons rfloat">
+	<input type="submit" class="button negative" name="Cancel" id="Cancel" value="{$lng.general.cancel}" />
+	<input type="submit" class="button positive" name="Submit" id="Submit" value="{$lng.general.submit}" />
+</div>
+<div class="clearfix"></div>
+</div>
+
+</form>
+
+<div id="payment" style="display: none;"></div>
+
+</div>{* end form_container *}
+</div> {* end main1 *}
+
+{/if} {* end if not error *}
+
+{include file="footer.html"}

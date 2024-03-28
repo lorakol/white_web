@@ -1,0 +1,29 @@
+{if $v.content}
+	{capture name=var_use_title assign=var_use_title}{$prefix}use_title{/capture}
+	{capture name=var_logo_field assign=var_logo_field}{$prefix}logo_field{/capture}
+	{capture name=var_use_website assign=var_use_website}{$prefix}use_website{/capture}
+	<div class="review">
+	<table cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+	{if isset($v.logo) && $v.logo}<td valign="top" width="80"><img src="{$live_site}/uploads/{$ratings_settings.$var_logo_field}/{$v.logo}"></td>{/if}
+	<td valign="top">
+	<div class="dialogbox">
+		<div class="body">
+			<span class="tip tip-left"></span>
+			<div class="message">
+				<div class="lfloat">
+					{section name=loop start=0 loop=5 step=1}
+					<img src="{$template_path}modules/ratings/css/images/star{if $v.rating|round>=($smarty.section.loop.index+1)}_on{else}_off{/if}.gif" />
+					{/section}
+				</div>
+				{if isset($v.title) && $v.title && $ratings_settings.$var_use_title}<div class="bold lfloat">&nbsp;{$v.title}</div>{/if}
+				<div class="clearfix"></div>
+				<div class="small">{if $ratings_settings.use_name}{$lng.general.by}&nbsp;{$v.name}&nbsp;{$lng.messages.on}&nbsp;{/if}{$v.date_nice}</div>
+				<p>{$v.content}</p>
+				{if isset($v.website) && $v.website && $ratings_settings.$var_use_website}<div><a href="{$v.website}">{$v.website}</a></div>{/if}
+			</div>
+		</div>
+	</div>	
+	</td></tr></table>
+	</div>
+{/if}

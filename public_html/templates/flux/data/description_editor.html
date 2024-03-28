@@ -1,0 +1,30 @@
+<script>
+//<![CDATA[
+
+{literal}
+$(document).ready(function() {
+{/literal}
+
+{if $languages|@count>1 && $ads_settings.translate_title_description==1}
+
+{foreach from=$languages item=v}
+{literal}
+
+myNicEditor = new nicEditor({iconsPath : 'libs/nicEdit/nicEditorIcons.gif', buttonList : ['bold','italic','underline', 'left', 'center', 'right', 'justify', 'ul', 'ol', 'indent', 'outdent', 'forecolor', 'bgcolor', 'hr','link','unlink', 'fontSize', 'fontFormat', 'removeformat'], countTextLeft: {/literal}{if isset($no_words) && $no_words}1{else}0{/if}{literal}, count_input: {/literal}'count_{$v.id}'{literal}}).panelInstance('description_{/literal}{$v.id}{literal}');
+
+{/literal}
+{/foreach}
+
+{else}
+{literal}
+	myNicEditor = new nicEditor({iconsPath : 'libs/nicEdit/nicEditorIcons.gif', buttonList : ['bold','italic','underline', 'left', 'center', 'right', 'justify', 'ul', 'ol', 'indent', 'outdent', 'forecolor', 'bgcolor', 'hr','link','unlink', 'fontSize', 'fontFormat', 'removeformat'], countTextLeft: {/literal}{if isset($no_words) && $no_words}1{else}0{/if}{literal}, count_input: {/literal}'count'{literal}}).panelInstance('description');
+
+{/literal}
+{/if}
+
+{literal}
+});
+{/literal}
+
+//]]>
+</script>

@@ -1,0 +1,47 @@
+{include file="header.html"}
+{include file="data/fancybox.html"}
+
+<div class="heading"><h1>{$lng.useraccount.messages}</h1></div>
+<div id="browse" style="line-height: 22px;">
+	{if $message.from!=$crt_usr}
+	<h4>{$lng.messages.from}: {if $message.from}{$message.contact_name}, <span class="current">{$message.email}</span>{else}<span class="current">{$message.from_email}</span>{/if}{if $message.from_phone}, {$message.from_phone}{/if} {$lng.messages.on}: {$message.date_nice}</h4>
+	{else}
+	<h4>{$lng.messages.to}: {if $message.to}{$message.contact_name}, <span class="current">{$message.email}</span>{else}<span class="current">{$message.to_email}</span>{/if} {$lng.messages.on}: {$message.date_nice}</h4>
+	{/if}
+	<p>{$message.message}</p>
+
+	{if $message.ad_id}<div class="small">{$lng.messages.started_for_listing}: <a href="{if $seo_settings.enable_mod_rewrite}{seo->makeDetailsLink p1=$message.ad_id p2=$message.title}{else}{$live_site}/details.php?id={$message.ad_id}{/if}" style="color: #197fc9">{$message.title}</a></div>{/if}
+
+	{if $message.starting}<a href="message_history.php?id={$message.starting}">
+	<div class="buttonwrapper"><div class="gray-button-left"><span class="gray-button-right">{$lng.messages.view_thread}</span></div></div>
+	</a>{/if}
+
+	{if $message.from!=$crt_usr}<br/><div><a href="javascript:;" class="freply"  id="msg{$message.msg_id}"><img src="{$template_path}images/reply.png" class="tooltip" title="{$lng.general.reply}" alt="Reply" />&nbsp;{$lng.general.reply}</a></div>{/if}
+	<div style="float: right"><a href="messages.php" style="color: #197fc9">{$lng.general.back}</a></div>
+</div>
+
+<script type="text/javascript">
+{literal}
+
+$(document).ready(function() {
+
+$("a.freply").click(function(event){
+var msg_id = jQuery(this).attr("id").substr(3);
+	$.fancybox({
+		'width'         		: 630,
+		'height'        		: 500,
+		'transitionIn'		: 'none',
+		'transitionOut'		: 'none',
+		'margin'		: '0',
+		'padding'		: '10',
+		'titleShow'		: false,
+		'type'			: 'iframe',
+		'href'			: '{/literal}{$live_site}/reply.php?id={$message.msg_id}{literal}'
+	});
+});
+
+});
+{/literal}
+</script>
+
+{include file="footer.html"}

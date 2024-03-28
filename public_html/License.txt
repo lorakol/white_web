@@ -1,0 +1,68 @@
+----------------------------------------------
+|                                            |
+|            OxyClassifieds v.9              |
+|          ------------------------          |
+|                                            |
+|   Web:   http://www.oxyclassifieds.com     |
+|   E-mail office@oxyclassifieds.com         |
+|                                            |
+|   version:  9                              |
+|                                            |
+|   Copyright www.oxyclassifieds.com,        |
+|   (c) 2017                                 |
+|                                            |
+----------------------------------------------
+
+COPYRIGHT NOTE
+--------------
+
+Copyright 2017 www.oxyclassifieds.com.
+All Rights Reserved. 
+
+You should carefully read all of the following terms and conditions
+before using this program. Your use of this software indicates
+your acceptance of this license agreement and warranty.
+
+
+TERMS OF USE
+
+1. OxyClassifieds is for licensed customers only.
+Customer may use OxyClassifieds on a single website.
+For using the scripts on more than one host, multiple licences must
+be purchased.
+
+2. OxyClassifieds may not under any circumstances be sold
+or redistributed without the written consent of www.oxyclassifieds.com
+its owner.
+
+3. www.oxyclassifieds.com at its own discresion will decide if any
+terms of the this agreement have been violated by customer. Upon written
+e-mailed notification to Customer of Terms of Use violations, 
+www.oxyclassifieds.com may revoke customer's license to use
+OxyClassifieds.
+
+In that event, Customer agrees to any and all of the following:
+a) Customers found in violation of this agreement, found reselling or
+redistributing OxyClassifieds, or using the product on multiple websites
+without having licence for every website will lose all rights to future
+versions of OxyClassifieds.
+
+b) Customer will no longer be licensed to run any version of 
+OxyClassifieds.
+
+This program may not be distributed in whole or part, freely, for pay,
+or any other form of compensation.
+
+ALL USE OF THIS PROGRAM IS ON YOUR OWN RISK AND COSTS. This program is
+not programmed to be 100% secure, and therefore can not be used in
+life critical environments, or heavy critical e-commerce
+(mission-critical) envirionments that will loose from hundreds of dollar
+to millions of dollar of small coding errors.
+
+www.oxyclassifieds.com accepts no liabilities.
+
+You may not reproduce and/or (re)sell the hole program, or any part of
+our code without the written aknowledge from the authors of this program,
+www.oxyclassifieds.com Team.
+
+All code is Copyright 2017, www.oxyclassifieds.com.

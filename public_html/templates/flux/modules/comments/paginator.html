@@ -1,0 +1,73 @@
+<div class="rfloat paginator">
+<ul>
+
+{if $cm_no_pages <= 10}
+
+{section name=loop start=1 loop=$cm_no_pages+1 step=1}
+<li><a class="cpage{if $cm_page==$smarty.section.loop.index} currentpage{/if}" id="cpage{$smarty.section.loop.index}" href="javascript:;">{$smarty.section.loop.index}</a></li>
+{/section}
+
+{else}
+
+{* start 2 pages *}
+{section name=loop start=1 loop=3 step=1}
+<li><a class="cpage{if $cm_page==$smarty.section.loop.index} currentpage{/if}" id="cpage{$smarty.section.loop.index}" href="javascript:;">{$smarty.section.loop.index}</a></li>
+{/section}
+
+{if $cm_page>5}
+...
+{/if}
+
+{* middle range *}
+{section name=loop start=$cm_page-2 loop=$cm_page+3 step=1}
+{if $smarty.section.loop.index <= $cm_no_pages && $smarty.section.loop.index>2 && $smarty.section.loop.index<=$cm_max_pages}
+<li><a class="cpage{if $cm_page==$smarty.section.loop.index} currentpage{/if}" id="cpage{$smarty.section.loop.index}" href="javascript:;">{$smarty.section.loop.index}</a></li>
+{/if}
+{/section}
+
+
+{if $cm_no_pages>$cm_page+4}
+...
+{/if}
+
+{* end 2 pages *}
+
+{if $cm_page+3<$cm_no_pages}
+{section name=loop start=$cm_no_pages-1 loop=$cm_no_pages+1 step=1}
+<li><a class="cpage{if $cm_page==$smarty.section.loop.index} currentpage{/if}" id="cpage{$smarty.section.loop.index}" href="javascript:;">{$smarty.section.loop.index}</a></li>
+{/section}
+{/if}
+{/if}
+
+</ul>
+</div>
+
+{literal}
+<script>
+//<![CDATA[
+
+$(document).on("click", ".cpage", function(event){ 
+
+	var page = parseInt(jQuery(this).attr("id").substr(5));
+
+	// replace comments_container content with new generated content for the chosen page
+	$.ajax({
+		type: "GET",
+		url: "{/literal}{$live_site}{literal}/modules/comments/get_comments.php",
+		data: { page: page, id: "{/literal}{$id}{literal}", no_pages: "{/literal}{$cm_no_pages}{literal}"}
+	})
+	.done(function( responseText ) {
+		var content = JSON.parse(responseText);
+		$("#comments_container").html(content);
+		$(".cpage").removeClass("currentpage");
+		$("#cpage"+page).addClass("currentpage");
+		$('html,body').animate({scrollTop:$("#no_comments").offset().top}, 'slow');
+
+	});
+
+	
+	
+});
+
+</script>
+{/literal}

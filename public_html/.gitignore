@@ -1,0 +1,10 @@
+.idea/
+
+temp/
+!temp/.htaccess
+!temp/index.html
+
+temp_mobile/
+!temp_mobile/.htaccess
+!temp_mobile/index.html
+.well-known/

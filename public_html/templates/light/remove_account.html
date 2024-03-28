@@ -1,0 +1,15 @@
+{include file="header.html"}
+
+<div id="form_container">
+<h1>{$lng.useraccount.request_removal}</h1>
+
+<div class="form_content">
+
+{if isset($error) && $error}<div class="error"><p>{$error}</p></div>{/if}
+
+{if isset($info) && $info}<div id="status">{$info}</div>
+{/if}
+
+</div>
+</div>
+{include file="footer.html"}

@@ -1,0 +1,5 @@
+{if $settings.map_type=="gmaps"}
+    {include file="data/gmap-ro-locator.html" v=$v listing=$listing}
+{else}
+    {include file="data/osm-ro-locator.html" v=$v listing=$listing}
+{/if}

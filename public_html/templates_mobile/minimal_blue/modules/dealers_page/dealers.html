@@ -1,0 +1,84 @@
+{include file="header.html"}
+
+{capture name=some_content assign=field_name}link_name_{$crt_lang}{/capture}
+<div id="heading">{$dealers_page_settings[$field_name]}</div>
+
+	<div class="clearfix mb10 mt10">
+		{if $dealers_page_settings.group_on_categories && $dealers_page_settings.category_field && $dcat}
+		<div class="lfloat"> <a href="{$live_site}/modules/dealers_page/dealers.php">{$dealers_page_settings[$field_name]}</a> <a href="{$live_site}/modules/dealers_page/dealers.php?dcat={$dcat}">&raquo; {$dcat}</a></div>
+		{/if}
+		<div class="rfloat" style="margin-top: -12px;">
+		<a href="javascript:;" id="search-dealers"><div class="btn1"><strong>{$lng.general.search}</strong></div></a>
+		</div>
+	</div>
+
+	{if $dealers_page_settings.group_on_categories && $dealers_page_settings.category_field && !$dcat &&  (!isset($post) || !$post)}
+
+		{include file="modules/dealers_page/search_form.html"}
+
+		<table cellpadding="2" cellspacing="2" width="90%" style="margin: auto; margin-top: 10px; margin-bottom: 10px;">
+		<tr>
+		{foreach from=$dealer_categories name=dcat item=v}
+			<td valign="top" width="{$width}%" align="left">
+			<a href="{$live_site}/modules/dealers_page/dealers.php?dcat={$v.category}">{$v.category} ( {$v.no_dealers} )</a>
+
+			{if $smarty.foreach.dcat.index%$dealers_page_settings.categories_on_row==$dealers_page_settings.categories_on_row-1}
+			</tr>
+			{/if}
+
+			{if $smarty.foreach.dcat.index%$dealers_page_settings.categories_on_row==$dealers_page_settings.categories_on_row-1 && $smarty.foreach.dcat.index!=$dealer_categories|@count-1}
+			<tr>
+			{/if}
+		{/foreach}
+		</table>
+		<div class="clearfix"></div>
+
+	{else}
+
+	{include file="modules/dealers_page/search_form.html"}
+
+	{if $no_dealers>0}
+	<ul class="classified">
+
+	{foreach name="dealers" from=$dealers_array item=v}
+		{include file="modules/dealers_page/short_dealer.html"}
+	{/foreach}
+
+	</ul>
+
+	{if $no_pages>1}
+	{include file="paginator.html"}
+	{else}
+	<div class="clearfix"></div>
+	{/if}
+
+	{else}
+<div class="info"><p>{$lng.advanced_search.no_results}</p></div>
+	{/if}
+
+	{/if}
+
+
+{literal}
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+$("#search-dealers").click(function(event){
+
+	if($(".search").is(":visible"))
+		$(".search").slideUp();
+	else 
+		$(".search").slideDown();
+
+});
+
+});
+
+</script>
+{/literal}
+
+
+
+{include file="footer.html"}

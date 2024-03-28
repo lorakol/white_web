@@ -1,0 +1,19 @@
+
+{if !isset($post_array) || !$post_array}{$post_array=array()}{/if}
+
+{if $seo_settings.enable_mod_rewrite}
+	{capture name=sfield assign=sfield}##currency##/{/capture}
+	{seo->makeSearchLink p1=$post_array p2=$page p3="page|category" p4='currency' assign='constructed_url'}
+{else}
+	{assign var="separator" value="&amp;"}
+	{capture name=some_content assign=constructed_url}{$live_site}/listings.php?page=1{foreach from=$post_array key=k item=x name=construct_url}{if $x!='' && $k!="currency" && $k!="page" && $k!="show" && (!$settings.enable_locations || (!in_array($k, $location_fields) && $k!="crt_city"))}{$separator}{$k}={$x|replace:'/':'_'}{/if}{/foreach}{/capture}
+{/if}
+
+{$lng.listings.currency}:&nbsp;
+{foreach from=$currencies item=v}
+
+{capture name=field_string assign=field_string}currency-{$v.currency}/{/capture}
+
+{if ((!isset($post_array.currency) || !$post_array.currency) && $mc_default_currency!=$v.currency) || (isset($post_array.currency) && $post_array.currency && $v.currency!=$post_array.currency)}<a href="{if $seo_settings.enable_mod_rewrite}{$constructed_url|replace:$sfield:$field_string}{else}{$constructed_url}{$separator}currency={$v.currency}{/if}" class="special">{else}<span>{/if}{$v.currency}{if ((!isset($post_array.currency) || !$post_array.currency) && $mc_default_currency!=$v.currency) || (isset($post_array.currency) && $post_array.currency && $v.currency!=$post_array.currency)}</a>{else}</span>{/if}&nbsp;&nbsp;
+{/foreach}
+

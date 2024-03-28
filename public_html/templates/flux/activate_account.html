@@ -1,0 +1,102 @@
+{include file="header.html"}
+
+<div class="wait"></div>
+
+<div class="page_bounds mb40">
+
+{if $type=="sms"}
+<form name="activation_form" id="activation_form" method="post" action="activate_account.php?account={$account}&type=sms&post=1">
+{/if}
+
+<div class="heading form_heading">{$lng.users.activate_account}</div>
+<div class="wbg p30">
+<div class="form_container">
+
+{if isset($error) && $error}<div class="error"><p>{$error}</p></div>{/if}
+{if isset($info) && $info && $type!="sms"}<div class="info"><p>{$info}</p></div>{/if}
+
+
+{if $type=="sms"}
+
+<div class="error" style="display: none;"></div>
+<script src="{$live_site}/libs/jQuery/plugins/jquery.form.js"></script>
+
+
+<script>
+{literal}
+$(document).ready(function () {
+
+var options = { 
+
+	beforeSerialize: function(jqForm, options) { $("body").addClass("loading"); },
+        beforeSubmit:  function(formData, jqForm, options) { 
+
+		return true;  
+	},
+        success:       successResponse  // post-submit callback 
+ 
+    }; 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1 || ret.response==-1) {
+
+				$(".sms_info").html("<p>"+ret.info+"</p>");
+				$(".sms_info").show();
+				$(".error").hide();
+
+				$(".tbox").hide();
+				$(".form_footer").hide();
+				
+				$("body").removeClass("loading"); 
+				return;
+			}
+
+			// response = 0 -> show the error
+			$(".error").html("<p>"+ret.error[0].error+"</p>");
+			$(".error").show();
+			//$(".options").hide();
+
+			$("body").removeClass("loading"); 
+
+} 
+
+//initialize the AJAX form
+ $('#activation_form').ajaxForm(options);
+
+	// *********** tax value **************
+
+}); // end document ready
+
+{/literal}
+
+</script>
+
+<div class="info sms_info">{if isset($info) && $info}<p>{$info}</p>{/if}</div>
+
+<div class="fel">
+	<label for="activation">{$lng.users.verification_code}</label>
+	<input type="text" name="activation" id="activation" size="10" />
+</div>
+
+{/if} {* end if sms *}
+
+</div> {* end form_container *}
+
+</div>{* end wbg *}
+
+{if $type=="sms"}
+<div class="form_footer">
+<input type="submit" class="button wide_button positive" name="Submit" id="Submit" value="{$lng.general.submit}" />
+</div>
+
+</form>
+{/if}
+
+</div> {* end page_bounds *}
+
+
+{include file="footer.html"}

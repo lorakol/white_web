@@ -1,0 +1,11 @@
+<div class="lgbox overlay_window p30">
+
+	{if isset($message.from) && $message.from!=$crt_usr}
+	<div class="gray-bold">{$lng.messages.from}: {if isset($message.from) && $message.from}{$message.contact_name}, {$message.email}{else}{$message.from_email}{/if}{if $message.from_phone}, {$message.from_phone}{/if} <span class="small-dark-gray">{$lng.messages.on}: {$message.date_nice}</span></div>
+	{else}
+	<div class="gray-bold">{$lng.messages.to}: {if isset($message.to) && $message.to}{$message.to_contact_name}, {$message.to_email}{else}{$message.to_email}{/if} <span class="small-dark-gray">{$lng.messages.on}: {$message.date_nice}</span></div>
+	{/if}
+
+	<p>{$message.message}</p>
+
+</div>

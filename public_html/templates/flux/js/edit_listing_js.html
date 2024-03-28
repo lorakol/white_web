@@ -1,0 +1,193 @@
+{literal}
+<script>
+//<![CDATA[
+
+$(document).ready(function() {
+
+$('a.imgfield').magnificPopup({type:'image', image: { cursor: null } });
+
+$('.tooltip').powerTip({
+	placement: 'n'
+});
+
+
+{/literal}{if $no_words && !$html_editor}{literal}
+
+$('.counter').textcounter({
+	type: "word",
+	max: {/literal}{$no_words}{literal},
+	stopInputAtMaximum       : true,
+	countDown: true,
+	countDownText: "%d {/literal} {$lng.listings.words_left}{literal}"
+});
+	
+{/literal}  
+{/if}
+
+var gmaps_on = {if (isset($gmaps) && $gmaps) || ( isset($user_gmaps) && $user_gmaps )}1{else}0{/if};
+// initialize google maps
+if (gmaps_on) {
+	{if $settings.map_type=="gmaps"}
+	if(!places && !dsearch)load_gmaps();
+	{else}
+	init_osm();
+	{/if}
+}
+
+
+{literal}
+
+var options = { 
+
+	beforeSerialize: beforeSerialize,
+        beforeSubmit:  beforeSubmit,  // pre-submit callback 
+        success:       successResponse  // post-submit callback 
+
+};
+
+function beforeSerialize(jqForm, options) {
+
+	$("body").addClass("loading"); 
+
+	
+	// capturing nicEditor content
+	if (typeof myNicEditor !== 'undefined')
+	for(var i=0;i<myNicEditor.nicInstances.length;i++){myNicEditor.nicInstances[i].saveContent();}
+	
+	if (typeof data_htmlarea !== 'undefined')
+	for(var i=0;i<data_htmlarea.nicInstances.length;i++){ data_htmlarea.nicInstances[i].saveContent(); }
+
+	// international phones errors
+	var extra_phone_error = recheckIntlPhone();
+	if(extra_phone_error.length>0) {
+
+		// clean all fields possible err class
+		$(".err").removeClass("err");
+		// remove all err_labels
+		$(".err_label").remove();
+			
+		for (var i = 0, len = extra_phone_error.length; i < len; i++) {
+
+			$("#"+extra_phone_error[i]).addClass("err");
+			// add as child before form element
+			$("#"+extra_phone_error[i]).first().before('<label class="err_label">{/literal}{$lng.listings.errors.invalid_phone}{literal}</label>');
+			
+		}
+
+		$("body").removeClass("loading"); 
+
+		// move the page to the first err_label element
+		$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+		return false;
+			
+	} // end international phone error
+
+	// return false to cancel submit
+
+}
+
+// pre-submit callback 
+function beforeSubmit(formData, jqForm, options) { 
+
+    var queryString = $.param(formData); 
+    return true; 
+
+} 
+
+// post-submit callback 
+function successResponse(responseText, statusText, xhr, $form)  { 
+
+
+			var ret = JSON.parse(responseText);
+
+			if(ret.response==1) {
+
+				$.ajax({
+					type		: "GET",
+					cache		: false,
+					url		: "{/literal}{$live_site}{literal}/edit_listing.php?id={/literal}{$id}{if isset($key) && $key}&key={$key}{/if}{literal}&step=3",
+					data		: $(this).serializeArray(),
+					success: function(data) {
+
+					$("#ad_details").html(data);
+
+					//hide editad form
+					$("#editad_form").html("");
+					$("#editad_form").slideUp();
+					// show ad details
+					$("#ad_details").slideDown();
+
+					$('html,body').animate({scrollTop:$("#ad_details").offset().top}, 'slow');
+
+					$("body").removeClass("loading"); 
+
+					}// end data
+				}); // end ajax
+
+				return;
+
+			}
+
+			// response = 0 -> there are errors in submit ad process 
+			var no_err = ret.error.length;
+			var err_field, err_string;
+
+			// clean all fields possible err class
+			$(".err").removeClass("err");
+
+			// remove all err_labels
+			$(".err_label").remove();
+
+			// mark each field with error 
+			for (var idx=0;idx<no_err;idx++) { 
+
+				err_field = ret.error[idx].field;
+				err_string = ret.error[idx].error;
+
+				// nicEditor fix
+				if(err_field.match("description[a-z0-9_]*")) $("#"+err_field+"_elm").addClass("err");
+
+				$("#"+err_field).addClass("err");
+				// add as child before form element
+				$("#"+err_field).first().before('<label class="err_label">'+err_string+'</label>');
+
+
+			}
+			
+			// move the page to the first err_label element
+			$('html,body').animate({scrollTop:$(".err:first").offset().top-60}, 'slow');
+
+			$("body").removeClass("loading"); 
+
+			{/literal}{if $settings.nologin_image_verification && $settings.enable_recaptcha && (!isset($crt_usr) || !$crt_usr)}
+			// reload recaptcha
+			gReCaptchaReset();
+			{/if}{literal}
+
+
+} 
+
+//initialize the AJAX form for submit ad
+ $('#newad').ajaxForm(options);
+
+$(document).on("click", "#editad", function(){ 
+
+	//show editad form
+	$("#editad_form").slideDown();
+	// hide ad details
+	$("#ad_details").slideUp();
+
+}); // end click editad
+
+}); // end document.ready
+
+function onVideo() {
+	if($('#video').is(':checked')) $("#video_div").slideDown();
+	else $("#video_div").slideUp();
+}
+
+//]]>
+
+</script>
+{/literal}

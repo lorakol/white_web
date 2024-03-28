@@ -1,0 +1,16 @@
+<div class="paginator">
+<ul>
+<li><a href="{if $page > 1}{if (($self_noext=="listings" || $no_pages) && $seo_settings.enable_mod_rewrite) && $page==2}{$pages_link|replace:'/##page##':''}{else}{$pages_link|replace:'##page##':$prev_page}{/if}{else}#{/if}" class="prevnext {if $no_pages <= 1 || $page <= 1}disablelink{/if}">&laquo;</a></li>
+
+{capture name=sp assign=start_page}{$page-2}{/capture}
+{if $start_page<1}{capture name=diff assign=diff_page}{$start_page*-1+1}{/capture}{assign var="start_page" value="1"}{/if}
+{capture name=ep assign=end_page}{$page+2+$diff_page}{/capture}
+{if $end_page>$no_pages}{assign var="end_page" value="$no_pages"}{/if}
+{section name=loop start=$start_page loop=$end_page+1 step=1}
+<li><a href="{if ($self_noext=="listings" || $no_pages) && $seo_settings.enable_mod_rewrite && $smarty.section.loop.index==1}{$pages_link|replace:'/##page##':''}{else}{$pages_link|replace:'##page##':$smarty.section.loop.index}{/if}"{if $page==$smarty.section.loop.index} class="currentpage"{/if}>{$smarty.section.loop.index}</a></li>
+{/section}
+
+<li><a href="{if $page < $no_pages}{$pages_link|replace:'##page##':$next_page}{else}#{/if}" class="prevnext {if $page >= $no_pages || $no_pages>=$max_pages}disablelink{/if}">&raquo;</a></li>
+
+</ul>
+</div>

@@ -1,0 +1,61 @@
+<script type="text/javascript">
+	var live_site = "{$live_site}";
+	var invalid_login = "{$lng_connect.invalid_login}";
+	var fb_enabled = "{$connect_settings.enable_facebook_login}";
+	var google_enabled = "{$connect_settings.enable_google_login}";
+	var oid_enabled = "{if $connect_settings.enable_openid_login}1{else}0{/if}";
+	{if $connect_settings.enable_facebook_login}
+	var appid="{$connect_settings.facebook_app_id}";
+	{/if}
+	{if $connect_settings.enable_google_login}
+	var google_client_id="{$connect_settings.google_client_id}";
+	{/if}
+	var realm="{$connect_settings.realm}";
+	var openid_identity_missing = '{$lng_connect.openid_identity_missing|addslashes}';
+</script>
+<script type="text/javascript" src="{$live_site}/modules/connect/js/auth.js"></script>
+{if $connect_settings.enable_google_login}
+<script src="https://apis.google.com/js/platform.js?onload=onGLoad" async defer></script>
+{/if}
+
+<div class="mt40">
+<hr/>
+
+<div class="lfloat">{$lng_connect.or_sign_in_using}&nbsp;&nbsp;</div>
+
+
+{if $connect_settings.enable_facebook_login}
+<div id="fb-root"></div>
+<script src="https://connect.facebook.net/en_US/sdk.js"></script>
+{/if}
+
+{if $connect_settings.enable_openid_login}
+<script type="text/javascript" src="{$live_site}/modules/connect/external/popuplib.js"></script>
+{/if}
+
+<div class="rfloat">
+{if $connect_settings.enable_facebook_login}
+	<a href="javascript:;"><img src="{$template_path}modules/connect/images/facebook-login.png" class="space5 facebook" /></a>
+{/if}
+{if $connect_settings.enable_google_login}
+	<div class="lfloat"><div id="google"></div></div>
+{/if}
+{if $connect_settings.enable_openid_login}
+	<a href="javascript:;"><img src="{$template_path}modules/connect/images/openid-login.png" class="space5 openid" id="openid_button" /></a>
+{/if}
+
+</div>
+<div class="clearfix"></div>
+
+{if $connect_settings.enable_openid_login}
+	<div id="openid_div" style="display: none;">
+	<div id="oiderror" class="error mb10" style="display: none;"></div>
+	<input type="text" name="openid" id="openid" style="width: 260px;" class="defaultText" title="{$lng_connect.enter_openid}"/>
+
+	<div class="btn9 rfloat"><a href="javascript:;" id="openid_submit">{$lng.navbar.login}</a></div>
+
+	</div>{* end openid_div *}
+{/if}
+
+
+</div> {* end mt40 *}
