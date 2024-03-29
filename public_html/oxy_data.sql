@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS admin_oxy;
+CREATE DATABASE admin_oxy; 
 USE admin_oxy;
 
 DROP TABLE IF EXISTS `oxy_2co_return`;
